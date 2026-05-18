@@ -1,10 +1,12 @@
 import { api } from '@/lib/axios';
 import { buildPagedRequest } from '@/lib/paged';
 import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
+import type { UserDto } from '@/features/auth/types/auth';
 import type {
   B2bIntegrationEventDto,
   B2bInsightSummaryDto,
   B2bPriceAvailabilityDto,
+  B2bPortalSessionDto,
   B2bBuyerDto,
   B2bCompanyDto,
   CartDto,
@@ -46,6 +48,15 @@ function normalizePaged<T>(response: ApiResponse<PagedResponse<T>>): PagedRespon
   };
 }
 
+const publicRequestConfig = { skipAuth: true, skipSessionExpiredOn401: true } as const;
+
+function portalRequestConfig(token: string) {
+  return {
+    ...publicRequestConfig,
+    headers: { 'X-B2B-Portal-Token': token },
+  };
+}
+
 export const b2bApi = {
   async getInsightSummary(): Promise<B2bInsightSummaryDto> {
     const response = await api.get<ApiResponse<B2bInsightSummaryDto>>('/api/b2b/insights/summary');
@@ -55,6 +66,32 @@ export const b2bApi = {
   async getCompanies(params: PagedParams = {}): Promise<PagedResponse<B2bCompanyDto>> {
     const response = await api.post<ApiResponse<PagedResponse<B2bCompanyDto>>>(
       '/api/b2b/companies/paged',
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
+    );
+    return normalizePaged(response);
+  },
+
+  async getPublicCompanies(params: PagedParams = {}): Promise<PagedResponse<B2bCompanyDto>> {
+    const response = await api.post<ApiResponse<PagedResponse<B2bCompanyDto>>>(
+      '/api/b2b/companies/public-paged',
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'CompanyName', sortDirection: 'asc' }),
+      publicRequestConfig,
+    );
+    return normalizePaged(response);
+  },
+
+  async createPortalSession(companyCode: string): Promise<B2bPortalSessionDto> {
+    const response = await api.post<ApiResponse<B2bPortalSessionDto>>(
+      '/api/b2b/portal/session',
+      { companyCode },
+      publicRequestConfig,
+    );
+    return extractData(response);
+  },
+
+  async getUsers(params: PagedParams = {}): Promise<PagedResponse<UserDto>> {
+    const response = await api.post<ApiResponse<PagedResponse<UserDto>>>(
+      '/api/User/paged',
       buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
     );
     return normalizePaged(response);
@@ -76,12 +113,51 @@ export const b2bApi = {
     return normalizePaged(response);
   },
 
+  async getPublicCatalogProducts(params: PagedParams = {}, portalToken = ''): Promise<PagedResponse<CatalogProductDto>> {
+    const response = await api.post<ApiResponse<PagedResponse<CatalogProductDto>>>(
+      '/api/b2b/catalog/paged',
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Name', sortDirection: 'asc' }),
+      portalRequestConfig(portalToken),
+    );
+    return normalizePaged(response);
+  },
+
+  async getCatalogProduct(id: number): Promise<CatalogProductDto> {
+    const response = await api.get<ApiResponse<CatalogProductDto>>(`/api/b2b/catalog/${id}`);
+    return extractData(response);
+  },
+
+  async createCompany(payload: Record<string, unknown>): Promise<B2bCompanyDto> {
+    const response = await api.post<ApiResponse<B2bCompanyDto>>('/api/b2b/companies', payload);
+    return extractData(response);
+  },
+
+  async createBuyer(payload: Record<string, unknown>): Promise<B2bBuyerDto> {
+    const response = await api.post<ApiResponse<B2bBuyerDto>>('/api/b2b/buyers', payload);
+    return extractData(response);
+  },
+
+  async createCatalogProduct(payload: Record<string, unknown>): Promise<CatalogProductDto> {
+    const response = await api.post<ApiResponse<CatalogProductDto>>('/api/b2b/catalog', payload);
+    return extractData(response);
+  },
+
+  async updateCatalogProduct(id: number, payload: Record<string, unknown>): Promise<CatalogProductDto> {
+    const response = await api.put<ApiResponse<CatalogProductDto>>(`/api/b2b/catalog/${id}`, payload);
+    return extractData(response);
+  },
+
   async getProductMatches(params: PagedParams = {}): Promise<PagedResponse<CustomerProductAliasDto>> {
     const response = await api.post<ApiResponse<PagedResponse<CustomerProductAliasDto>>>(
       '/api/b2b/product-matches/paged',
       buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
     );
     return normalizePaged(response);
+  },
+
+  async createProductMatch(payload: Record<string, unknown>): Promise<CustomerProductAliasDto> {
+    const response = await api.post<ApiResponse<CustomerProductAliasDto>>('/api/b2b/product-matches', payload);
+    return extractData(response);
   },
 
   async getVisibilityRules(params: PagedParams = {}): Promise<PagedResponse<CatalogVisibilityRuleDto>> {
@@ -92,6 +168,11 @@ export const b2bApi = {
     return normalizePaged(response);
   },
 
+  async createVisibilityRule(payload: Record<string, unknown>): Promise<CatalogVisibilityRuleDto> {
+    const response = await api.post<ApiResponse<CatalogVisibilityRuleDto>>('/api/b2b/catalog-visibility', payload);
+    return extractData(response);
+  },
+
   async getPriceLists(params: PagedParams = {}): Promise<PagedResponse<CustomerPriceListDto>> {
     const response = await api.post<ApiResponse<PagedResponse<CustomerPriceListDto>>>(
       '/api/b2b/pricing/price-lists/paged',
@@ -100,8 +181,18 @@ export const b2bApi = {
     return normalizePaged(response);
   },
 
+  async createPriceList(payload: Record<string, unknown>): Promise<CustomerPriceListDto> {
+    const response = await api.post<ApiResponse<CustomerPriceListDto>>('/api/b2b/pricing/price-lists', payload);
+    return extractData(response);
+  },
+
   async resolvePriceAvailability(payload: ResolveB2bPriceAvailabilityDto): Promise<B2bPriceAvailabilityDto> {
     const response = await api.post<ApiResponse<B2bPriceAvailabilityDto>>('/api/b2b/pricing/resolve', payload);
+    return extractData(response);
+  },
+
+  async publicResolvePriceAvailability(payload: ResolveB2bPriceAvailabilityDto, portalToken: string): Promise<B2bPriceAvailabilityDto> {
+    const response = await api.post<ApiResponse<B2bPriceAvailabilityDto>>('/api/b2b/pricing/resolve', payload, portalRequestConfig(portalToken));
     return extractData(response);
   },
 
@@ -113,12 +204,27 @@ export const b2bApi = {
     return normalizePaged(response);
   },
 
+  async upsertInventory(payload: Record<string, unknown>): Promise<InventorySnapshotDto> {
+    const response = await api.post<ApiResponse<InventorySnapshotDto>>('/api/b2b/inventory', payload);
+    return extractData(response);
+  },
+
   async getQuotes(params: PagedParams = {}): Promise<PagedResponse<QuoteRequestDto>> {
     const response = await api.post<ApiResponse<PagedResponse<QuoteRequestDto>>>(
       '/api/b2b/quotes/paged',
       buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
     );
     return normalizePaged(response);
+  },
+
+  async createQuote(payload: Record<string, unknown>): Promise<QuoteRequestDto> {
+    const response = await api.post<ApiResponse<QuoteRequestDto>>('/api/b2b/quotes', payload);
+    return extractData(response);
+  },
+
+  async createPublicQuote(payload: Record<string, unknown>, portalToken: string): Promise<QuoteRequestDto> {
+    const response = await api.post<ApiResponse<QuoteRequestDto>>('/api/b2b/quotes', payload, portalRequestConfig(portalToken));
+    return extractData(response);
   },
 
   async convertQuoteToCart(quoteId: number, payload: ConvertQuoteToCartDto = {}): Promise<CartDto> {
@@ -134,12 +240,22 @@ export const b2bApi = {
     return normalizePaged(response);
   },
 
+  async createShoppingList(payload: Record<string, unknown>): Promise<ShoppingListDto> {
+    const response = await api.post<ApiResponse<ShoppingListDto>>('/api/b2b/shopping-lists', payload);
+    return extractData(response);
+  },
+
   async getApprovalRules(params: PagedParams = {}): Promise<PagedResponse<PurchaseApprovalRuleDto>> {
     const response = await api.post<ApiResponse<PagedResponse<PurchaseApprovalRuleDto>>>(
       '/api/b2b/approval-rules/paged',
       buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
     );
     return normalizePaged(response);
+  },
+
+  async createApprovalRule(payload: Record<string, unknown>): Promise<PurchaseApprovalRuleDto> {
+    const response = await api.post<ApiResponse<PurchaseApprovalRuleDto>>('/api/b2b/approval-rules', payload);
+    return extractData(response);
   },
 
   async getOrders(params: PagedParams = {}): Promise<PagedResponse<OrderDto>> {
@@ -155,6 +271,29 @@ export const b2bApi = {
     return extractData(response);
   },
 
+  async publicQuickOrder(payload: QuickOrderDto, portalToken: string): Promise<QuickOrderResultDto> {
+    const response = await api.post<ApiResponse<QuickOrderResultDto>>('/api/b2b/cart/quick-order', payload, portalRequestConfig(portalToken));
+    return extractData(response);
+  },
+
+  async getPublicDraftCart(customerId: number, portalToken: string, userId?: number): Promise<CartDto> {
+    const response = await api.get<ApiResponse<CartDto>>(`/api/b2b/cart/draft/${customerId}`, {
+      ...portalRequestConfig(portalToken),
+      params: { userId },
+    });
+    return extractData(response);
+  },
+
+  async publicAddCartLine(payload: Record<string, unknown>, portalToken: string): Promise<CartDto> {
+    const response = await api.post<ApiResponse<CartDto>>('/api/b2b/cart/lines', payload, portalRequestConfig(portalToken));
+    return extractData(response);
+  },
+
+  async publicCreateOrderFromCart(payload: Record<string, unknown>, portalToken: string): Promise<OrderDto> {
+    const response = await api.post<ApiResponse<OrderDto>>('/api/b2b/orders/from-cart', payload, portalRequestConfig(portalToken));
+    return extractData(response);
+  },
+
   async reorder(payload: ReorderDto): Promise<QuickOrderResultDto> {
     const response = await api.post<ApiResponse<QuickOrderResultDto>>('/api/b2b/orders/reorder', payload);
     return extractData(response);
@@ -165,12 +304,25 @@ export const b2bApi = {
     return extractData(response);
   },
 
+  async getPublicCustomerPortalSummary(customerId: number, portalToken: string, userId?: number): Promise<CustomerPortalSummaryDto> {
+    const response = await api.get<ApiResponse<CustomerPortalSummaryDto>>(`/api/b2b/orders/portal/${customerId}`, {
+      ...portalRequestConfig(portalToken),
+      params: { userId },
+    });
+    return extractData(response);
+  },
+
   async getPayments(params: PagedParams = {}): Promise<PagedResponse<PaymentTransactionDto>> {
     const response = await api.post<ApiResponse<PagedResponse<PaymentTransactionDto>>>(
       '/api/b2b/payments/paged',
       buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
     );
     return normalizePaged(response);
+  },
+
+  async createPayment(payload: Record<string, unknown>): Promise<PaymentTransactionDto> {
+    const response = await api.post<ApiResponse<PaymentTransactionDto>>('/api/b2b/payments', payload);
+    return extractData(response);
   },
 
   async getIntegrationEvents(params: PagedParams = {}): Promise<PagedResponse<B2bIntegrationEventDto>> {

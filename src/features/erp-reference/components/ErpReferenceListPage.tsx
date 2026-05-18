@@ -45,9 +45,9 @@ function getConfig(kind: ErpReferenceKind, t: (key: string, options?: Record<str
   switch (kind) {
     case 'customer':
       return {
-        title: t('erpReference.customer.title', { defaultValue: 'Missing translation' }),
-        description: t('erpReference.customer.description', { defaultValue: 'Missing translation' }),
-        breadcrumb: t('sidebar.erpCustomers', { defaultValue: 'Missing translation' }),
+        title: t('erpReference.customer.title', { defaultValue: 'ERP Cari Referansları' }),
+        description: t('erpReference.customer.description', { defaultValue: 'ERP carilerini CRM liste standardı ile arayın, filtreleyin ve izleyin.' }),
+        breadcrumb: t('sidebar.erpCustomers', { defaultValue: 'ERP Carileri' }),
         pageKey: 'erp-reference-customers',
         errorKey: t('common.errors.erpCustomersLoadFailed'),
         defaultSortBy: 'code' as ColumnKey,
@@ -66,12 +66,12 @@ function getConfig(kind: ErpReferenceKind, t: (key: string, options?: Record<str
           lastSyncDate: 'LastSyncDate',
         }[value] ?? 'CustomerCode'),
         columns: [
-          { key: 'code', label: t('erpReference.columns.code', { defaultValue: 'Missing translation' }) },
-          { key: 'name', label: t('erpReference.columns.name', { defaultValue: 'Missing translation' }) },
-          { key: 'branchCode', label: t('erpReference.columns.branch', { defaultValue: 'Missing translation' }) },
-          { key: 'meta1', label: t('erpReference.columns.city', { defaultValue: 'Missing translation' }) },
-          { key: 'meta2', label: t('erpReference.columns.phone', { defaultValue: 'Missing translation' }) },
-          { key: 'lastSyncDate', label: t('erpReference.columns.lastSyncDate', { defaultValue: 'Missing translation' }) },
+          { key: 'code', label: t('erpReference.columns.code', { defaultValue: 'Kod' }) },
+          { key: 'name', label: t('erpReference.columns.name', { defaultValue: 'Ad' }) },
+          { key: 'branchCode', label: t('erpReference.columns.branch', { defaultValue: 'Şube' }) },
+          { key: 'meta1', label: t('erpReference.columns.city', { defaultValue: 'Şehir' }) },
+          { key: 'meta2', label: t('erpReference.columns.phone', { defaultValue: 'Telefon' }) },
+          { key: 'lastSyncDate', label: t('erpReference.columns.lastSyncDate', { defaultValue: 'Son Eşleme' }) },
         ] satisfies PagedDataGridColumn<ColumnKey>[],
         renderCell: (item: Row, columnKey: ColumnKey) => {
           switch (columnKey) {
@@ -86,9 +86,9 @@ function getConfig(kind: ErpReferenceKind, t: (key: string, options?: Record<str
       };
     case 'stock':
       return {
-        title: t('erpReference.stock.title', { defaultValue: 'Missing translation' }),
-        description: t('erpReference.stock.description', { defaultValue: 'Missing translation' }),
-        breadcrumb: t('sidebar.erpStocks', { defaultValue: 'Missing translation' }),
+        title: t('erpReference.stock.title', { defaultValue: 'ERP Stok Referansları' }),
+        description: t('erpReference.stock.description', { defaultValue: 'ERP stok kartlarını B2B katalog ve stok eşleme süreci için izleyin.' }),
+        breadcrumb: t('sidebar.erpStocks', { defaultValue: 'ERP Stokları' }),
         pageKey: 'erp-reference-stocks',
         errorKey: t('common.errors.erpProductsLoadFailed'),
         defaultSortBy: 'code' as ColumnKey,
@@ -107,12 +107,12 @@ function getConfig(kind: ErpReferenceKind, t: (key: string, options?: Record<str
           lastSyncDate: 'LastSyncDate',
         }[value] ?? 'ErpStockCode'),
         columns: [
-          { key: 'code', label: t('erpReference.columns.code', { defaultValue: 'Missing translation' }) },
-          { key: 'name', label: t('erpReference.columns.name', { defaultValue: 'Missing translation' }) },
-          { key: 'branchCode', label: t('erpReference.columns.branch', { defaultValue: 'Missing translation' }) },
-          { key: 'meta1', label: t('erpReference.columns.unit', { defaultValue: 'Missing translation' }) },
-          { key: 'meta2', label: t('erpReference.columns.group', { defaultValue: 'Missing translation' }) },
-          { key: 'lastSyncDate', label: t('erpReference.columns.lastSyncDate', { defaultValue: 'Missing translation' }) },
+          { key: 'code', label: t('erpReference.columns.code', { defaultValue: 'Kod' }) },
+          { key: 'name', label: t('erpReference.columns.name', { defaultValue: 'Ad' }) },
+          { key: 'branchCode', label: t('erpReference.columns.branch', { defaultValue: 'Şube' }) },
+          { key: 'meta1', label: t('erpReference.columns.unit', { defaultValue: 'Birim' }) },
+          { key: 'meta2', label: t('erpReference.columns.group', { defaultValue: 'Grup' }) },
+          { key: 'lastSyncDate', label: t('erpReference.columns.lastSyncDate', { defaultValue: 'Son Eşleme' }) },
         ] satisfies PagedDataGridColumn<ColumnKey>[],
         renderCell: (item: Row, columnKey: ColumnKey) => {
           switch (columnKey) {
@@ -127,9 +127,9 @@ function getConfig(kind: ErpReferenceKind, t: (key: string, options?: Record<str
       };
     case 'warehouse':
       return {
-        title: t('erpReference.warehouse.title', { defaultValue: 'Missing translation' }),
-        description: t('erpReference.warehouse.description', { defaultValue: 'Missing translation' }),
-        breadcrumb: t('sidebar.erpWarehouses', { defaultValue: 'Missing translation' }),
+        title: t('erpReference.warehouse.title', { defaultValue: 'ERP Depo Referansları' }),
+        description: t('erpReference.warehouse.description', { defaultValue: 'ERP depo kayıtlarını şube ve stok görünürlüğü için takip edin.' }),
+        breadcrumb: t('sidebar.erpWarehouses', { defaultValue: 'ERP Depoları' }),
         pageKey: 'erp-reference-warehouses',
         errorKey: t('common.errors.erpWarehousesLoadFailed'),
         defaultSortBy: 'code' as ColumnKey,
@@ -147,9 +147,9 @@ function getConfig(kind: ErpReferenceKind, t: (key: string, options?: Record<str
           }
         },
         columns: [
-          { key: 'code', label: t('erpReference.columns.code', { defaultValue: 'Missing translation' }) },
-          { key: 'name', label: t('erpReference.columns.name', { defaultValue: 'Missing translation' }) },
-          { key: 'branchCode', label: t('erpReference.columns.branch', { defaultValue: 'Missing translation' }) },
+          { key: 'code', label: t('erpReference.columns.code', { defaultValue: 'Kod' }) },
+          { key: 'name', label: t('erpReference.columns.name', { defaultValue: 'Ad' }) },
+          { key: 'branchCode', label: t('erpReference.columns.branch', { defaultValue: 'Şube' }) },
         ] satisfies PagedDataGridColumn<ColumnKey>[],
         renderCell: (item: Row, columnKey: ColumnKey) => {
           switch (columnKey) {
@@ -162,9 +162,9 @@ function getConfig(kind: ErpReferenceKind, t: (key: string, options?: Record<str
       };
     case 'yapkod':
       return {
-        title: t('erpReference.yapkod.title', { defaultValue: 'Missing translation' }),
-        description: t('erpReference.yapkod.description', { defaultValue: 'Missing translation' }),
-        breadcrumb: t('sidebar.erpYapKodlar', { defaultValue: 'Missing translation' }),
+        title: t('erpReference.yapkod.title', { defaultValue: 'ERP Yapılandırma Kodları' }),
+        description: t('erpReference.yapkod.description', { defaultValue: 'YapKod kayıtlarını stok/katalog eşlemesi için CRM liste standardında izleyin.' }),
+        breadcrumb: t('sidebar.erpYapKodlar', { defaultValue: 'ERP YapKodları' }),
         pageKey: 'erp-reference-yapkod',
         errorKey: t('common.errors.requestFailed'),
         defaultSortBy: 'code' as ColumnKey,
@@ -184,11 +184,11 @@ function getConfig(kind: ErpReferenceKind, t: (key: string, options?: Record<str
           }
         },
         columns: [
-          { key: 'code', label: t('erpReference.columns.code', { defaultValue: 'Missing translation' }) },
-          { key: 'name', label: t('erpReference.columns.name', { defaultValue: 'Missing translation' }) },
-          { key: 'branchCode', label: t('erpReference.columns.branch', { defaultValue: 'Missing translation' }) },
-          { key: 'meta1', label: t('erpReference.columns.linkedStock', { defaultValue: 'Missing translation' }) },
-          { key: 'lastSyncDate', label: t('erpReference.columns.lastSyncDate', { defaultValue: 'Missing translation' }) },
+          { key: 'code', label: t('erpReference.columns.code', { defaultValue: 'Kod' }) },
+          { key: 'name', label: t('erpReference.columns.name', { defaultValue: 'Ad' }) },
+          { key: 'branchCode', label: t('erpReference.columns.branch', { defaultValue: 'Şube' }) },
+          { key: 'meta1', label: t('erpReference.columns.linkedStock', { defaultValue: 'Bağlı Stok' }) },
+          { key: 'lastSyncDate', label: t('erpReference.columns.lastSyncDate', { defaultValue: 'Son Eşleme' }) },
         ] satisfies PagedDataGridColumn<ColumnKey>[],
         renderCell: (item: Row, columnKey: ColumnKey) => {
           switch (columnKey) {
@@ -277,13 +277,13 @@ export function ErpReferenceListPage({ kind }: { kind: ErpReferenceKind }): Reac
 
   return (
     <div className="w-full space-y-6 crm-page">
-      <Breadcrumb items={[{ label: t('sidebar.erp', { defaultValue: 'Missing translation' }) }, { label: config.breadcrumb, isActive: true }]} />
+      <Breadcrumb items={[{ label: t('sidebar.erp', { defaultValue: 'ERP' }) }, { label: config.breadcrumb, isActive: true }]} />
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
             <Database className="h-3.5 w-3.5" />
-            {t('erpReference.badge', { defaultValue: 'Missing translation' })}
+            {t('erpReference.badge', { defaultValue: 'ERP referans listesi' })}
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{config.title}</h1>
@@ -292,7 +292,7 @@ export function ErpReferenceListPage({ kind }: { kind: ErpReferenceKind }): Reac
         </div>
         <Button variant="outline" onClick={() => void refetch()}>
           <RefreshCw size={18} className="mr-2" />
-          {t('common.refresh', { defaultValue: 'Missing translation' })}
+          {t('common.refresh', { defaultValue: 'Yenile' })}
         </Button>
       </div>
 
@@ -368,7 +368,7 @@ export function ErpReferenceListPage({ kind }: { kind: ErpReferenceKind }): Reac
               refresh: {
                 onRefresh: () => void refetch(),
                 isLoading,
-                label: t('common.refresh', { defaultValue: 'Missing translation' }),
+                label: t('common.refresh', { defaultValue: 'Yenile' }),
               },
               leftSlot: <VoiceSearchButton onResult={pagedGrid.handleVoiceSearch} size="sm" variant="outline" />,
             }}

@@ -7,3 +7,5 @@ export { extractData } from './utils/extract-api-data';
 export { PermissionDefinitionsPage } from './components/PermissionDefinitionsPage';
 export { PermissionGroupsPage } from './components/PermissionGroupsPage';
 export { UserGroupAssignmentsPage } from './components/UserGroupAssignmentsPage';
+export { WmsScopePoliciesPage } from './components/WmsScopePoliciesPage';
+export { WmsScopeAssignmentsPage } from './components/WmsScopeAssignmentsPage';

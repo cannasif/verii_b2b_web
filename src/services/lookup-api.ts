@@ -1,7 +1,7 @@
 import { api } from '@/lib/axios';
 import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
 import { getLocalizedText } from '@/lib/localized-error';
-import type { BranchLookup, CustomerLookup, ProjectLookup, ShelfLookup, StockLookup, WarehouseLookup, YapKodLookup } from './lookup-types';
+import type { BranchLookup, CustomerLookup, KurLookup, ProjectLookup, ShelfLookup, StockLookup, WarehouseLookup, YapKodLookup } from './lookup-types';
 import type { ApiRequestOptions } from '@/lib/request-utils';
 import { buildPagedRequest } from '@/lib/paged';
 
@@ -103,7 +103,7 @@ interface YapKodStockRef {
 export const lookupApi = {
   getCustomerById: async (id: number, options?: ApiRequestOptions): Promise<CustomerLookup> => {
     try {
-      const response = await api.get<ApiResponse<WmsCustomerLookupDto>>(`/api/Customer/${id}`, options);
+      const response = await api.get<ApiResponse<WmsCustomerLookupDto>>(`/api/erp-mirror/customers/${id}`, options);
       const customer = response.data;
       if (!response.success || !customer) {
         throw new Error(response.message || getLocalizedText('common.errors.unknown'));
@@ -162,7 +162,7 @@ export const lookupApi = {
 
   getCustomers: async (options?: ApiRequestOptions): Promise<CustomerLookup[]> => {
     try {
-      const customers = await getServerPagedFirstPageData<WmsCustomerLookupDto>('/api/Customer/paged', options);
+      const customers = await getServerPagedFirstPageData<WmsCustomerLookupDto>('/api/erp-mirror/customers/paged', options);
       return customers.map((customer) => ({
         id: customer.id,
         subeKodu: Number(customer.branchCode || 0),
@@ -219,7 +219,7 @@ export const lookupApi = {
     options?: ApiRequestOptions,
   ): Promise<PagedResponse<CustomerLookup>> => {
     try {
-      const response = await getServerPagedResponse<WmsCustomerLookupDto>('/api/Customer/paged', params, options);
+      const response = await getServerPagedResponse<WmsCustomerLookupDto>('/api/erp-mirror/customers/paged', params, options);
       return {
         ...response,
         data: (response.data ?? []).map((customer) => ({
@@ -284,7 +284,7 @@ export const lookupApi = {
 
   getWarehouses: async (depoKodu?: number, options?: ApiRequestOptions): Promise<WarehouseLookup[]> => {
     try {
-      const warehouses = await getServerPagedFirstPageData<WmsWarehouseLookupDto>('/api/Warehouse/paged', options);
+      const warehouses = await getServerPagedFirstPageData<WmsWarehouseLookupDto>('/api/erp-mirror/warehouses/paged', options);
       return warehouses
         .filter((warehouse) => depoKodu === undefined || warehouse.warehouseCode === depoKodu)
         .map((warehouse) => ({
@@ -303,7 +303,7 @@ export const lookupApi = {
     options?: ApiRequestOptions,
   ): Promise<PagedResponse<WarehouseLookup>> => {
     try {
-      const response = await getServerPagedResponse<WmsWarehouseLookupDto>('/api/Warehouse/paged', params, options);
+      const response = await getServerPagedResponse<WmsWarehouseLookupDto>('/api/erp-mirror/warehouses/paged', params, options);
       const data = (response.data ?? [])
         .filter((warehouse) => depoKodu === undefined || warehouse.warehouseCode === depoKodu)
         .map((warehouse) => ({
@@ -324,7 +324,7 @@ export const lookupApi = {
 
   getWarehouseById: async (id: number, options?: ApiRequestOptions): Promise<WarehouseLookup> => {
     try {
-      const response = await api.get<ApiResponse<WmsWarehouseLookupDto>>(`/api/Warehouse/${id}`, options);
+      const response = await api.get<ApiResponse<WmsWarehouseLookupDto>>(`/api/erp-mirror/warehouses/${id}`, options);
       const warehouse = response.data;
       if (!response.success || !warehouse) {
         throw new Error(response.message || getLocalizedText('common.errors.unknown'));
@@ -379,7 +379,7 @@ export const lookupApi = {
 
   getProducts: async (options?: ApiRequestOptions): Promise<StockLookup[]> => {
     try {
-      const products = await getServerPagedFirstPageData<WmsStockLookupDto>('/api/Stock/paged', options);
+      const products = await getServerPagedFirstPageData<WmsStockLookupDto>('/api/erp-mirror/stocks/paged', options);
       return products.map((product) => ({
         id: product.id,
         subeKodu: Number(product.branchCode || 0),
@@ -408,7 +408,7 @@ export const lookupApi = {
     options?: ApiRequestOptions,
   ): Promise<PagedResponse<StockLookup>> => {
     try {
-      const response = await getServerPagedResponse<WmsStockLookupDto>('/api/Stock/paged', params, options);
+      const response = await getServerPagedResponse<WmsStockLookupDto>('/api/erp-mirror/stocks/paged', params, options);
       return {
         ...response,
         data: (response.data ?? []).map((product) => ({
@@ -437,7 +437,7 @@ export const lookupApi = {
 
   getProductById: async (id: number, options?: ApiRequestOptions): Promise<StockLookup> => {
     try {
-      const response = await api.get<ApiResponse<WmsStockLookupDto>>(`/api/Stock/${id}`, options);
+      const response = await api.get<ApiResponse<WmsStockLookupDto>>(`/api/erp-mirror/stocks/${id}`, options);
       const product = response.data;
       if (!response.success || !product) {
         throw new Error(response.message || getLocalizedText('common.errors.unknown'));
@@ -468,7 +468,7 @@ export const lookupApi = {
 
   getYapKodlar: async (options?: ApiRequestOptions): Promise<YapKodLookup[]> => {
     try {
-      const items = await getServerPagedFirstPageData<WmsYapKodLookupDto>('/api/YapKod/paged', options);
+      const items = await getServerPagedFirstPageData<WmsYapKodLookupDto>('/api/erp-mirror/yapkod/paged', options);
       return items.map((item) => ({
         id: item.id,
         yapKod: item.yapKod,
@@ -492,7 +492,7 @@ export const lookupApi = {
         : stockRef ?? {};
 
       const response = await getServerPagedResponse<WmsYapKodLookupDto>(
-        '/api/YapKod/paged',
+        '/api/erp-mirror/yapkod/paged',
         normalizedStockRef.stockId
           ? {
               ...params,
@@ -527,5 +527,19 @@ export const lookupApi = {
       return response.data;
     }
     throw new Error(response.message || getLocalizedText('common.errors.erpBranchesLoadFailed'));
+  },
+
+  getExchangeRate: async (tarih?: Date, fiyatTipi = 1, options?: ApiRequestOptions): Promise<KurLookup[]> => {
+    const selectedDate = tarih ?? new Date();
+    const dateString = selectedDate.toISOString().split('T')[0];
+    const response = await api.get('/api/netsis-read/getExchangeRate', {
+      skipAuth: true,
+      ...options,
+      params: { tarih: dateString, fiyatTipi },
+    }) as ApiResponse<KurLookup[]>;
+    if (response.success && response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || getLocalizedText('common.errors.unknown'));
   },
 };

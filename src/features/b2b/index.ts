@@ -1,4 +1,8 @@
 export {
+  B2bPortalPage,
+} from './components/B2bPortalPage';
+
+export {
   B2bApprovalRulesPage,
   B2bBuyersPage,
   B2bCatalogPage,
@@ -12,6 +16,10 @@ export {
   B2bPricingPage,
   B2bProductMatchesPage,
   B2bQuotesPage,
+  B2bRecordCreatePage,
+  B2bRecordDetailPage,
+  B2bRecordEditPage,
+  B2bRecordFormPage,
   B2bShoppingListsPage,
   B2bWorkspacePage,
 } from './components/B2bWorkspacePage';

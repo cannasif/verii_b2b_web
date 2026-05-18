@@ -135,8 +135,8 @@
     "selectAll": "Select all"
   },
   "wmsScopePolicies": {
-    "title": "WMS Scope Policies",
-    "description": "Manage branch, warehouse, and assignment-based data scope rules",
+    "title": "B2B Scope Policies",
+    "description": "Manage branch, customer, catalog, and assignment-based data scope rules",
     "add": "Add Policy",
     "stats": {
       "total": "Total Policies",
@@ -144,8 +144,8 @@
       "entities": "Covered Flows"
     },
     "form": {
-      "addTitle": "Add WMS Scope Policy",
-      "editTitle": "Edit WMS Scope Policy",
+      "addTitle": "Add B2B Scope Policy",
+      "editTitle": "Edit B2B Scope Policy",
       "addDescription": "Define a new data-scope policy.",
       "editDescription": "Update the policy behavior and scope type.",
       "code": "Code",
@@ -173,13 +173,13 @@
       "isActive": "Active"
     },
     "delete": {
-      "confirmTitle": "Delete WMS Scope Policy",
+      "confirmTitle": "Delete B2B Scope Policy",
       "confirmMessage": "Are you sure you want to delete \"{{name}}\"?"
     }
   },
   "wmsScopeAssignments": {
-    "title": "WMS Scope Assignments",
-    "description": "Manage which branch, warehouse, and record scope each user can operate on",
+    "title": "B2B Scope Assignments",
+    "description": "Manage which branch, customer, catalog, and record scope each user can operate on",
     "selectUser": "Select User",
     "selectUserPlaceholder": "Search and select user...",
     "selectUserHint": "Choose a user to edit scope assignments.",
@@ -193,7 +193,7 @@
     "editorTitle": "Assignment Editor",
     "editorDescription": "You can define branch and warehouse based scope for multiple entity types.",
     "addAssignment": "Add Assignment",
-    "empty": "This user does not have any WMS scope assignments yet.",
+    "empty": "This user does not have any B2B scope assignments yet.",
     "policyPlaceholder": "Select policy",
     "branchCodePlaceholder": "Branch code",
     "warehousePlaceholder": "Select warehouse",
@@ -230,7 +230,7 @@
     "permissionDefinitions": "Permission Definitions",
     "permissionGroups": "Permission Groups",
     "userGroupAssignments": "User Group Assignments",
-    "wmsScopePolicies": "WMS Scope Policies",
-    "wmsScopeAssignments": "WMS Scope Assignments"
+    "wmsScopePolicies": "B2B Scope Policies",
+    "wmsScopeAssignments": "B2B Scope Assignments"
   }
 }

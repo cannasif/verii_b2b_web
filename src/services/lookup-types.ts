@@ -98,3 +98,9 @@ export interface BranchLookup {
   subeKodu: number;
   unvan: string;
 }
+
+export interface KurLookup {
+  dovizTipi: number;
+  dovizIsmi: string | null;
+  kurDegeri: number | null;
+}

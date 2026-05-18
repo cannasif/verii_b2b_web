@@ -2,6 +2,7 @@ import { type ReactElement, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useUIStore } from '@/stores/ui-store';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -24,6 +25,27 @@ export function DashboardPage(): ReactElement {
 
   return (
     <div className="space-y-6 crm-page">
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(16,185,129,0.20),_transparent_32%),linear-gradient(135deg,_#f8fafc,_#ecfeff)] p-6 shadow-sm dark:border-white/10 dark:bg-[radial-gradient(circle_at_top_right,_rgba(16,185,129,0.18),_transparent_32%),linear-gradient(135deg,_#020617,_#111827)]">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
+            <Badge className="w-fit bg-emerald-700 text-white hover:bg-emerald-700">B2B Portal</Badge>
+            <div>
+              <h1 className="text-2xl font-black tracking-tight text-slate-950 dark:text-white">Müşteri portalı ve admin paneli tek akışta</h1>
+              <p className="mt-1 max-w-2xl text-sm font-medium text-slate-600 dark:text-slate-300">
+                Müşterinin gördüğü katalog, fiyat, stok ve sepet akışını portalda test edin; operasyon yönetimini admin panelinden sürdürün.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild className="bg-emerald-700 hover:bg-emerald-600">
+              <Link to="/b2b-portal">Portala Git</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/b2b/insights">B2B Admin Paneli</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -177,7 +199,30 @@ export function DashboardPage(): ReactElement {
           <CardContent>
             <div className="space-y-2">
               <Link
-                to="/goods-receipt/create"
+                to="/b2b-portal"
+                className="flex items-center justify-between rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-emerald-950 transition-colors hover:bg-emerald-100 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-100 dark:hover:bg-emerald-500/20"
+              >
+                <div className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 11 12 3l9 8" />
+                    <path d="M5 10v10h14V10" />
+                    <path d="M9 20v-6h6v6" />
+                  </svg>
+                  <span className="text-sm font-semibold">Müşteri Portalını Aç</span>
+                </div>
+              </Link>
+              <Link
+                to="/b2b/quotes"
                 className="flex items-center justify-between rounded-lg border p-3 hover:bg-accent cursor-pointer transition-colors"
               >
                 <div className="flex items-center gap-2">
@@ -201,7 +246,7 @@ export function DashboardPage(): ReactElement {
                 </div>
               </Link>
               <Link
-                to="/shipment"
+                to="/b2b/orders"
                 className="flex items-center justify-between rounded-lg border p-3 hover:bg-accent cursor-pointer transition-colors"
               >
                 <div className="flex items-center gap-2">
@@ -224,7 +269,7 @@ export function DashboardPage(): ReactElement {
                 </div>
               </Link>
               <Link
-                to="/inventory"
+                to="/b2b/inventory"
                 className="flex items-center justify-between rounded-lg border p-3 hover:bg-accent cursor-pointer transition-colors"
               >
                 <div className="flex items-center gap-2">
@@ -253,4 +298,3 @@ export function DashboardPage(): ReactElement {
     </div>
   );
 }
-

@@ -18,8 +18,11 @@ export interface CatalogProductDto {
   id: number;
   sku: string;
   name: string;
+  slug?: string;
   brand?: string;
   categoryPath?: string;
+  description?: string;
+  primaryImageUrl?: string;
   isPublished: boolean;
   defaultStockId?: number;
   variants?: CatalogVariantDto[];
@@ -52,9 +55,23 @@ export interface OrderDto {
   userId?: number;
   status: string;
   currencyCode: string;
+  offerType?: string;
+  offerDate?: string;
+  offerNo?: string;
+  revisionNo?: string;
+  revisionId?: number;
+  validUntil?: string;
+  deliveryDate?: string;
+  deliveryMethod?: string;
+  paymentTypeId?: number;
+  quoteRequestId?: number;
+  erpProjectCode?: string;
+  generalDiscountRate?: number;
+  generalDiscountAmount?: number;
   subtotal: number;
   taxTotal: number;
   grandTotal: number;
+  description?: string;
   externalErpOrderNumber?: string;
   submittedDate?: string;
   lines?: OrderLineDto[];
@@ -71,7 +88,24 @@ export interface OrderLineDto {
   productName?: string;
   quantity: number;
   unitPrice: number;
+  discountRate1?: number;
+  discountAmount1?: number;
+  discountRate2?: number;
+  discountAmount2?: number;
+  discountRate3?: number;
+  discountAmount3?: number;
+  vatRate?: number;
+  vatAmount?: number;
   lineTotal: number;
+  lineGrandTotal?: number;
+  description?: string;
+  description1?: string;
+  description2?: string;
+  description3?: string;
+  pricingRuleHeaderId?: number;
+  relatedProductKey?: string;
+  isMainRelatedProduct?: boolean;
+  erpProjectCode?: string;
 }
 
 export interface CartDto {
@@ -191,10 +225,59 @@ export interface QuoteRequestDto {
   id: number;
   quoteNumber: string;
   customerId: number;
+  userId?: number;
   status: string;
   currencyCode: string;
+  offerType?: string;
+  offerDate?: string;
+  offerNo?: string;
+  revisionNo?: string;
+  revisionId?: number;
+  validUntil?: string;
+  deliveryDate?: string;
+  deliveryMethod?: string;
+  paymentTypeId?: number;
+  erpProjectCode?: string;
+  generalDiscountRate?: number;
+  generalDiscountAmount?: number;
+  total?: number;
   estimatedTotal: number;
+  customerNote?: string;
+  salesNote?: string;
   submittedDate?: string;
+  approvedDate?: string;
+  lines?: QuoteRequestLineDto[];
+}
+
+export interface QuoteRequestLineDto {
+  id: number;
+  quoteRequestId: number;
+  catalogProductId?: number;
+  catalogVariantId?: number;
+  erpStockId?: number;
+  requestedSku?: string;
+  requestedName?: string;
+  quantity: number;
+  targetUnitPrice?: number;
+  approvedUnitPrice?: number;
+  discountRate1?: number;
+  discountAmount1?: number;
+  discountRate2?: number;
+  discountAmount2?: number;
+  discountRate3?: number;
+  discountAmount3?: number;
+  vatRate?: number;
+  vatAmount?: number;
+  lineTotal?: number;
+  lineGrandTotal?: number;
+  description?: string;
+  description1?: string;
+  description2?: string;
+  description3?: string;
+  pricingRuleHeaderId?: number;
+  relatedProductKey?: string;
+  isMainRelatedProduct?: boolean;
+  erpProjectCode?: string;
 }
 
 export interface ConvertQuoteToCartDto {
@@ -224,6 +307,12 @@ export interface B2bCompanyDto {
   creditLimit?: number;
   currencyCode: string;
   status: string;
+}
+
+export interface B2bPortalSessionDto {
+  token: string;
+  expiresAt: string;
+  company: B2bCompanyDto;
 }
 
 export interface B2bBuyerDto {

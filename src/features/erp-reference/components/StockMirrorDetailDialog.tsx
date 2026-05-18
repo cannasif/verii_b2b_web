@@ -60,7 +60,7 @@ export function StockMirrorDetailDialog({ stockId, open, onOpenChange }: StockMi
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      if (!stockId) throw new Error('Stock id is required');
+      if (!stockId) throw new Error('Stok kaydı seçilmeden detay kaydedilemez.');
 
       if (detailQuery.data?.id) {
         const dto: UpdateStockDetailDto = {

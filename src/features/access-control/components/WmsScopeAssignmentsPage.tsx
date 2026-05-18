@@ -330,7 +330,7 @@ export function WmsScopeAssignmentsPage(): ReactElement {
                     <div className="mt-3 flex flex-wrap gap-2">
                       {(resolutionQuery.data.warehouseIds ?? []).length === 0
                         ? <Badge variant="secondary">-</Badge>
-                        : resolutionQuery.data.warehouseIds.map((id) => <Badge key={id}>#{id}</Badge>)}
+                        : resolutionQuery.data.warehouseIds.map((id) => <Badge key={id}>Depo kaydı</Badge>)}
                     </div>
                   </div>
 

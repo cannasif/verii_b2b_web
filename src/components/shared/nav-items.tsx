@@ -63,7 +63,24 @@ const b2bIcon = (
   </svg>
 );
 
-export const WMS_NAV_ITEMS: NavItem[] = [
+const accessControlIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+    <path d="m9 12 2 2 4-4" />
+  </svg>
+);
+
+export const B2B_NAV_ITEMS: NavItem[] = [
   {
     title: 'sidebar.dashboard',
     titleFallback: 'Dashboard',
@@ -75,25 +92,43 @@ export const WMS_NAV_ITEMS: NavItem[] = [
     titleFallback: 'B2B',
     icon: b2bIcon,
     children: [
-      { title: 'sidebar.b2bInsights', titleFallback: 'Hazırlık Paneli', href: '/b2b/insights' },
-      { title: 'sidebar.b2bCompanies', titleFallback: 'Şirket Hesapları', href: '/b2b/companies' },
-      { title: 'sidebar.b2bBuyers', titleFallback: 'Alıcılar', href: '/b2b/buyers' },
-      { title: 'sidebar.b2bCatalog', titleFallback: 'Katalog', href: '/b2b/catalog' },
-      { title: 'sidebar.b2bProductMatches', titleFallback: 'Ürün Eşleştirme', href: '/b2b/product-matches' },
-      { title: 'sidebar.b2bCatalogVisibility', titleFallback: 'Katalog Görünürlüğü', href: '/b2b/catalog-visibility' },
-      { title: 'sidebar.b2bPricing', titleFallback: 'Müşteri Fiyatları', href: '/b2b/pricing' },
-      { title: 'sidebar.b2bInventory', titleFallback: 'Stok Görünürlüğü', href: '/b2b/inventory' },
-      { title: 'sidebar.b2bShoppingLists', titleFallback: 'Alışveriş Listeleri', href: '/b2b/shopping-lists' },
-      { title: 'sidebar.b2bApprovalRules', titleFallback: 'Satın Alma Onayları', href: '/b2b/approval-rules' },
-      { title: 'sidebar.b2bQuotes', titleFallback: 'Teklif Talepleri', href: '/b2b/quotes' },
-      { title: 'sidebar.b2bOrders', titleFallback: 'Siparişler', href: '/b2b/orders' },
-      { title: 'sidebar.b2bPayments', titleFallback: 'Ödeme', href: '/b2b/payments' },
-      { title: 'sidebar.b2bIntegrations', titleFallback: 'ERP Entegrasyon', href: '/b2b/integrations' },
+      {
+        title: 'sidebar.b2bOperationsGroup',
+        titleFallback: 'Operasyon',
+        children: [
+          { title: 'sidebar.b2bInsights', titleFallback: 'Hazırlık Paneli', href: '/b2b/insights' },
+          { title: 'sidebar.b2bCompanies', titleFallback: 'Şirket Hesapları', href: '/b2b/companies' },
+          { title: 'sidebar.b2bBuyers', titleFallback: 'Alıcılar', href: '/b2b/buyers' },
+          { title: 'sidebar.b2bShoppingLists', titleFallback: 'Alışveriş Listeleri', href: '/b2b/shopping-lists' },
+          { title: 'sidebar.b2bApprovalRules', titleFallback: 'Satın Alma Onayları', href: '/b2b/approval-rules' },
+        ],
+      },
+      {
+        title: 'sidebar.b2bCatalogGroup',
+        titleFallback: 'Katalog ve Ticari Kurallar',
+        children: [
+          { title: 'sidebar.b2bCatalog', titleFallback: 'Katalog', href: '/b2b/catalog' },
+          { title: 'sidebar.b2bProductMatches', titleFallback: 'Ürün Eşleştirme', href: '/b2b/product-matches' },
+          { title: 'sidebar.b2bCatalogVisibility', titleFallback: 'Katalog Görünürlüğü', href: '/b2b/catalog-visibility' },
+          { title: 'sidebar.b2bPricing', titleFallback: 'Müşteri Fiyatları', href: '/b2b/pricing' },
+          { title: 'sidebar.b2bInventory', titleFallback: 'Stok Görünürlüğü', href: '/b2b/inventory' },
+        ],
+      },
+      {
+        title: 'sidebar.b2bCommercialGroup',
+        titleFallback: 'Satış Süreci',
+        children: [
+          { title: 'sidebar.b2bQuotes', titleFallback: 'Teklif Talepleri', href: '/b2b/quotes' },
+          { title: 'sidebar.b2bOrders', titleFallback: 'Siparişler', href: '/b2b/orders' },
+          { title: 'sidebar.b2bPayments', titleFallback: 'Ödeme', href: '/b2b/payments' },
+          { title: 'sidebar.b2bIntegrations', titleFallback: 'ERP Entegrasyon', href: '/b2b/integrations' },
+        ],
+      },
     ],
   },
   {
     title: 'sidebar.masterDataGroup',
-    titleFallback: 'ERP ve Mirror',
+    titleFallback: 'ERP ve Eşleme',
     icon: masterDataIcon,
     children: [
       {
@@ -108,4 +143,33 @@ export const WMS_NAV_ITEMS: NavItem[] = [
       },
     ],
   },
+  {
+    title: 'sidebar.accessControl',
+    titleFallback: 'Yetki ve Sistem',
+    icon: accessControlIcon,
+    children: [
+      {
+        title: 'sidebar.accessControlManagementGroup',
+        titleFallback: 'Yetki ve Kullanıcı Yönetimi',
+        children: [
+          { title: 'sidebar.permissionDefinitions', titleFallback: 'Yetki Tanımları', href: '/access-control/permission-definitions' },
+          { title: 'sidebar.permissionGroups', titleFallback: 'Yetki Grupları', href: '/access-control/permission-groups' },
+          { title: 'sidebar.userGroupAssignments', titleFallback: 'Kullanıcı Grup Atamaları', href: '/access-control/user-group-assignments' },
+          { title: 'sidebar.b2bScopePolicies', titleFallback: 'B2B Kapsam Politikaları', href: '/access-control/wms-scope-policies' },
+          { title: 'sidebar.b2bScopeAssignments', titleFallback: 'B2B Kapsam Atamaları', href: '/access-control/wms-scope-assignments' },
+        ],
+      },
+      {
+        title: 'sidebar.accessControlSystemGroup',
+        titleFallback: 'Sistem Araçları',
+        children: [
+          { title: 'sidebar.mailSettings', titleFallback: 'SMTP / Mail Ayarları', href: '/users/mail-settings' },
+          { title: 'sidebar.hangfireMonitoring', titleFallback: 'Hangfire İzleme', href: '/hangfire-monitoring' },
+          { title: 'sidebar.traceExplorer', titleFallback: 'İz Takibi', href: '/trace-explorer' },
+        ],
+      },
+    ],
+  },
 ];
+
+export const WMS_NAV_ITEMS = B2B_NAV_ITEMS;

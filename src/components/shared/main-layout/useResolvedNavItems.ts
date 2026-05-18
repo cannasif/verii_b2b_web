@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useMyPermissionsQuery } from '@/features/access-control/hooks/useMyPermissionsQuery';
 import { filterNavItemsByPermission } from '@/features/access-control/utils/filterNavItems';
-import { WMS_NAV_ITEMS, type NavItem } from '../nav-items';
+import { B2B_NAV_ITEMS, type NavItem } from '../nav-items';
 
 interface UseResolvedNavItemsOptions {
   navItems?: NavItem[];
@@ -14,7 +14,7 @@ interface UseResolvedNavItemsResult {
 
 export function useResolvedNavItems({ navItems }: UseResolvedNavItemsOptions): UseResolvedNavItemsResult {
   const { data: permissions, isLoading, isError } = useMyPermissionsQuery();
-  const baseItems = navItems ?? WMS_NAV_ITEMS;
+  const baseItems = navItems ?? B2B_NAV_ITEMS;
 
   const items = useMemo(() => {
     if (isLoading) return baseItems;

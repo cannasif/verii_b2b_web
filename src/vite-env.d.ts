@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-declare module '@/config/config.json' {
+declare module '@/config/runtime-settings.json' {
   interface Config {
     branches: Array<{
       id: string;

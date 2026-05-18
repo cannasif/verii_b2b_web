@@ -1,9 +1,11 @@
 export const DEFAULT_API_BASE_URL = 'https://api.v3rii.com';
-const RUNTIME_CONFIG_CACHE_KEY = 'wms-runtime-config:v1';
-const RUNTIME_CONFIG_TTL_MS = 60 * 60 * 1000;
+const RUNTIME_CONFIG_FILE_NAME = 'runtime-settings.json';
+const RUNTIME_CONFIG_CACHE_KEY = 'runtime-config-cache';
 
 interface RuntimeConfig {
   apiUrl?: string;
+  apiBaseUrl?: string;
+  apiBaseURL?: string;
   baseUrl?: string;
 }
 
@@ -23,8 +25,8 @@ function isValidApiUrl(value: string | undefined | null): boolean {
   const trimmed = value.trim();
   if (!trimmed) return false;
   try {
-    const url = new URL(trimmed);
-    return url.protocol === 'http:' || url.protocol === 'https:';
+    const u = new URL(trimmed);
+    return u.protocol === 'http:' || u.protocol === 'https:';
   } catch {
     return false;
   }
@@ -65,23 +67,9 @@ function normalizeAppBasePath(value: string | undefined | null): string {
   return `/${trimmed.replace(/^\/+|\/+$/g, '')}`;
 }
 
-function getWindowOriginFallback(): string | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return normalizeBaseUrl(window.location.origin);
-  }
-
-  return null;
-}
-
 let cachedApiUrl = normalizeBaseUrl(DEFAULT_API_BASE_URL);
 let cachedAppBasePath = normalizeAppBasePath(import.meta.env.BASE_URL || '/');
 let configPromise: Promise<ResolvedRuntimeConfig> | null = null;
-let backgroundRefreshPromise: Promise<void> | null = null;
 const runtimeBasePath = import.meta.env.BASE_URL || '/';
 
 function toBaseRelativePath(fileName: string): string {
@@ -89,38 +77,40 @@ function toBaseRelativePath(fileName: string): string {
   return `${normalizedBase}${fileName}`;
 }
 
-function resolveEnvRuntimeConfig(): ResolvedRuntimeConfig {
-  const envUrl = import.meta.env.VITE_API_URL;
-  const devFallback = getWindowOriginFallback();
+function resolveRuntimeConfig(config: RuntimeConfig | undefined | null, fallbackConfig: ResolvedRuntimeConfig): ResolvedRuntimeConfig {
+  const configuredApiUrl = config?.apiUrl ?? config?.apiBaseUrl ?? config?.apiBaseURL;
 
   return {
-    apiUrl: isValidApiUrl(envUrl)
-      ? normalizeBaseUrl(envUrl)
-      : (import.meta.env.DEV && devFallback ? devFallback : normalizeBaseUrl(DEFAULT_API_BASE_URL)),
-    baseUrl: normalizeAppBasePath(import.meta.env.BASE_URL || '/'),
+    apiUrl: isValidApiUrl(configuredApiUrl) ? normalizeBaseUrl(configuredApiUrl!) : fallbackConfig.apiUrl,
+    baseUrl: normalizeAppBasePath(config?.baseUrl ?? fallbackConfig.baseUrl),
   };
 }
 
 async function fetchRuntimeConfig(): Promise<ResolvedRuntimeConfig> {
-  const fallbackConfig = resolveEnvRuntimeConfig();
+  const fallbackConfig: ResolvedRuntimeConfig = {
+    apiUrl: isValidApiUrl(import.meta.env.VITE_API_URL)
+      ? normalizeBaseUrl(import.meta.env.VITE_API_URL)
+      : normalizeBaseUrl(DEFAULT_API_BASE_URL),
+    baseUrl: normalizeAppBasePath(import.meta.env.BASE_URL || '/'),
+  };
 
   try {
-    const response = await fetch(toBaseRelativePath('config.json'), {
-      cache: import.meta.env.PROD ? 'no-cache' : 'default',
+    const response = await fetch(toBaseRelativePath(RUNTIME_CONFIG_FILE_NAME), {
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      headers: {
+        Accept: 'application/json',
+      },
     });
     if (!response.ok) {
-      return fallbackConfig;
+      throw new Error(`${RUNTIME_CONFIG_FILE_NAME} HTTP ${response.status}`);
     }
 
     const config = (await response.json()) as RuntimeConfig;
-
-    return {
-      apiUrl: isValidApiUrl(config?.apiUrl) ? normalizeBaseUrl(config.apiUrl!) : fallbackConfig.apiUrl,
-      baseUrl: normalizeAppBasePath(config?.baseUrl ?? fallbackConfig.baseUrl),
-    };
+    return resolveRuntimeConfig(config, fallbackConfig);
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.warn('[api-config] config.json yüklenemedi, fallback kullanılıyor:', error);
+      console.warn(`[api-config] ${RUNTIME_CONFIG_FILE_NAME} yüklenemedi, fallback kullanılıyor:`, error);
     }
   }
 
@@ -128,15 +118,11 @@ async function fetchRuntimeConfig(): Promise<ResolvedRuntimeConfig> {
 }
 
 function readPersistedRuntimeConfig(): PersistedRuntimeConfig | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
+  if (typeof window === 'undefined') return null;
 
   try {
     const raw = window.localStorage.getItem(RUNTIME_CONFIG_CACHE_KEY);
-    if (!raw) {
-      return null;
-    }
+    if (!raw) return null;
 
     const parsed = JSON.parse(raw) as Partial<PersistedRuntimeConfig>;
     if (
@@ -147,9 +133,12 @@ function readPersistedRuntimeConfig(): PersistedRuntimeConfig | null {
       return null;
     }
 
+    const apiUrl = parsed.apiUrl as string;
+    const baseUrl = parsed.baseUrl as string;
+
     return {
-      apiUrl: normalizeBaseUrl(parsed.apiUrl as string),
-      baseUrl: normalizeAppBasePath(parsed.baseUrl),
+      apiUrl: normalizeBaseUrl(apiUrl),
+      baseUrl: normalizeAppBasePath(baseUrl),
       fetchedAt: parsed.fetchedAt,
     };
   } catch {
@@ -158,9 +147,7 @@ function readPersistedRuntimeConfig(): PersistedRuntimeConfig | null {
 }
 
 function persistRuntimeConfig(config: ResolvedRuntimeConfig): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
+  if (typeof window === 'undefined') return;
 
   const payload: PersistedRuntimeConfig = {
     apiUrl: config.apiUrl,
@@ -181,76 +168,33 @@ function hydrateMemoryCache(config: ResolvedRuntimeConfig): ResolvedRuntimeConfi
   return config;
 }
 
-function isPersistedConfigFresh(config: PersistedRuntimeConfig | null): boolean {
-  if (!config) {
-    return false;
-  }
-
-  return Date.now() - config.fetchedAt < RUNTIME_CONFIG_TTL_MS;
-}
-
-function refreshRuntimeConfigInBackground(): void {
-  if (backgroundRefreshPromise) {
-    return;
-  }
-
-  backgroundRefreshPromise = fetchRuntimeConfig()
-    .then((config) => {
-      hydrateMemoryCache(config);
-      persistRuntimeConfig(config);
-    })
-    .finally(() => {
-      backgroundRefreshPromise = null;
-    });
-}
-
 export function loadConfig(): Promise<string> {
   if (!configPromise) {
-    if (import.meta.env.DEV) {
-      const persisted = readPersistedRuntimeConfig();
-
-      if (persisted) {
-        const resolved = hydrateMemoryCache({
-          apiUrl: persisted.apiUrl,
-          baseUrl: persisted.baseUrl,
-        });
-
-        if (!isPersistedConfigFresh(persisted)) {
-          refreshRuntimeConfigInBackground();
+    configPromise = fetchRuntimeConfig()
+      .catch((error) => {
+        const persisted = readPersistedRuntimeConfig();
+        if (persisted) {
+          if (import.meta.env.DEV) {
+            console.warn(`[api-config] ${RUNTIME_CONFIG_FILE_NAME} okunamadı, persisted fallback kullanılıyor:`, error);
+          }
+          return {
+            apiUrl: persisted.apiUrl,
+            baseUrl: persisted.baseUrl,
+          };
         }
 
-        configPromise = Promise.resolve(resolved);
-      } else {
-        configPromise = fetchRuntimeConfig().then((config) => {
-          hydrateMemoryCache(config);
-          persistRuntimeConfig(config);
-          return config;
-        });
-      }
-
-      return configPromise.then((config) => config.apiUrl);
-    }
-
-    const persisted = readPersistedRuntimeConfig();
-
-    if (persisted) {
-      const resolved = hydrateMemoryCache({
-        apiUrl: persisted.apiUrl,
-        baseUrl: persisted.baseUrl,
-      });
-
-      if (!isPersistedConfigFresh(persisted)) {
-        refreshRuntimeConfigInBackground();
-      }
-
-      configPromise = Promise.resolve(resolved);
-    } else {
-      configPromise = fetchRuntimeConfig().then((config) => {
+        return {
+          apiUrl: isValidApiUrl(import.meta.env.VITE_API_URL)
+            ? normalizeBaseUrl(import.meta.env.VITE_API_URL)
+            : normalizeBaseUrl(DEFAULT_API_BASE_URL),
+          baseUrl: normalizeAppBasePath(import.meta.env.BASE_URL || '/'),
+        };
+      })
+      .then((config) => {
         hydrateMemoryCache(config);
         persistRuntimeConfig(config);
         return config;
       });
-    }
   }
 
   return configPromise.then((config) => config.apiUrl);
@@ -261,7 +205,7 @@ export async function getApiUrl(): Promise<string> {
 }
 
 export function getApiBaseUrl(): string {
-  return cachedApiUrl || resolveEnvRuntimeConfig().apiUrl;
+  return cachedApiUrl || normalizeBaseUrl(DEFAULT_API_BASE_URL);
 }
 
 export function getAppBasePath(): string {

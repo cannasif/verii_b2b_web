@@ -105,10 +105,10 @@ function normalizeYapKod(row: Record<string, unknown>): YapKodReferenceDto {
 
 function getEndpoint(kind: ErpReferenceKind): string {
   switch (kind) {
-    case 'customer': return '/api/Customer/paged';
-    case 'stock': return '/api/Stock/paged';
-    case 'warehouse': return '/api/Warehouse/paged';
-    case 'yapkod': return '/api/YapKod/paged';
+    case 'customer': return '/api/erp-mirror/customers/paged';
+    case 'stock': return '/api/erp-mirror/stocks/paged';
+    case 'warehouse': return '/api/erp-mirror/warehouses/paged';
+    case 'yapkod': return '/api/erp-mirror/yapkod/paged';
   }
 }
 
@@ -149,7 +149,7 @@ export const erpReferenceApi = {
   },
 
   async getStockById(id: number): Promise<StockReferenceDto> {
-    const response = await api.get<ApiResponse<Record<string, unknown>>>(`/api/Stock/${id}`);
+    const response = await api.get<ApiResponse<Record<string, unknown>>>(`/api/erp-mirror/stocks/${id}`);
     return normalizeStock(extractData(response));
   },
 

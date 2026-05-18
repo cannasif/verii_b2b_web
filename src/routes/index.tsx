@@ -11,9 +11,15 @@ import { lazyNamed, withRoute } from './route-utils';
 
 const DashboardPage = lazyNamed(() => import('@/features/dashboard'), 'DashboardPage');
 const ProfilePage = lazyNamed(() => import('@/features/user-detail/components/ProfilePage'), 'ProfilePage');
+const B2bPortalPage = lazyNamed(() => import('@/features/b2b'), 'B2bPortalPage');
 
 export function createAppRouter() {
   return createBrowserRouter([
+    {
+      path: '/b2b-portal',
+      errorElement: <RouteErrorPage />,
+      element: withRoute(B2bPortalPage, { routeName: 'b2b-public-portal' }),
+    },
     {
       path: '/',
       errorElement: <RouteErrorPage />,

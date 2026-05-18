@@ -22,21 +22,21 @@
     },
     "wmsScopePolicy": {
       "code": "Policy kodu backend enforcement ve support akışlarında sabit anahtar olarak kullanılır.",
-      "name": "Operasyon ekiplerinin bu politikayı neden kullanacağını açıklayan yönetimsel ad.",
-      "entityType": "Politikanın hangi belge/iş akışı tipi için geçerli olduğunu belirler.",
+      "name": "B2B operasyon ekiplerinin bu politikayı neden kullanacağını açıklayan yönetimsel ad.",
+      "entityType": "Politikanın hangi B2B akışı veya veri tipi için geçerli olduğunu belirler.",
       "scopeType": "Kapsam daraltma şekli: tam erişim, şube, depo veya sadece atanan kayıtlar.",
       "description": "İsteğe bağlı açıklama. Support ve audit tarafında bağlam sağlar."
     }
   },
   "permissionDefinitions": {
-    "title": "İzin Tanımları",
-    "description": "Sistemde kullanılan izin kodlarını yönetin",
+    "title": "Yetki Tanımları",
+    "description": "Sistemde kullanılan yetki kodlarını yönetin",
     "add": "Tanım Ekle",
     "form": {
-      "editTitle": "İzin Tanımını Düzenle",
-      "addTitle": "İzin Tanımı Ekle",
-      "editDescription": "İzin tanımı bilgilerini güncelleyin",
-      "addDescription": "Yeni bir izin tanımı oluşturun",
+      "editTitle": "Yetki Tanımını Düzenle",
+      "addTitle": "Yetki Tanımı Ekle",
+      "editDescription": "Yetki tanımı bilgilerini güncelleyin",
+      "addDescription": "Yeni bir yetki tanımı oluşturun",
       "code": "Kod",
       "codePlaceholder": "Kod seçin",
       "affectedRoutes": "Etkilenen sayfalar",
@@ -57,14 +57,14 @@
       "showing": "{{from}}-{{to}} / {{total}}"
     },
     "delete": {
-      "confirmTitle": "İzin Tanımını Sil",
+      "confirmTitle": "Yetki Tanımını Sil",
       "confirmMessage": "\"{{name}}\" silmek istediğinizden emin misiniz? Bu işlem geri alınamaz."
     },
     "syncFromRoutes": "Rotalardan senkronize et"
   },
   "permissionGroups": {
-    "title": "İzin Grupları",
-    "description": "İzin gruplarını ve atamalarını yönetin",
+    "title": "Yetki Grupları",
+    "description": "Yetki gruplarını ve atamalarını yönetin",
     "add": "Grup Ekle",
     "selectAll": "Tümünü seç",
     "noDefinitions": "Kullanılabilir izin tanımı yok",
@@ -129,14 +129,14 @@
     "selectUser": "Kullanıcı Seç",
     "selectUserPlaceholder": "Ara ve kullanıcı seç...",
     "selectUserHint": "İzin grubu atamalarını yönetmek için bir kullanıcı seçin",
-    "assignedGroups": "Atanan İzin Grupları",
+    "assignedGroups": "Atanan Yetki Grupları",
     "noUsers": "Kullanıcı bulunamadı",
-    "noGroups": "Kullanılabilir izin grubu yok",
+    "noGroups": "Kullanılabilir yetki grubu yok",
     "selectAll": "Tümünü seç"
   },
   "wmsScopePolicies": {
-    "title": "WMS Kapsam Politikaları",
-    "description": "Depo, şube ve atama bazlı veri kapsamı kurallarını yönetin",
+    "title": "B2B Kapsam Politikaları",
+    "description": "Şube, müşteri, katalog ve atama bazlı veri kapsamı kurallarını yönetin",
     "add": "Politika Ekle",
     "stats": {
       "total": "Toplam Politika",
@@ -144,8 +144,8 @@
       "entities": "Kapsanan Akış"
     },
     "form": {
-      "addTitle": "WMS Kapsam Politikası Ekle",
-      "editTitle": "WMS Kapsam Politikasını Düzenle",
+      "addTitle": "B2B Kapsam Politikası Ekle",
+      "editTitle": "B2B Kapsam Politikasını Düzenle",
       "addDescription": "Yeni bir veri kapsamı politikası tanımlayın.",
       "editDescription": "Politika davranışını ve kapsam tipini güncelleyin.",
       "code": "Kod",
@@ -173,13 +173,13 @@
       "isActive": "Aktif"
     },
     "delete": {
-      "confirmTitle": "WMS Kapsam Politikasını Sil",
+      "confirmTitle": "B2B Kapsam Politikasını Sil",
       "confirmMessage": "\"{{name}}\" politikasını silmek istediğinizden emin misiniz?"
     }
   },
   "wmsScopeAssignments": {
-    "title": "WMS Kapsam Atamaları",
-    "description": "Kullanıcıların hangi şube/depo ve kayıt kapsamında çalışacağını yönetin",
+    "title": "B2B Kapsam Atamaları",
+    "description": "Kullanıcıların hangi şube, müşteri, katalog ve kayıt kapsamında çalışacağını yönetin",
     "selectUser": "Kullanıcı Seç",
     "selectUserPlaceholder": "Ara ve kullanıcı seç...",
     "selectUserHint": "Scope atamalarını düzenlemek için bir kullanıcı seçin",
@@ -193,7 +193,7 @@
     "editorTitle": "Atama Editörü",
     "editorDescription": "Kullanıcıya birden fazla entity tipi için şube/depo bazlı kapsam tanımlayabilirsiniz.",
     "addAssignment": "Atama Ekle",
-    "empty": "Bu kullanıcı için henüz WMS scope ataması yok.",
+    "empty": "Bu kullanıcı için henüz B2B kapsam ataması yok.",
     "policyPlaceholder": "Politika seçin",
     "branchCodePlaceholder": "Şube kodu",
     "warehousePlaceholder": "Depo seçin",
@@ -227,10 +227,10 @@
   },
   "sidebar": {
     "accessControl": "Erişim Kontrolü",
-    "permissionDefinitions": "İzin Tanımları",
-    "permissionGroups": "İzin Grupları",
+    "permissionDefinitions": "Yetki Tanımları",
+    "permissionGroups": "Yetki Grupları",
     "userGroupAssignments": "Kullanıcı Grup Atamaları",
-    "wmsScopePolicies": "WMS Kapsam Politikaları",
-    "wmsScopeAssignments": "WMS Kapsam Atamaları"
+    "wmsScopePolicies": "B2B Kapsam Politikaları",
+    "wmsScopeAssignments": "B2B Kapsam Atamaları"
   }
 }
