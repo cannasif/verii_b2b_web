@@ -1,6 +1,6 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react';
+import { ArrowDown, ArrowUp, CheckCircle2, Clock3, FileText, GitBranchPlus, RefreshCw, ShoppingCart, TriangleAlert } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { DetailPageShell, FormPageShell, PagedDataGrid, PagedLookupDialog, type PagedDataGridColumn } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
@@ -570,6 +570,40 @@ const workspaceFilterColumns: readonly FilterColumnConfig[] = [
 ];
 
 function getWorkspaceTableConfig(kind: B2bWorkspaceKind): WorkspaceTableConfig {
+  const commercialColumns: Partial<Record<B2bWorkspaceKind, PagedDataGridColumn<WorkspaceColumnKey>[]>> = {
+    quotes: [
+      { key: 'primary', label: 'Talep / Teklif No' },
+      { key: 'secondary', label: 'Revizyon / Tip' },
+      { key: 'scope', label: 'Cari / Proje' },
+      { key: 'status', label: 'Süreç Durumu' },
+      { key: 'amount', label: 'Teklif Toplamı' },
+      { key: 'date', label: 'Tarih / Geçerlilik' },
+    ],
+    orders: [
+      { key: 'primary', label: 'Sipariş No' },
+      { key: 'secondary', label: 'ERP / Netsis' },
+      { key: 'scope', label: 'Cari / Proje' },
+      { key: 'status', label: 'Sipariş Durumu' },
+      { key: 'amount', label: 'Sipariş Toplamı' },
+      { key: 'date', label: 'Tarih' },
+    ],
+  };
+
+  const commercialFilterColumns: Partial<Record<B2bWorkspaceKind, readonly FilterColumnConfig[]>> = {
+    quotes: [
+      { value: 'primary', type: 'string', labelKey: 'Talep / Teklif No', label: 'Talep / Teklif No' },
+      { value: 'secondary', type: 'string', labelKey: 'Revizyon / Tip', label: 'Revizyon / Tip' },
+      { value: 'scope', type: 'string', labelKey: 'Cari / Proje', label: 'Cari / Proje' },
+      { value: 'status', type: 'string', labelKey: 'Süreç Durumu', label: 'Süreç Durumu' },
+    ],
+    orders: [
+      { value: 'primary', type: 'string', labelKey: 'Sipariş No', label: 'Sipariş No' },
+      { value: 'secondary', type: 'string', labelKey: 'ERP / Netsis', label: 'ERP / Netsis' },
+      { value: 'scope', type: 'string', labelKey: 'Cari / Proje', label: 'Cari / Proje' },
+      { value: 'status', type: 'string', labelKey: 'Sipariş Durumu', label: 'Sipariş Durumu' },
+    ],
+  };
+
   const sortMaps: Record<B2bWorkspaceKind, Partial<Record<WorkspaceColumnKey, string>>> = {
     insights: {},
     companies: { primary: 'CompanyName', secondary: 'CompanyCode', scope: 'CustomerId', status: 'Status', amount: 'CreditLimit' },
@@ -591,8 +625,8 @@ function getWorkspaceTableConfig(kind: B2bWorkspaceKind): WorkspaceTableConfig {
     pageKey: `b2b-workspace-${kind}`,
     defaultSortBy: kind === 'catalog' ? 'primary' : 'date',
     mapSortBy: (columnKey) => sortMaps[kind][columnKey] ?? 'Id',
-    columns: workspaceColumns,
-    filterColumns: workspaceFilterColumns,
+    columns: commercialColumns[kind] ?? workspaceColumns,
+    filterColumns: commercialFilterColumns[kind] ?? workspaceFilterColumns,
   };
 }
 
@@ -601,6 +635,49 @@ function renderStatusBadge(label: string, active?: boolean): ReactElement {
     return <Badge variant={active ? 'default' : 'secondary'}>{label}</Badge>;
   }
   return <Badge variant={statusBadgeVariant(label)}>{label || '-'}</Badge>;
+}
+
+function isCommercialWorkspace(kind: B2bWorkspaceKind): boolean {
+  return kind === 'quotes' || kind === 'orders';
+}
+
+function normalizeCommercialStatus(status?: string): string {
+  return (status || 'Draft').trim();
+}
+
+function isWaitingCommercialStatus(status?: string): boolean {
+  return ['Draft', 'Submitted', 'Pending', 'WaitingApproval', 'WaitingOffer', 'Created'].includes(normalizeCommercialStatus(status));
+}
+
+function isApprovedCommercialStatus(status?: string): boolean {
+  return ['Approved', 'Accepted', 'Completed', 'ConvertedToCart', 'ConvertedToOrder', 'Paid'].includes(normalizeCommercialStatus(status));
+}
+
+function isRiskCommercialStatus(status?: string): boolean {
+  return ['Failed', 'Rejected', 'Cancelled', 'Blocked'].includes(normalizeCommercialStatus(status));
+}
+
+function getCommercialMetrics(kind: B2bWorkspaceKind, rows: WorkspaceRow[]) {
+  const commercialRows = rows.filter((row) => kind === 'quotes' ? isQuote(row) : isOrder(row));
+  const waitingCount = commercialRows.filter((row) => {
+    const status = isQuote(row) ? row.status : isOrder(row) ? row.status : '';
+    return isWaitingCommercialStatus(status);
+  }).length;
+  const approvedCount = commercialRows.filter((row) => {
+    const status = isQuote(row) ? row.status : isOrder(row) ? row.status : '';
+    return isApprovedCommercialStatus(status);
+  }).length;
+  const riskCount = commercialRows.filter((row) => {
+    const status = isQuote(row) ? row.status : isOrder(row) ? row.status : '';
+    return isRiskCommercialStatus(status);
+  }).length;
+  const total = commercialRows.reduce((sum, row) => {
+    if (isQuote(row)) return sum + (row.estimatedTotal || 0);
+    if (isOrder(row)) return sum + (row.grandTotal || 0);
+    return sum;
+  }, 0);
+
+  return { count: commercialRows.length, waitingCount, approvedCount, riskCount, total };
 }
 
 function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKey: WorkspaceColumnKey): ReactElement | string {
@@ -1011,6 +1088,7 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
     [orderedVisibleColumns, tableConfig.columns],
   );
   const exportRows = useMemo(() => rows.map((row) => workspaceExportRow(kind, row)), [kind, rows]);
+  const commercialMetrics = useMemo(() => getCommercialMetrics(kind, rows), [kind, rows]);
   const renderSortIcon = (columnKey: WorkspaceColumnKey): ReactElement | null => {
     if (columnKey !== pagedGrid.sortBy) return null;
     return pagedGrid.sortDirection === 'asc' ? <ArrowUp className="ml-1 h-3.5 w-3.5" /> : <ArrowDown className="ml-1 h-3.5 w-3.5" />;
@@ -1059,6 +1137,80 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
           </Button>
         </div>
       </div>
+
+      {isCommercialWorkspace(kind) ? (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <Card className="overflow-hidden border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3">
+            <CardContent className="flex items-center gap-4 p-5">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-950">
+                {kind === 'quotes' ? <FileText className="h-5 w-5" /> : <ShoppingCart className="h-5 w-5" />}
+              </span>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Toplam kayıt</p>
+                <p className="text-2xl font-black text-slate-950 dark:text-white">{commercialMetrics.count}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="overflow-hidden border-amber-200/80 bg-amber-50/60 shadow-sm dark:border-amber-400/20 dark:bg-amber-500/10">
+            <CardContent className="flex items-center gap-4 p-5">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-600 text-white">
+                <Clock3 className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-700 dark:text-amber-200">Aksiyon bekleyen</p>
+                <p className="text-2xl font-black text-amber-950 dark:text-amber-50">{commercialMetrics.waitingCount}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="overflow-hidden border-emerald-200/80 bg-emerald-50/60 shadow-sm dark:border-emerald-400/20 dark:bg-emerald-500/10">
+            <CardContent className="flex items-center gap-4 p-5">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-700 text-white">
+                <CheckCircle2 className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-200">Onaylı / tamam</p>
+                <p className="text-2xl font-black text-emerald-950 dark:text-emerald-50">{commercialMetrics.approvedCount}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="overflow-hidden border-rose-200/80 bg-rose-50/60 shadow-sm dark:border-rose-400/20 dark:bg-rose-500/10">
+            <CardContent className="flex items-center gap-4 p-5">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-700 text-white">
+                <TriangleAlert className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700 dark:text-rose-200">Riskli kayıt</p>
+                <p className="text-2xl font-black text-rose-950 dark:text-rose-50">{commercialMetrics.riskCount}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : null}
+
+      {kind === 'quotes' ? (
+        <Card className="border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3">
+          <CardHeader className="border-b border-slate-100 bg-slate-50/70 dark:border-white/10 dark:bg-white/5">
+            <CardTitle className="flex items-center gap-2">
+              <GitBranchPlus className="h-5 w-5" />
+              Talep / Teklif İş Akışı
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 pt-6 md:grid-cols-4">
+            {[
+              ['1', 'Talep alınır', 'Portal, hızlı sipariş veya satış ekibi talebi oluşturur.'],
+              ['2', 'Fiyat netleşir', 'Effective price, iskonto, termin ve müşteri notu aynı kayıtta izlenir.'],
+              ['3', 'Onaylanır', 'Revizyon ve pazarlık geçmişi bozulmadan teklif onaya gider.'],
+              ['4', 'Sepete / siparişe döner', 'Onaylı teklif tek aksiyonla sepete alınır ve siparişe çevrilir.'],
+            ].map(([step, title, text]) => (
+              <div key={step} className="rounded-2xl border border-slate-200 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
+                <span className="mb-3 flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-600 text-sm font-black text-white">{step}</span>
+                <p className="font-black text-slate-950 dark:text-white">{title}</p>
+                <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">{text}</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
 
       {kind === 'orders' ? (
         <Card className="border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3">
