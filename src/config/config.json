@@ -1,0 +1,25 @@
+{
+  "branches": [
+    {
+      "id": "1",
+      "name": "Merkez Şube",
+      "code": "MERKEZ"
+    },
+    {
+      "id": "2",
+      "name": "İstanbul Şubesi",
+      "code": "IST"
+    },
+    {
+      "id": "3",
+      "name": "Ankara Şubesi",
+      "code": "ANK"
+    },
+    {
+      "id": "4",
+      "name": "İzmir Şubesi",
+      "code": "IZM"
+    }
+  ]
+}
+

@@ -1,0 +1,236 @@
+{
+  "help": {
+    "permissionDefinition": {
+      "code": "Unique key used by route and page guards. Prefer stable snake_case or dot naming.",
+      "name": "Display name shown to admins when managing permissions.",
+      "description": "Optional internal explanation for this permission.",
+      "isActive": "Inactive permissions are not considered when calculating user access.",
+      "save": "Changes affect role and group authorization flows."
+    },
+    "permissionGroup": {
+      "name": "Group name for identification when assigning to users.",
+      "isSystemAdmin": "Members of this group can access all pages and actions without individual permission checks.",
+      "isActive": "Inactive groups should not be assigned for new access decisions.",
+      "permissions": "Selected permissions define what members of this group can access.",
+      "save": "Updates effective access for all users assigned to this group."
+    },
+    "userAssignment": {
+      "user": "Choose the user whose access scope you want to manage.",
+      "groups": "User receives combined permissions from all selected groups.",
+      "save": "Assignments apply immediately for the next authorization checks. Users may need to refresh their session.",
+      "systemAdminNote": "If the user has a system-admin group, detailed permissions are bypassed."
+    },
+    "wmsScopePolicy": {
+      "code": "Policy code is the stable key used by backend enforcement and support flows.",
+      "name": "Operational display name that explains why the policy exists.",
+      "entityType": "Determines which document or workflow type this policy applies to.",
+      "scopeType": "Defines whether access is unrestricted, branch-based, warehouse-based, or assigned-only.",
+      "description": "Optional internal note used for support and audit context."
+    }
+  },
+  "permissionDefinitions": {
+    "title": "Permission Definitions",
+    "description": "Manage permission codes used in the system",
+    "add": "Add Definition",
+    "form": {
+      "editTitle": "Edit Permission Definition",
+      "addTitle": "Add Permission Definition",
+      "editDescription": "Update permission definition details",
+      "addDescription": "Create a new permission definition",
+      "code": "Code",
+      "codePlaceholder": "Select a code",
+      "affectedRoutes": "Affected pages",
+      "affectedRoutesNone": "No matching routes found for this code",
+      "name": "Name",
+      "namePlaceholder": "Display name",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "isActive": "Active",
+      "codeSearchPlaceholder": "Search...",
+      "codeEmpty": "No results found"
+    },
+    "table": {
+      "code": "Code",
+      "name": "Name",
+      "isActive": "Active",
+      "updatedDate": "Updated",
+      "showing": "{{from}}-{{to}} of {{total}}"
+    },
+    "delete": {
+      "confirmTitle": "Delete Permission Definition",
+      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+    },
+    "syncFromRoutes": "Sync from routes"
+  },
+  "permissionGroups": {
+    "title": "Permission Groups",
+    "description": "Manage permission groups and their assignments",
+    "add": "Add Group",
+    "selectAll": "Select all",
+    "noDefinitions": "No permission definitions available",
+    "form": {
+      "editTitle": "Edit Permission Group",
+      "addTitle": "Add Permission Group",
+      "editDescription": "Update permission group details",
+      "addDescription": "Create a new permission group",
+      "name": "Name",
+      "namePlaceholder": "Group name",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "isSystemAdmin": "System Admin",
+      "isActive": "Active",
+      "permissions": "Permissions"
+    },
+    "table": {
+      "name": "Name",
+      "isSystemAdmin": "System Admin",
+      "isActive": "Active",
+      "permissionCount": "Permissions",
+      "showing": "{{from}}-{{to}} of {{total}}"
+    },
+    "managePermissions": "Manage permissions",
+    "permissionsPanel": {
+      "title": "Edit Group Permissions",
+      "description": "Select permissions for this group",
+      "currentCodes": "Current permission codes",
+      "introTitle": "What can this group do?",
+      "introBody": "Below, you choose which modules this group can view, create, update, or delete. Every user assigned to this group receives the same permission set.",
+      "selectionSummaryTitle": "Selected CRUD summary",
+      "selectionSummaryBody": "This summary helps you quickly see which operation types are currently granted to the group.",
+      "searchPlaceholder": "Search by module, action, or permission name...",
+      "selectActionGroup": "Select all {{action}} permissions"
+    },
+    "delete": {
+      "confirmTitle": "Delete Permission Group",
+      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+    },
+    "search": "Search...",
+    "systemAdminLocked": "System Admin group cannot be modified"
+  },
+  "accessControl": {
+    "permissionActions": {
+      "view": {
+        "description": "Opens list, detail, and read-only monitoring screens."
+      },
+      "create": {
+        "description": "Opens new record creation and first-save steps."
+      },
+      "update": {
+        "description": "Opens edit, process, and change-saving steps for existing records."
+      },
+      "delete": {
+        "description": "Allows soft delete, deactivation, or delete actions."
+      }
+    }
+  },
+  "userGroupAssignments": {
+    "title": "User Group Assignments",
+    "description": "Assign permission groups to users",
+    "selectUser": "Select User",
+    "selectUserPlaceholder": "Search and select user...",
+    "selectUserHint": "Select a user to manage their permission group assignments",
+    "assignedGroups": "Assigned Permission Groups",
+    "noUsers": "No users found",
+    "noGroups": "No permission groups available",
+    "selectAll": "Select all"
+  },
+  "wmsScopePolicies": {
+    "title": "WMS Scope Policies",
+    "description": "Manage branch, warehouse, and assignment-based data scope rules",
+    "add": "Add Policy",
+    "stats": {
+      "total": "Total Policies",
+      "active": "Active Policies",
+      "entities": "Covered Flows"
+    },
+    "form": {
+      "addTitle": "Add WMS Scope Policy",
+      "editTitle": "Edit WMS Scope Policy",
+      "addDescription": "Define a new data-scope policy.",
+      "editDescription": "Update the policy behavior and scope type.",
+      "code": "Code",
+      "codePlaceholder": "Select a policy code",
+      "codeEmpty": "No suitable policy code found",
+      "name": "Name",
+      "namePlaceholder": "Policy display name",
+      "entityType": "Entity Type",
+      "entityTypePlaceholder": "Select an entity type",
+      "scopeType": "Scope Type",
+      "scopeTypePlaceholder": "Select a scope type",
+      "description": "Description",
+      "descriptionPlaceholder": "Explain the operational context",
+      "includeSelf": "Include Own Records",
+      "includeSelfHint": "Allows the user to also see their own records when the policy is assignment, branch, or warehouse based.",
+      "isActive": "Active",
+      "isActiveHint": "Inactive policies are ignored in resolution and assignment flows."
+    },
+    "table": {
+      "code": "Code",
+      "name": "Name",
+      "entityType": "Entity Type",
+      "scopeType": "Scope Type",
+      "includeSelf": "Include Self",
+      "isActive": "Active"
+    },
+    "delete": {
+      "confirmTitle": "Delete WMS Scope Policy",
+      "confirmMessage": "Are you sure you want to delete \"{{name}}\"?"
+    }
+  },
+  "wmsScopeAssignments": {
+    "title": "WMS Scope Assignments",
+    "description": "Manage which branch, warehouse, and record scope each user can operate on",
+    "selectUser": "Select User",
+    "selectUserPlaceholder": "Search and select user...",
+    "selectUserHint": "Choose a user to edit scope assignments.",
+    "noUserSelected": "No user selected yet",
+    "noUsers": "No users found",
+    "assignedPolicies": "Assigned Policies",
+    "resolutionScope": "Reviewed Flow",
+    "statusLabel": "Status",
+    "statusPending": "Unsaved changes",
+    "statusCurrent": "In sync with server",
+    "editorTitle": "Assignment Editor",
+    "editorDescription": "You can define branch and warehouse based scope for multiple entity types.",
+    "addAssignment": "Add Assignment",
+    "empty": "This user does not have any WMS scope assignments yet.",
+    "policyPlaceholder": "Select policy",
+    "branchCodePlaceholder": "Branch code",
+    "warehousePlaceholder": "Select warehouse",
+    "previewTitle": "Access Preview",
+    "previewDescription": "Shows the effective scope resolution for the selected entity type.",
+    "entityTypePlaceholder": "Select entity type",
+    "previewEmpty": "Choose a user and entity type to see the effective scope here.",
+    "previewUnrestricted": "Unrestricted access",
+    "previewIncludeSelf": "Own records included",
+    "previewAssignedOnly": "Assigned records only",
+    "previewBranches": "Branches",
+    "previewWarehouses": "Warehouses",
+    "previewAssignments": "Matching Assignments",
+    "noExplicitPolicy": "No explicit policy"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save": "Save and Apply",
+    "loading": "Loading...",
+    "search": "Search...",
+    "noData": "No data",
+    "actions": "Actions",
+    "yes": "Yes",
+    "no": "No",
+    "edit": "Edit",
+    "delete": "Delete",
+    "previous": "Previous",
+    "next": "Next",
+    "processing": "Processing..."
+  },
+  "sidebar": {
+    "accessControl": "Access Control",
+    "permissionDefinitions": "Permission Definitions",
+    "permissionGroups": "Permission Groups",
+    "userGroupAssignments": "User Group Assignments",
+    "wmsScopePolicies": "WMS Scope Policies",
+    "wmsScopeAssignments": "WMS Scope Assignments"
+  }
+}

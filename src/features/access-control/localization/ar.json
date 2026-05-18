@@ -1,0 +1,152 @@
+{
+  "help": {
+    "permissionDefinition": {
+      "code": "مفتاح فريد يستخدمه حراس المسار والصفحة.",
+      "name": "الاسم المعروض للمسؤولين عند إدارة الأذونات.",
+      "description": "شرح داخلي اختياري لهذا الإذن.",
+      "isActive": "الأذونات غير النشطة لا تؤخذ بعين الاعتبار عند حساب وصول المستخدم.",
+      "save": "التغييرات تؤثر على تدفقات تفويض الأدوار والمجموعات."
+    },
+    "permissionGroup": {
+      "name": "اسم المجموعة للتعريف عند التعيين للمستخدمين.",
+      "isSystemAdmin": "يمكن لأعضاء هذه المجموعة الوصول إلى جميع الصفحات والإجراءات دون فحوصات فردية.",
+      "isActive": "لا ينبغي تعيين المجموعات غير النشطة لقرارات الوصول الجديدة.",
+      "permissions": "الأذونات المحددة تحدد ما يمكن لأعضاء المجموعة الوصول إليه.",
+      "save": "يحدث الوصول الفعلي لجميع المستخدمين المعينين لهذه المجموعة."
+    },
+    "userAssignment": {
+      "user": "اختر المستخدم الذي تريد إدارة نطاق وصوله.",
+      "groups": "يتلقى المستخدم أذونات مدمجة من جميع المجموعات المحددة.",
+      "save": "تُطبق التعيينات فوراً. قد يحتاج المستخدمون إلى تحديث جلستهم.",
+      "systemAdminNote": "إذا كان للمستخدم مجموعة مسؤول النظام، يتم تجاوز الأذونات التفصيلية."
+    }
+  },
+  "permissionDefinitions": {
+    "title": "تعريفات الأذونات",
+    "description": "إدارة رموز الأذونات المستخدمة في النظام",
+    "add": "إضافة تعريف",
+    "form": {
+      "editTitle": "Edit Permission Definition",
+      "addTitle": "Add Permission Definition",
+      "editDescription": "Update permission definition details",
+      "addDescription": "Create a new permission definition",
+      "code": "Code",
+      "codePlaceholder": "Select a code",
+      "affectedRoutes": "Affected pages",
+      "affectedRoutesNone": "No matching routes found for this code",
+      "name": "Name",
+      "namePlaceholder": "Display name",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "isActive": "Active",
+      "codeSearchPlaceholder": "Search...",
+      "codeEmpty": "No results found"
+    },
+    "table": {
+      "code": "Code",
+      "name": "Name",
+      "isActive": "Active",
+      "updatedDate": "Updated",
+      "showing": "{{from}}-{{to}} of {{total}}"
+    },
+    "delete": {
+      "confirmTitle": "Delete Permission Definition",
+      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+    },
+    "syncFromRoutes": "مزامنة من المسارات"
+  },
+  "permissionGroups": {
+    "title": "مجموعات الأذونات",
+    "description": "إدارة مجموعات الأذونات وتعييناتها",
+    "add": "إضافة مجموعة",
+    "selectAll": "تحديد الكل",
+    "noDefinitions": "لا تتوفر تعريفات أذونات",
+    "form": {
+      "editTitle": "Edit Permission Group",
+      "addTitle": "Add Permission Group",
+      "editDescription": "Update permission group details",
+      "addDescription": "Create a new permission group",
+      "name": "Name",
+      "namePlaceholder": "Group name",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "isSystemAdmin": "System Admin",
+      "isActive": "Active",
+      "permissions": "Permissions"
+    },
+    "table": {
+      "name": "Name",
+      "isSystemAdmin": "System Admin",
+      "isActive": "Active",
+      "permissionCount": "Permissions",
+      "showing": "{{from}}-{{to}} of {{total}}"
+    },
+    "managePermissions": "إدارة الأذونات",
+    "permissionsPanel": {
+      "title": "Edit Group Permissions",
+      "description": "Select permissions for this group",
+      "currentCodes": "Current permission codes",
+      "introTitle": "What can this group do?",
+      "introBody": "Below, you choose which modules this group can view, create, update, or delete. Every user assigned to this group receives the same permission set.",
+      "selectionSummaryTitle": "Selected CRUD summary",
+      "selectionSummaryBody": "This summary helps you quickly see which operation types are currently granted to the group.",
+      "searchPlaceholder": "Search by module, action, or permission name...",
+      "selectActionGroup": "Select all {{action}} permissions"
+    },
+    "delete": {
+      "confirmTitle": "Delete Permission Group",
+      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+    },
+    "search": "بحث...",
+    "systemAdminLocked": "لا يمكن تعديل مجموعة مسؤول النظام"
+  },
+  "userGroupAssignments": {
+    "title": "تعيينات مجموعات المستخدمين",
+    "description": "تعيين مجموعات الأذونات للمستخدمين",
+    "selectUser": "اختر مستخدماً",
+    "selectUserPlaceholder": "ابحث وحدد مستخدماً...",
+    "selectUserHint": "حدد مستخدماً لإدارة تعيينات مجموعاته",
+    "assignedGroups": "مجموعات الأذونات المعينة",
+    "noUsers": "لم يتم العثور على مستخدمين",
+    "noGroups": "لا تتوفر مجموعات أذونات",
+    "selectAll": "تحديد الكل"
+  },
+  "common": {
+    "cancel": "إلغاء",
+    "saving": "جارٍ الحفظ...",
+    "save": "حفظ وتطبيق",
+    "loading": "جارٍ التحميل...",
+    "search": "بحث...",
+    "noData": "لا توجد بيانات",
+    "actions": "إجراءات",
+    "yes": "نعم",
+    "no": "لا",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "previous": "السابق",
+    "next": "التالي",
+    "processing": "جارٍ المعالجة..."
+  },
+  "sidebar": {
+    "accessControl": "التحكم في الوصول",
+    "permissionDefinitions": "تعريفات الأذونات",
+    "permissionGroups": "مجموعات الأذونات",
+    "userGroupAssignments": "تعيينات مجموعات المستخدمين"
+  },
+  "accessControl": {
+    "permissionActions": {
+      "view": {
+        "description": "Opens list, detail, and read-only monitoring screens."
+      },
+      "create": {
+        "description": "Opens new record creation and first-save steps."
+      },
+      "update": {
+        "description": "Opens edit, process, and change-saving steps for existing records."
+      },
+      "delete": {
+        "description": "Allows soft delete, deactivation, or delete actions."
+      }
+    }
+  }
+}

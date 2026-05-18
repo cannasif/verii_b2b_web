@@ -1,0 +1,152 @@
+{
+  "help": {
+    "permissionDefinition": {
+      "code": "Clé unique utilisée par les gardes de route et de page. Préférez une notation snake_case ou point stable.",
+      "name": "Nom affiché aux administrateurs lors de la gestion des permissions.",
+      "description": "Explication interne facultative pour cette permission.",
+      "isActive": "Les permissions inactives ne sont pas prises en compte lors du calcul de l'accès utilisateur.",
+      "save": "Les modifications affectent les flux d'autorisation des rôles et des groupes."
+    },
+    "permissionGroup": {
+      "name": "Nom du groupe pour l'identification lors de l'attribution aux utilisateurs.",
+      "isSystemAdmin": "Les membres de ce groupe peuvent accéder à toutes les pages et actions sans vérification individuelle des permissions.",
+      "isActive": "Les groupes inactifs ne doivent pas être attribués pour les nouvelles décisions d'accès.",
+      "permissions": "Les permissions sélectionnées définissent ce à quoi les membres de ce groupe peuvent accéder.",
+      "save": "Met à jour l'accès effectif pour tous les utilisateurs assignés à ce groupe."
+    },
+    "userAssignment": {
+      "user": "Choisissez l'utilisateur dont vous souhaitez gérer la portée d'accès.",
+      "groups": "L'utilisateur reçoit les permissions combinées de tous les groupes sélectionnés.",
+      "save": "Les affectations s'appliquent immédiatement pour les prochains contrôles d'autorisation. Les utilisateurs devront peut-être rafraîchir leur session.",
+      "systemAdminNote": "Si l'utilisateur a un groupe administrateur système, les permissions détaillées sont contournées."
+    }
+  },
+  "permissionDefinitions": {
+    "title": "Permission Definitions",
+    "description": "Manage permission codes used in the system",
+    "add": "Add Definition",
+    "form": {
+      "editTitle": "Edit Permission Definition",
+      "addTitle": "Add Permission Definition",
+      "editDescription": "Update permission definition details",
+      "addDescription": "Create a new permission definition",
+      "code": "Code",
+      "name": "Name",
+      "namePlaceholder": "Display name",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "isActive": "Active",
+      "codePlaceholder": "Choisissez le code",
+      "affectedRoutes": "Pages concernées",
+      "affectedRoutesNone": "Aucun itinéraire correspondant trouvé pour ce code",
+      "codeSearchPlaceholder": "Rechercher...",
+      "codeEmpty": "Aucun résultat trouvé"
+    },
+    "table": {
+      "code": "Code",
+      "name": "Name",
+      "isActive": "Active",
+      "updatedDate": "Updated",
+      "showing": "{{from}}-{{to}} of {{total}}"
+    },
+    "delete": {
+      "confirmTitle": "Delete Permission Definition",
+      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+    },
+    "syncFromRoutes": "Synchroniser à partir des itinéraires"
+  },
+  "permissionGroups": {
+    "title": "Permission Groups",
+    "description": "Manage permission groups and their assignments",
+    "add": "Add Group",
+    "selectAll": "Select all",
+    "noDefinitions": "No permission definitions available",
+    "form": {
+      "editTitle": "Edit Permission Group",
+      "addTitle": "Add Permission Group",
+      "editDescription": "Update permission group details",
+      "addDescription": "Create a new permission group",
+      "name": "Name",
+      "namePlaceholder": "Group name",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "isSystemAdmin": "System Admin",
+      "isActive": "Active",
+      "permissions": "Permissions"
+    },
+    "table": {
+      "name": "Name",
+      "isSystemAdmin": "System Admin",
+      "isActive": "Active",
+      "permissionCount": "Permissions",
+      "showing": "{{from}}-{{to}} of {{total}}"
+    },
+    "managePermissions": "Manage permissions",
+    "permissionsPanel": {
+      "title": "Edit Group Permissions",
+      "description": "Select permissions for this group",
+      "currentCodes": "Current permission codes",
+      "introTitle": "What can this group do?",
+      "introBody": "Below, you choose which modules this group can view, create, update, or delete. Every user assigned to this group receives the same permission set.",
+      "selectionSummaryTitle": "Selected CRUD summary",
+      "selectionSummaryBody": "This summary helps you quickly see which operation types are currently granted to the group.",
+      "searchPlaceholder": "Search by module, action, or permission name...",
+      "selectActionGroup": "Select all {{action}} permissions"
+    },
+    "delete": {
+      "confirmTitle": "Delete Permission Group",
+      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+    },
+    "search": "Rechercher...",
+    "systemAdminLocked": "Le groupe System Admin ne peut pas être modifié"
+  },
+  "userGroupAssignments": {
+    "title": "User Group Assignments",
+    "description": "Assign permission groups to users",
+    "selectUser": "Select User",
+    "selectUserPlaceholder": "Search and select user...",
+    "selectUserHint": "Select a user to manage their permission group assignments",
+    "assignedGroups": "Assigned Permission Groups",
+    "noUsers": "No users found",
+    "noGroups": "No permission groups available",
+    "selectAll": "Select all"
+  },
+  "common": {
+    "cancel": "Annuler",
+    "saving": "Enregistrement...",
+    "save": "Enregistrer et appliquer",
+    "loading": "Chargement...",
+    "search": "Rechercher...",
+    "noData": "Aucune donnée",
+    "actions": "Transactions",
+    "yes": "Oui",
+    "no": "Non",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "processing": "Traitement..."
+  },
+  "sidebar": {
+    "accessControl": "Contrôle d'accès",
+    "permissionDefinitions": "Définitions des permissions",
+    "permissionGroups": "Groupes de permissions",
+    "userGroupAssignments": "Affectations de groupes utilisateurs"
+  },
+  "accessControl": {
+    "permissionActions": {
+      "view": {
+        "description": "Opens list, detail, and read-only monitoring screens."
+      },
+      "create": {
+        "description": "Opens new record creation and first-save steps."
+      },
+      "update": {
+        "description": "Opens edit, process, and change-saving steps for existing records."
+      },
+      "delete": {
+        "description": "Allows soft delete, deactivation, or delete actions."
+      }
+    }
+  }
+}
