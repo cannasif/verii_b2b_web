@@ -97,9 +97,9 @@ const configs: Record<B2bWorkspaceKind, WorkspaceConfig> = {
   },
   catalog: {
     title: 'B2B Katalog',
-    description: 'ERP stoklarını bozmadan müşteriye gösterilecek dijital ürün kartlarını ve varyantlarını yönetin.',
+    description: 'ERP stok kartını seçin, müşteri portalında görünecek ürün bilgisini sadeleştirip yayınlayın.',
     breadcrumb: 'Katalog',
-    emptyState: 'Henüz katalog ürünü yok. İlk adım ERP stoklarından yayınlanacak ürün havuzunu oluşturmak.',
+    emptyState: 'Henüz katalog ürünü yok. ERP stok kartı seçerek ilk ürünü yayınlayın.',
   },
   matches: {
     title: 'Ürün Eşleştirme',
@@ -193,6 +193,8 @@ type B2bFormField = {
   lookupKind?: B2bLookupKind;
   required?: boolean;
   placeholder?: string;
+  helpText?: string;
+  hidden?: boolean;
   colSpan?: 'full';
 };
 
@@ -218,6 +220,21 @@ function trimOptional(value: string | boolean): string | undefined {
   if (typeof value === 'boolean') return undefined;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function slugify(value: string): string {
+  return value
+    .toLocaleLowerCase('tr-TR')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ı/g, 'i')
+    .replace(/ğ/g, 'g')
+    .replace(/ü/g, 'u')
+    .replace(/ş/g, 's')
+    .replace(/ö/g, 'o')
+    .replace(/ç/g, 'c')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function baseTransform(values: Record<string, string | boolean>): Record<string, unknown> {
@@ -260,15 +277,15 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
   catalog: {
     defaults: { sku: '', name: '', slug: '', brand: '', categoryPath: '', description: '', primaryImageUrl: '', defaultStockId: '', isPublished: false },
     fields: [
-      { name: 'sku', label: 'SKU', required: true },
-      { name: 'name', label: 'Ürün Adı', required: true },
-      { name: 'slug', label: 'Slug' },
-      { name: 'brand', label: 'Marka' },
-      { name: 'categoryPath', label: 'Kategori Yolu' },
-      { name: 'defaultStockId', label: 'Varsayılan ERP Stok', type: 'lookup', lookupKind: 'stock' },
-      { name: 'primaryImageUrl', label: 'Ana Görsel URL', colSpan: 'full' },
-      { name: 'description', label: 'Açıklama', type: 'textarea', colSpan: 'full' },
-      { name: 'isPublished', label: 'Yayında', type: 'switch' },
+      { name: 'defaultStockId', label: 'ERP stok kartı', type: 'lookup', lookupKind: 'stock', required: true, colSpan: 'full', helpText: 'Ürünü buradan seçin; kod, ad, marka ve kategori bilgisi otomatik gelir.' },
+      { name: 'sku', label: 'ERP Stok Kodu', hidden: true },
+      { name: 'slug', label: 'Portal Adresi', hidden: true },
+      { name: 'name', label: 'Müşteriye Görünecek Ürün Adı', required: true, placeholder: 'Örn. 40x60 Alüminyum Profil' },
+      { name: 'brand', label: 'Marka / Üretici', placeholder: 'ERP stoktan otomatik gelir, gerekirse düzeltin.' },
+      { name: 'categoryPath', label: 'Portal Kategorisi', placeholder: 'Örn. Profil / Alüminyum / Aksesuar' },
+      { name: 'primaryImageUrl', label: 'Ürün Görsel Bağlantısı', placeholder: 'https://...', colSpan: 'full', helpText: 'Boş bırakabilirsiniz; ürün yine taslak/yayında kaydedilir.' },
+      { name: 'description', label: 'Müşteriye Görünecek Açıklama', type: 'textarea', placeholder: 'Kısa teknik açıklama, kullanım alanı veya satış notu yazın.', colSpan: 'full' },
+      { name: 'isPublished', label: 'Müşteri portalında yayınla', type: 'switch', helpText: 'Kapalı kalırsa ürün taslak olarak kaydedilir, müşteriler görmez.' },
     ],
     mapInitial: (item) => ({
       sku: item.sku,
@@ -281,7 +298,16 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
       defaultStockId: item.defaultStockId ? String(item.defaultStockId) : '',
       isPublished: item.isPublished,
     }),
-    transform: (values) => ({ ...baseTransform(values), defaultStockId: toOptionalNumber(values.defaultStockId) }),
+    transform: (values) => {
+      const payload = baseTransform(values);
+      const name = trimOptional(values.name) ?? trimOptional(values.sku) ?? '';
+      return {
+        ...payload,
+        sku: trimOptional(values.sku),
+        slug: trimOptional(values.slug) ?? slugify(name),
+        defaultStockId: toOptionalNumber(values.defaultStockId),
+      };
+    },
     submit: (payload, id) => id ? b2bApi.updateCatalogProduct(id, payload) : b2bApi.createCatalogProduct(payload),
   },
   matches: {
@@ -1459,15 +1485,27 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
           getKey={(item) => String(item.id)}
           getLabel={(item) => `${item.stokKodu} - ${item.stokAdi}`}
           onSelect={(item) => {
-            const extraValues = field.name === 'erpStockId'
-              ? { erpStockCode: item.stokKodu, unit: item.olcuBr1 }
-              : undefined;
-            setLookupValue(field.name, item.id, `${item.stokKodu} - ${item.stokAdi}`, extraValues);
+            const categoryPath = [item.grupKodu, item.kod1, item.kod2, item.kod3]
+              .filter((value) => Boolean(value?.trim()))
+              .join(' / ');
+            let extraValues: Record<string, string | boolean> | undefined;
+            if (field.name === 'erpStockId') {
+              extraValues = { erpStockCode: item.stokKodu, unit: item.olcuBr1 };
+            } else if (field.name === 'defaultStockId') {
+              extraValues = {
+                sku: item.stokKodu,
+                name: item.stokAdi,
+                slug: slugify(`${item.stokKodu}-${item.stokAdi}`),
+                brand: item.ureticiKodu || '',
+                categoryPath,
+              };
+            }
+            const lookupLabel = `${item.stokKodu} - ${item.stokAdi}`;
+            setLookupValue(field.name, item.id, lookupLabel, extraValues);
           }}
         />
       );
     }
-
     if (field.lookupKind === 'catalogProduct') {
       return (
         <PagedLookupDialog<CatalogProductDto>
@@ -1551,7 +1589,32 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
             saveMutation.mutate();
           }}
         >
+          {kind === 'catalog' ? (
+            <div className="md:col-span-2 rounded-3xl border border-emerald-200/80 bg-emerald-50/80 p-4 text-sm text-emerald-950 shadow-sm dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-50">
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="rounded-2xl bg-white/80 p-3 dark:bg-white/5">
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">1. Ürünü seç</p>
+                  <p className="mt-1 font-semibold">ERP stok kartını arayıp seçin.</p>
+                </div>
+                <div className="rounded-2xl bg-white/80 p-3 dark:bg-white/5">
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">2. Bilgiyi kontrol et</p>
+                  <p className="mt-1 font-semibold">Ad, marka ve kategori otomatik dolar; sadece gerekirse düzeltin.</p>
+                </div>
+                <div className="rounded-2xl bg-white/80 p-3 dark:bg-white/5">
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-300">3. Yayınla</p>
+                  <p className="mt-1 font-semibold">Portalda görünsün istiyorsanız yayın anahtarını açın.</p>
+                </div>
+              </div>
+              {values.sku ? (
+                <div className="mt-3 rounded-2xl border border-emerald-200/70 bg-white/75 px-4 py-3 dark:border-emerald-400/15 dark:bg-white/5">
+                  <span className="font-semibold">Seçilen ERP stok:</span> {values.sku}
+                  {lookupLabels.defaultStockId ? <span className="text-emerald-700 dark:text-emerald-200"> · {lookupLabels.defaultStockId}</span> : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           {formConfig.fields.map((field) => {
+            if (field.hidden) return null;
             const value = values[field.name] ?? '';
             const fieldId = `b2b-${kind}-${field.name}`;
             const wrapperClass = field.colSpan === 'full' ? 'space-y-2 md:col-span-2' : 'space-y-2';
@@ -1570,6 +1633,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
                     {field.label}{field.required ? ' *' : ''}
                   </span>
                   {renderLookupField(field)}
+                  {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
                 </label>
               );
             }
@@ -1591,6 +1655,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
                       ))}
                     </SelectContent>
                   </Select>
+                  {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
                 </label>
               );
             }
@@ -1615,6 +1680,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
                     onChange={(event) => updateValue(field.name, event.target.value)}
                   />
                 )}
+                {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
               </label>
             );
           })}
