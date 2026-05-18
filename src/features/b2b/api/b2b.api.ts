@@ -186,6 +186,16 @@ export const b2bApi = {
     return extractData(response);
   },
 
+  async getPriceList(id: number): Promise<CustomerPriceListDto> {
+    const response = await api.get<ApiResponse<CustomerPriceListDto>>(`/api/b2b/pricing/price-lists/${id}`);
+    return extractData(response);
+  },
+
+  async upsertPriceListItem(priceListId: number, payload: Record<string, unknown>): Promise<unknown> {
+    const response = await api.post<ApiResponse<unknown>>(`/api/b2b/pricing/price-lists/${priceListId}/items`, payload);
+    return extractData(response);
+  },
+
   async resolvePriceAvailability(payload: ResolveB2bPriceAvailabilityDto): Promise<B2bPriceAvailabilityDto> {
     const response = await api.post<ApiResponse<B2bPriceAvailabilityDto>>('/api/b2b/pricing/resolve', payload);
     return extractData(response);
@@ -215,6 +225,11 @@ export const b2bApi = {
       buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
     );
     return normalizePaged(response);
+  },
+
+  async getQuote(id: number): Promise<QuoteRequestDto> {
+    const response = await api.get<ApiResponse<QuoteRequestDto>>(`/api/b2b/quotes/${id}`);
+    return extractData(response);
   },
 
   async createQuote(payload: Record<string, unknown>): Promise<QuoteRequestDto> {
@@ -264,6 +279,11 @@ export const b2bApi = {
       buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
     );
     return normalizePaged(response);
+  },
+
+  async getOrder(id: number): Promise<OrderDto> {
+    const response = await api.get<ApiResponse<OrderDto>>(`/api/b2b/orders/${id}`);
+    return extractData(response);
   },
 
   async quickOrder(payload: QuickOrderDto): Promise<QuickOrderResultDto> {

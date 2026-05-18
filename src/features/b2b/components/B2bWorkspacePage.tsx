@@ -1354,11 +1354,11 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
             previousLabel="Önceki"
             nextLabel="Sonraki"
             paginationInfoText={paginationInfoText}
-            onRowDoubleClick={kind === 'catalog' ? (row) => navigate(`/b2b/${routeSlug}/${row.id}`) : undefined}
+            onRowDoubleClick={['catalog', 'pricing', 'quotes', 'orders'].includes(kind) ? (row) => navigate(`/b2b/${routeSlug}/${row.id}`) : undefined}
             showActionsColumn
             actionsHeaderLabel="İşlem"
             renderActionsCell={(row) => {
-              const detailAction = kind === 'catalog' ? (
+              const detailAction = ['catalog', 'pricing', 'quotes', 'orders'].includes(kind) ? (
                 <Button type="button" size="sm" variant="ghost" onClick={(event) => { event.stopPropagation(); navigate(`/b2b/${routeSlug}/${row.id}`); }}>
                   Detay
                 </Button>
@@ -1862,13 +1862,42 @@ export function B2bRecordDetailPage(): ReactElement {
   const kind = resolveRouteKind(workspaceKind);
   const config = configs[kind];
   const recordId = id ? Number(id) : undefined;
+  const [priceItemValues, setPriceItemValues] = useState({ erpStockId: '', erpStockLabel: '', unitPrice: '', minQuantity: '1', discountRate: '', validFrom: '', validTo: '' });
+  const [priceItemLookupOpen, setPriceItemLookupOpen] = useState(false);
   const detailQuery = useQuery({
     queryKey: ['b2b-record-detail', kind, recordId],
     queryFn: async () => {
-      if (kind !== 'catalog' || !recordId) return null;
-      return b2bApi.getCatalogProduct(recordId);
+      if (!recordId) return null;
+      if (kind === 'catalog') return b2bApi.getCatalogProduct(recordId);
+      if (kind === 'pricing') return b2bApi.getPriceList(recordId);
+      if (kind === 'quotes') return b2bApi.getQuote(recordId);
+      if (kind === 'orders') return b2bApi.getOrder(recordId);
+      return null;
     },
-    enabled: kind === 'catalog' && Boolean(recordId),
+    enabled: ['catalog', 'pricing', 'quotes', 'orders'].includes(kind) && Boolean(recordId),
+  });
+  const priceItemMutation = useMutation({
+    mutationFn: async () => {
+      if (!recordId) throw new Error('Fiyat listesi bulunamadı.');
+      const erpStockId = Number(priceItemValues.erpStockId);
+      const unitPrice = Number(priceItemValues.unitPrice);
+      const minQuantity = Number(priceItemValues.minQuantity || '1');
+      if (!Number.isFinite(erpStockId) || erpStockId <= 0) throw new Error('Ürün seçin.');
+      if (!Number.isFinite(unitPrice) || unitPrice <= 0) throw new Error('Geçerli fiyat girin.');
+      await b2bApi.upsertPriceListItem(recordId, {
+        erpStockId,
+        unitPrice,
+        minQuantity: Number.isFinite(minQuantity) && minQuantity > 0 ? minQuantity : 1,
+        discountRate: priceItemValues.discountRate ? Number(priceItemValues.discountRate) : null,
+        currencyCode: (detailQuery.data as CustomerPriceListDto | undefined)?.currencyCode ?? 'TRY',
+        validFrom: priceItemValues.validFrom || null,
+        validTo: priceItemValues.validTo || null,
+      });
+    },
+    onSuccess: async () => {
+      setPriceItemValues({ erpStockId: '', erpStockLabel: '', unitPrice: '', minQuantity: '1', discountRate: '', validFrom: '', validTo: '' });
+      await detailQuery.refetch();
+    },
   });
 
   useEffect(() => {
@@ -1876,11 +1905,15 @@ export function B2bRecordDetailPage(): ReactElement {
     return () => useUIStore.getState().setPageTitle(null);
   }, [config.title]);
 
-  if (kind !== 'catalog') {
+  if (!['catalog', 'pricing', 'quotes', 'orders'].includes(kind)) {
     return <Navigate to={`/b2b/${routeSlugByKind[kind]}`} replace />;
   }
 
-  const item = detailQuery.data;
+  const item = detailQuery.data as CatalogProductDto | CustomerPriceListDto | QuoteRequestDto | OrderDto | null | undefined;
+  const priceList = kind === 'pricing' ? item as CustomerPriceListDto | null | undefined : null;
+  const quote = kind === 'quotes' ? item as QuoteRequestDto | null | undefined : null;
+  const order = kind === 'orders' ? item as OrderDto | null | undefined : null;
+  const catalog = kind === 'catalog' ? item as CatalogProductDto | null | undefined : null;
 
   return (
     <div className="w-full space-y-6 crm-page">
@@ -1893,10 +1926,10 @@ export function B2bRecordDetailPage(): ReactElement {
       />
       <DetailPageShell
         title={`${config.title} Detay`}
-        description={item ? `${item.sku} - ${item.name}` : config.description}
+        description={catalog ? `${catalog.sku} - ${catalog.name}` : priceList ? `${priceList.code} - ${priceList.name}` : quote ? `${quote.offerNo || quote.quoteNumber}` : order ? `${order.offerNo || order.orderNumber}` : config.description}
         isLoading={detailQuery.isLoading}
         isError={Boolean(detailQuery.error)}
-        errorTitle="Katalog ürünü yüklenemedi"
+        errorTitle="Kayıt yüklenemedi"
         errorDescription={(detailQuery.error as Error | undefined)?.message}
         actions={(
           <div className="flex flex-wrap gap-2">
@@ -1912,37 +1945,156 @@ export function B2bRecordDetailPage(): ReactElement {
         )}
         className="border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3"
       >
-        {item ? <div className="grid gap-4 md:grid-cols-3">
+        {catalog ? <div className="grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">SKU</p>
-            <p className="mt-2 font-mono text-slate-900 dark:text-white">{item.sku}</p>
+            <p className="mt-2 font-mono text-slate-900 dark:text-white">{catalog.sku}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Ürün Adı</p>
-            <p className="mt-2 font-semibold text-slate-900 dark:text-white">{item.name}</p>
+            <p className="mt-2 font-semibold text-slate-900 dark:text-white">{catalog.name}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Durum</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{item.isPublished ? 'Yayında' : 'Taslak'}</p>
+            <p className="mt-2 text-slate-900 dark:text-white">{catalog.isPublished ? 'Yayında' : 'Taslak'}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Marka</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{item.brand || '-'}</p>
+            <p className="mt-2 text-slate-900 dark:text-white">{catalog.brand || '-'}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Kategori</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{item.categoryPath || '-'}</p>
+            <p className="mt-2 text-slate-900 dark:text-white">{catalog.categoryPath || '-'}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">ERP Stok</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{item.defaultStockId ? 'ERP stok bağlı' : '-'}</p>
+            <p className="mt-2 text-slate-900 dark:text-white">{catalog.defaultStockId ? 'ERP stok bağlı' : '-'}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:col-span-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Açıklama</p>
-            <p className="mt-2 whitespace-pre-wrap text-slate-900 dark:text-white">{item.description || '-'}</p>
+            <p className="mt-2 whitespace-pre-wrap text-slate-900 dark:text-white">{catalog.description || '-'}</p>
           </div>
         </div> : null}
+        {priceList ? (
+          <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-4">
+              <SummaryTile label="Liste" value={priceList.code} />
+              <SummaryTile label="Para Birimi" value={priceList.currencyCode} />
+              <SummaryTile label="Kapsam" value={priceList.customerId ? 'Cari özel' : priceList.customerGroupCode ? 'Cari grup' : 'Genel'} />
+              <SummaryTile label="Durum" value={priceList.isActive ? 'Aktif' : 'Pasif'} />
+            </div>
+            <Card className="border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3">
+              <CardHeader><CardTitle>Fiyat Satırı Ekle</CardTitle></CardHeader>
+              <CardContent className="grid gap-3 md:grid-cols-[minmax(0,1.5fr)_120px_120px_120px_auto]">
+                <PagedLookupDialog<StockLookup>
+                  open={priceItemLookupOpen}
+                  onOpenChange={setPriceItemLookupOpen}
+                  value={priceItemValues.erpStockLabel || null}
+                  placeholder="Ürün seç"
+                  searchPlaceholder="Stok kodu, ürün adı veya üretici kodu ara"
+                  title="Fiyat Verilecek Ürünü Seç"
+                  description="Kullanıcı ID girmez; ERP stok kartından ürün seçer."
+                  emptyText="Ürün bulunamadı."
+                  queryKey={['b2b-price-item-stock']}
+                  fetchPage={({ pageNumber, pageSize, search, signal }) => lookupApi.getProductsPaged({ pageNumber, pageSize, search }, { signal })}
+                  getKey={(stock) => String(stock.id)}
+                  getLabel={(stock) => `${stock.stokKodu} - ${stock.stokAdi}`}
+                  onSelect={(stock) => setPriceItemValues((current) => ({ ...current, erpStockId: String(stock.id), erpStockLabel: `${stock.stokKodu} - ${stock.stokAdi}` }))}
+                />
+                <Input type="number" placeholder="Fiyat" value={priceItemValues.unitPrice} onChange={(event) => setPriceItemValues((current) => ({ ...current, unitPrice: event.target.value }))} />
+                <Input type="number" placeholder="Min. miktar" value={priceItemValues.minQuantity} onChange={(event) => setPriceItemValues((current) => ({ ...current, minQuantity: event.target.value }))} />
+                <Input type="number" placeholder="İskonto %" value={priceItemValues.discountRate} onChange={(event) => setPriceItemValues((current) => ({ ...current, discountRate: event.target.value }))} />
+                <Button type="button" disabled={priceItemMutation.isPending} onClick={() => priceItemMutation.mutate()}>
+                  Satır Ekle
+                </Button>
+                {priceItemMutation.error ? <div className="text-sm font-semibold text-red-600 md:col-span-5">{(priceItemMutation.error as Error).message}</div> : null}
+              </CardContent>
+            </Card>
+            <LineTable
+              title="Manuel Fiyat Satırları"
+              headers={['Ürün', 'Min. miktar', 'Fiyat', 'İskonto', 'Geçerlilik']}
+              rows={(priceList.items ?? []).map((line) => [
+                line.erpStockId ? 'ERP stok kartı' : line.catalogProductId ? 'Katalog ürünü' : '-',
+                line.minQuantity ?? 1,
+                formatMoney(line.unitPrice, line.currencyCode),
+                line.discountRate ? `%${line.discountRate}` : '-',
+                [formatDate(line.validFrom), formatDate(line.validTo)].filter((value) => value !== '-').join(' / ') || '-',
+              ])}
+            />
+          </div>
+        ) : null}
+        {quote ? <CommercialDetail kind="quote" record={quote} /> : null}
+        {order ? <CommercialDetail kind="order" record={order} /> : null}
       </DetailPageShell>
+    </div>
+  );
+}
+
+function SummaryTile({ label, value }: { label: string; value: string | number | null | undefined }): ReactElement {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="mt-2 font-semibold text-slate-900 dark:text-white">{value ?? '-'}</p>
+    </div>
+  );
+}
+
+function LineTable({ title, headers, rows }: { title: string; headers: string[]; rows: Array<Array<string | number>> }): ReactElement {
+  return (
+    <Card className="border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3">
+      <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+      <CardContent className="overflow-x-auto">
+        <table className="w-full min-w-[760px] text-sm">
+          <thead className="text-left text-xs uppercase tracking-wide text-slate-500">
+            <tr>{headers.map((header) => <th key={header} className="border-b border-slate-200 px-3 py-2 dark:border-white/10">{header}</th>)}</tr>
+          </thead>
+          <tbody>
+            {rows.length ? rows.map((row, index) => (
+              <tr key={index} className="border-b border-slate-100 dark:border-white/5">
+                {row.map((cell, cellIndex) => <td key={`${index}-${cellIndex}`} className="px-3 py-3 text-slate-700 dark:text-slate-200">{cell}</td>)}
+              </tr>
+            )) : (
+              <tr><td colSpan={headers.length} className="px-3 py-8 text-center text-slate-500">Kayıt yok.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CommercialDetail({ kind, record }: { kind: 'quote'; record: QuoteRequestDto } | { kind: 'order'; record: OrderDto }): ReactElement {
+  const rows = kind === 'quote'
+    ? (record.lines ?? []).map((line) => [
+        line.requestedName || line.requestedSku || (line.erpStockId ? 'ERP stok kartı' : '-'),
+        line.quantity,
+        formatMoney(line.approvedUnitPrice ?? line.targetUnitPrice ?? 0, record.currencyCode),
+        `%${line.vatRate ?? 0}`,
+        line.priceSource || '-',
+        formatMoney(line.lineGrandTotal ?? line.lineTotal ?? 0, record.currencyCode),
+      ])
+    : (record.lines ?? []).map((line) => [
+        line.productName || line.productSku || (line.erpStockId ? 'ERP stok kartı' : '-'),
+        line.quantity,
+        formatMoney(line.unitPrice, record.currencyCode),
+        `%${line.vatRate ?? 0}`,
+        line.priceSource || '-',
+        formatMoney(line.lineGrandTotal ?? line.lineTotal ?? 0, record.currencyCode),
+      ]);
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-4">
+        <SummaryTile label={kind === 'quote' ? 'Teklif No' : 'Sipariş No'} value={kind === 'quote' ? record.offerNo || record.quoteNumber : record.offerNo || record.orderNumber} />
+        <SummaryTile label="Revizyon" value={record.revisionNo || '-'} />
+        <SummaryTile label="Durum" value={record.status} />
+        <SummaryTile label="Toplam" value={formatMoney(kind === 'quote' ? record.estimatedTotal : record.grandTotal, record.currencyCode)} />
+      </div>
+      <LineTable
+        title={kind === 'quote' ? 'Teklif Satırları' : 'Sipariş Satırları'}
+        headers={['Ürün', 'Miktar', 'Birim Fiyat', 'KDV', 'Kaynak', 'Satır Toplam']}
+        rows={rows}
+      />
     </div>
   );
 }

@@ -40,6 +40,7 @@ export const b2bChildRoutes: RouteObject[] = [
       { path: ':workspaceKind/create', element: withRoute(B2bRecordCreatePage, { routeName: 'b2b-record-create' }) },
       { path: 'catalog/:id/edit', element: withRoute(B2bRecordEditPage, { routeName: 'b2b-catalog-edit' }) },
       { path: 'catalog/:id', element: withRoute(B2bRecordDetailPage, { routeName: 'b2b-catalog-detail' }) },
+      { path: ':workspaceKind/:id', element: withRoute(B2bRecordDetailPage, { routeName: 'b2b-record-detail' }) },
     ],
   },
 ];

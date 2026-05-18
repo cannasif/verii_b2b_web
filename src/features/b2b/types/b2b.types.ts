@@ -98,6 +98,10 @@ export interface OrderLineDto {
   vatAmount?: number;
   lineTotal: number;
   lineGrandTotal?: number;
+  priceSource?: string;
+  priceListId?: number;
+  exchangeRate?: number;
+  priceResolvedAt?: string;
   description?: string;
   description1?: string;
   description2?: string;
@@ -127,6 +131,13 @@ export interface CartLineDto {
   quantity: number;
   unitPrice: number;
   currencyCode: string;
+  priceSource?: string;
+  priceListId?: number;
+  discountRate?: number;
+  vatRate?: number;
+  vatAmount?: number;
+  exchangeRate?: number;
+  priceResolvedAt?: string;
 }
 
 export interface QuickOrderLineDto {
@@ -207,7 +218,25 @@ export interface CustomerPriceListDto {
   customerId?: number;
   customerGroupCode?: string;
   currencyCode: string;
+  validFrom?: string;
+  validTo?: string;
   isActive: boolean;
+  items?: CustomerPriceListItemDto[];
+}
+
+export interface CustomerPriceListItemDto {
+  id: number;
+  priceListId: number;
+  customerId?: number;
+  catalogProductId?: number;
+  catalogVariantId?: number;
+  erpStockId?: number;
+  unitPrice: number;
+  minQuantity?: number;
+  discountRate?: number;
+  currencyCode: string;
+  validFrom?: string;
+  validTo?: string;
 }
 
 export interface InventorySnapshotDto {
@@ -270,6 +299,10 @@ export interface QuoteRequestLineDto {
   vatAmount?: number;
   lineTotal?: number;
   lineGrandTotal?: number;
+  priceSource?: string;
+  priceListId?: number;
+  exchangeRate?: number;
+  priceResolvedAt?: string;
   description?: string;
   description1?: string;
   description2?: string;
@@ -429,6 +462,10 @@ export interface B2bPriceAvailabilityDto {
   priceListId?: number;
   priceListCode?: string;
   priceSource?: string;
+  priceResolvedAt?: string;
+  vatRate?: number;
+  vatAmount?: number;
+  exchangeRate?: number;
   isAvailable: boolean;
   availableToSell: number;
   reservedQuantity: number;
