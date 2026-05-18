@@ -17,10 +17,9 @@ export const useLogin = (branches?: Branch[]) => {
         if (user) {
           const selectedBranch = branches?.find((b) => b.id === variables.branchId) || null;
           setAuth(user, response.data, selectedBranch);
-          navigate('/');
+          navigate('/dashboard');
         }
       }
     },
   });
 };
-

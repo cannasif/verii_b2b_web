@@ -74,7 +74,6 @@ export function B2bPortalPage(): ReactElement {
   const catalogQuery = useQuery({
     queryKey: ['b2b-public-catalog', catalogSearch, portalToken],
     queryFn: () => b2bApi.getPublicCatalogProducts({ pageNumber: 1, pageSize: 12, search: catalogSearch }, portalToken),
-    enabled: Boolean(portalToken),
   });
 
   const portalQuery = useQuery({
@@ -214,10 +213,10 @@ export function B2bPortalPage(): ReactElement {
             </div>
             <div className="flex flex-wrap gap-2">
               <Button asChild variant="outline" className="border-emerald-900/15 bg-white/70 text-emerald-950 hover:bg-white">
-                <Link to="/dashboard">Admin Panele Git</Link>
+                <Link to="/auth/login">Admin Girişi</Link>
               </Button>
               <Button asChild className="bg-emerald-900 text-white hover:bg-emerald-800">
-                <Link to="/b2b/insights">B2B Yönetimi</Link>
+                <Link to="/dashboard">Yönetim Paneli</Link>
               </Button>
             </div>
           </header>
@@ -246,7 +245,7 @@ export function B2bPortalPage(): ReactElement {
           </div>
           <Card className="w-full border-emerald-900/10 bg-white/85 shadow-2xl shadow-emerald-950/15 backdrop-blur">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-emerald-950"><Building2 className="h-5 w-5" /> Şirket hesabı</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-emerald-950"><Building2 className="h-5 w-5" /> Müşteri girişi</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <form
@@ -260,11 +259,11 @@ export function B2bPortalPage(): ReactElement {
                   open={companyLookupOpen}
                   onOpenChange={setCompanyLookupOpen}
                   value={companyLookupLabel}
-                  placeholder="Şirket seç"
+                  placeholder="Müşteri hesabı seç"
                   searchPlaceholder="Şirket adı veya ERP cari kodu ara"
-                  title="Portal Şirketi Seç"
-                  description="B2B portalına bağlı şirket hesabınızı arayın ve seçin."
-                  emptyText="Şirket hesabı bulunamadı."
+                  title="Müşteri Hesabı Seç"
+                  description="Fiyat, stok, sepet ve hesap özeti için bağlı müşteri hesabını seçin."
+                  emptyText="Müşteri hesabı bulunamadı."
                   queryKey={['b2b-public-portal-companies']}
                   fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getPublicCompanies({ pageNumber, pageSize, search })}
                   getKey={(item) => String(item.id)}
@@ -275,7 +274,7 @@ export function B2bPortalPage(): ReactElement {
                   }}
                 />
                 <Button type="submit" className="h-11 w-full bg-emerald-800 font-black hover:bg-emerald-700" disabled={!companyCode.trim() || sessionMutation.isPending}>
-                  Portal Oturumu Aç
+                  Müşteri Olarak Devam Et
                 </Button>
               </form>
               {selectedCompany ? (
@@ -338,14 +337,19 @@ export function B2bPortalPage(): ReactElement {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {!portalToken ? (
+            {catalogQuery.isLoading ? (
               <Card className="border-dashed border-stone-300 bg-white/75 p-8 shadow-sm md:col-span-2 xl:col-span-3">
-                <p className="text-xl font-black text-slate-900">Katalog ve fiyat bilgileri şirket hesabına göre açılır.</p>
-                <p className="mt-2 max-w-2xl text-sm font-semibold text-slate-500">Özel fiyat listesi, stok görünürlüğü, teklif ve sepet yetkileri için sağ üstteki şirket kodu ile portal oturumu açın.</p>
+                <p className="text-xl font-black text-slate-900">Katalog yükleniyor...</p>
+              </Card>
+            ) : (catalogQuery.data?.data ?? []).length === 0 ? (
+              <Card className="border-dashed border-stone-300 bg-white/75 p-8 shadow-sm md:col-span-2 xl:col-span-3">
+                <p className="text-xl font-black text-slate-900">Yayınlanmış katalog ürünü bulunamadı.</p>
+                <p className="mt-2 max-w-2xl text-sm font-semibold text-slate-500">Admin panelinden ERP stok kartlarını katalog ürünü olarak yayınladığınızda burada görünecek.</p>
               </Card>
             ) : (catalogQuery.data?.data ?? []).map((product) => {
               const resolved = resolvedPrices[product.id];
               const quantity = quantities[product.id] || 1;
+              const isCustomerSessionOpen = Boolean(selectedCompany);
               return (
                 <Card key={product.id} className="group overflow-hidden border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl">
                   <div className="h-36 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.25),transparent_35%),linear-gradient(135deg,#102f25,#2f855a)] p-4 text-white">
@@ -360,11 +364,11 @@ export function B2bPortalPage(): ReactElement {
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="rounded-2xl bg-stone-50 p-3">
                         <p className="text-xs font-bold text-slate-400">Fiyat</p>
-                        <p className="font-black">{resolved?.isPriceResolved ? formatMoney(resolved.unitPrice, resolved.currencyCode) : 'Kontrol et'}</p>
+                        <p className="font-black">{!isCustomerSessionOpen ? 'Giriş sonrası' : resolved?.isPriceResolved ? formatMoney(resolved.unitPrice, resolved.currencyCode) : 'Kontrol et'}</p>
                       </div>
                       <div className="rounded-2xl bg-stone-50 p-3">
                         <p className="text-xs font-bold text-slate-400">Satılabilir</p>
-                        <p className="font-black">{resolved ? `${resolved.availableToSell}` : '-'}</p>
+                        <p className="font-black">{!isCustomerSessionOpen ? 'Giriş sonrası' : resolved ? `${resolved.availableToSell}` : '-'}</p>
                       </div>
                     </div>
                     <Input
@@ -374,11 +378,11 @@ export function B2bPortalPage(): ReactElement {
                       onChange={(event) => setQuantities((current) => ({ ...current, [product.id]: Number(event.target.value || 1) }))}
                     />
                     <div className="flex gap-2">
-                      <Button type="button" variant="outline" className="flex-1" onClick={() => resolveMutation.mutate(product)}>
+                      <Button type="button" variant="outline" className="flex-1" disabled={!isCustomerSessionOpen} onClick={() => resolveMutation.mutate(product)}>
                         Fiyatı Kontrol Et
                       </Button>
-                      <Button type="button" className="flex-1 bg-emerald-800 hover:bg-emerald-700" disabled={!selectedCompany} onClick={() => addToCartMutation.mutate(product)}>
-                        Sepete Ekle
+                      <Button type="button" className="flex-1 bg-emerald-800 hover:bg-emerald-700" disabled={!isCustomerSessionOpen} onClick={() => addToCartMutation.mutate(product)}>
+                        {isCustomerSessionOpen ? 'Sepete Ekle' : 'Müşteri Girişi Gerekli'}
                       </Button>
                     </div>
                   </CardContent>
@@ -394,6 +398,11 @@ export function B2bPortalPage(): ReactElement {
               <CardTitle className="flex items-center gap-2"><ShoppingCart className="h-5 w-5" /> Sepet ve işlem</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {!selectedCompany ? (
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950">
+                  Ürünleri görebilirsiniz. Fiyat, satılabilir stok, sepet ve teklif işlemleri için müşteri girişi yapın.
+                </div>
+              ) : null}
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-2xl bg-emerald-50 p-4">
                   <p className="text-xs font-bold text-emerald-700">Satır/Miktar</p>

@@ -16,9 +16,14 @@ const B2bPortalPage = lazyNamed(() => import('@/features/b2b'), 'B2bPortalPage')
 export function createAppRouter() {
   return createBrowserRouter([
     {
-      path: '/b2b-portal',
+      path: '/',
       errorElement: <RouteErrorPage />,
       element: withRoute(B2bPortalPage, { routeName: 'b2b-public-portal' }),
+    },
+    {
+      path: '/b2b-portal',
+      errorElement: <RouteErrorPage />,
+      element: withRoute(B2bPortalPage, { routeName: 'b2b-public-portal-alias' }),
     },
     {
       path: '/',
@@ -29,7 +34,6 @@ export function createAppRouter() {
         </ProtectedRoute>
       ),
       children: [
-        { index: true, element: withRoute(DashboardPage, { routeName: 'dashboard-home' }) },
         { path: 'dashboard', element: withRoute(DashboardPage, { routeName: 'dashboard' }) },
         ...adminChildRoutes,
         ...b2bChildRoutes,

@@ -68,7 +68,7 @@ export function LoginPage(): React.JSX.Element {
     }
 
     if (token && isTokenValid(token) && isAuthenticated()) {
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     }
   }, [searchParams, setSearchParams, t, token, isAuthenticated, navigate, logout]);
 

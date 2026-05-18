@@ -115,9 +115,9 @@ export const b2bApi = {
 
   async getPublicCatalogProducts(params: PagedParams = {}, portalToken = ''): Promise<PagedResponse<CatalogProductDto>> {
     const response = await api.post<ApiResponse<PagedResponse<CatalogProductDto>>>(
-      '/api/b2b/catalog/paged',
+      '/api/b2b/catalog/public-paged',
       buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Name', sortDirection: 'asc' }),
-      portalRequestConfig(portalToken),
+      portalToken ? portalRequestConfig(portalToken) : publicRequestConfig,
     );
     return normalizePaged(response);
   },
