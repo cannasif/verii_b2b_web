@@ -189,8 +189,9 @@ const editSupportedKinds = new Set<B2bWorkspaceKind>(['catalog']);
 type B2bFormField = {
   name: string;
   label: string;
-  type?: 'text' | 'number' | 'textarea' | 'switch' | 'date' | 'lookup' | 'currency';
+  type?: 'text' | 'number' | 'textarea' | 'switch' | 'date' | 'lookup' | 'currency' | 'select';
   lookupKind?: B2bLookupKind;
+  options?: Array<{ label: string; value: string }>;
   required?: boolean;
   placeholder?: string;
   helpText?: string;
@@ -264,10 +265,15 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
     defaults: { companyId: '', userId: '', email: '', fullName: '', roleCode: 'Buyer', orderLimit: '', requiresApproval: false },
     fields: [
       { name: 'companyId', label: 'Şirket', type: 'lookup', lookupKind: 'company', required: true },
-      { name: 'userId', label: 'Kullanıcı', type: 'lookup', lookupKind: 'user' },
-      { name: 'email', label: 'E-posta', required: true },
-      { name: 'fullName', label: 'Ad Soyad', required: true },
-      { name: 'roleCode', label: 'Rol Kodu', required: true },
+      { name: 'userId', label: 'Portal Kullanıcısı', type: 'lookup', lookupKind: 'user', required: true, helpText: 'Kullanıcı seçildiğinde e-posta ve ad soyad otomatik alınır; müşteri ID girilmez.' },
+      { name: 'email', label: 'E-posta', required: true, helpText: 'Kullanıcıdan otomatik gelir, gerekirse düzeltilebilir.' },
+      { name: 'fullName', label: 'Ad Soyad', required: true, helpText: 'Kullanıcıdan otomatik gelir, gerekirse düzeltilebilir.' },
+      { name: 'roleCode', label: 'B2B Rolü', type: 'select', required: true, options: [
+        { label: 'Buyer - kendi kayıtları', value: 'Buyer' },
+        { label: 'Approver - onaycı', value: 'Approver' },
+        { label: 'Manager - şirket geneli', value: 'Manager' },
+        { label: 'Company Admin - şirket yöneticisi', value: 'CompanyAdmin' },
+      ] },
       { name: 'orderLimit', label: 'Sipariş Limiti', type: 'number' },
       { name: 'requiresApproval', label: 'Onay Gerekli', type: 'switch' },
     ],
@@ -1621,7 +1627,15 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
           fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getUsers({ pageNumber, pageSize, search })}
           getKey={(item) => String(item.id)}
           getLabel={(item) => `${item.fullName || item.username} - ${item.email}`}
-          onSelect={(item) => setLookupValue(field.name, item.id, `${item.fullName || item.username} - ${item.email}`)}
+          onSelect={(item) => {
+            const extraValues = kind === 'buyers'
+              ? {
+                  email: item.email,
+                  fullName: item.fullName || item.username,
+                }
+              : undefined;
+            setLookupValue(field.name, item.id, `${item.fullName || item.username} - ${item.email}`, extraValues);
+          }}
         />
       );
     }
@@ -1802,6 +1816,28 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
                     <SelectContent>
                       {currencyOptions.map((option) => (
                         <SelectItem key={`${option.code}-${option.dovizTipi}`} value={option.code}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
+                </label>
+              );
+            }
+            if (field.type === 'select') {
+              return (
+                <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                    {field.label}{field.required ? ' *' : ''}
+                  </span>
+                  <Select value={String(value || '')} onValueChange={(selectedValue) => updateValue(field.name, selectedValue)}>
+                    <SelectTrigger id={fieldId} className="h-12 w-full rounded-2xl border-slate-200 bg-white/85 px-4 text-sm font-semibold text-slate-800 dark:border-white/10 dark:bg-white/5 dark:text-slate-100">
+                      <SelectValue placeholder={`${field.label} seç`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(field.options ?? []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
                           {option.label}
                         </SelectItem>
                       ))}

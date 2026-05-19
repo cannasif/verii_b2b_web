@@ -2,6 +2,7 @@ import { api } from '@/lib/axios';
 import type { LoginRequest, LoginResponse, ActiveUsersResponse } from '../types/auth';
 import type { ApiResponse } from '@/types/api';
 import type { ApiRequestOptions } from '@/lib/request-utils';
+import type { B2bPortalSessionDto } from '@/features/b2b/types/b2b.types';
 
 export const authApi = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
@@ -24,6 +25,10 @@ export const authApi = {
   },
   getActiveUsers: async (options?: ApiRequestOptions): Promise<ActiveUsersResponse> => {
     const response = await api.get<ActiveUsersResponse>('/api/auth/users/active', options);
+    return response;
+  },
+  createMyB2bPortalSession: async (): Promise<ApiResponse<B2bPortalSessionDto>> => {
+    const response = await api.post<ApiResponse<B2bPortalSessionDto>>('/api/b2b/portal/me/session');
     return response;
   },
   requestPasswordReset: async (email: string): Promise<ApiResponse<string>> => {
