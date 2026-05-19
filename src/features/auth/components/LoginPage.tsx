@@ -10,6 +10,7 @@ import { useLogin } from '../hooks/useLogin';
 import { useBranches } from '../hooks/useBranches';
 import { useAuthStore } from '@/stores/auth-store';
 import { isTokenValid } from '@/utils/jwt';
+import { getApiBaseUrl } from '@/lib/api-config';
 import type React from 'react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -48,6 +49,7 @@ export function LoginPage(): React.JSX.Element {
   const { token, isAuthenticated, logout } = useAuthStore();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [capsLockActive, setCapsLockActive] = useState(false);
+  const apiBaseUrl = getApiBaseUrl();
 
   const form = useForm<LoginRequest>({
     resolver: zodResolver(loginRequestSchema),
@@ -236,7 +238,7 @@ export function LoginPage(): React.JSX.Element {
 
               {branchesError ? (
                 <div className="mb-4 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
-                  Şubeler alınamadı. API localde HTTP çalışıyor olmalı: <strong>http://localhost:5000</strong>
+                  Şubeler alınamadı. API bağlantısını kontrol edin: <strong>{apiBaseUrl}</strong>
                   <Button type="button" variant="outline" size="sm" className="mt-3" onClick={() => void refetchBranches()}>
                     Şubeleri Yenile
                   </Button>

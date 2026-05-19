@@ -13,7 +13,7 @@ export const authRouteTrees: RouteObject[] = [
     errorElement: <RouteErrorPage />,
     element: <AuthLayout />,
     children: [
-      { path: 'login', element: withRoute(LoginPage, { routeName: 'auth-login' }) },
+      { path: 'admin-login', element: withRoute(LoginPage, { routeName: 'auth-admin-login' }) },
       { path: 'forgot-password', element: withRoute(ForgotPasswordPage, { routeName: 'auth-forgot-password' }) },
       { path: 'reset-password', element: withRoute(ResetPasswordPage, { routeName: 'auth-reset-password' }) },
     ],

@@ -184,8 +184,8 @@ api.interceptors.response.use(
       sessionStorage.removeItem('access_token');
       useAuthStore.getState().logout();
 
-      if (!isCurrentAppPath('/auth/login?sessionExpired=true')) {
-        window.location.href = resolveAppPath('/auth/login?sessionExpired=true');
+      if (!isCurrentAppPath('/auth/admin-login?sessionExpired=true')) {
+        window.location.href = resolveAppPath('/auth/admin-login?sessionExpired=true');
       }
     }
 

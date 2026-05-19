@@ -1,4 +1,4 @@
 {
   "baseUrl": "/",
-  "apiUrl": "http://localhost:5000"
+  "apiUrl": "https://b2bapi.v3rii.com"
 }

@@ -225,7 +225,7 @@ export function B2bPortalPage(): ReactElement {
             </div>
             <div className="flex flex-wrap gap-2">
               <Button asChild variant="outline" className="border-emerald-900/15 bg-white/70 text-emerald-950 hover:bg-white">
-                <Link to="/auth/login">Admin Girişi</Link>
+                <Link to="/auth/admin-login">Admin Girişi</Link>
               </Button>
               <Button asChild className="bg-emerald-900 text-white hover:bg-emerald-800">
                 <Link to="/dashboard">Yönetim Paneli</Link>
@@ -237,9 +237,9 @@ export function B2bPortalPage(): ReactElement {
           <div className="max-w-4xl space-y-6">
             <Badge className="w-fit border-emerald-900/10 bg-emerald-800 text-white">Müşteri Portalı</Badge>
             <div>
-              <h1 className="max-w-4xl text-4xl font-black leading-[0.95] tracking-tight text-emerald-950 md:text-7xl">Satın alma ekibinin tüm B2B işi tek ekranda.</h1>
+              <h1 className="max-w-4xl text-4xl font-black leading-[0.95] tracking-tight text-emerald-950 md:text-7xl">Kurumsal satın alma portalınız.</h1>
               <p className="mt-4 max-w-2xl text-base font-medium text-emerald-950/70">
-                Şirket hesabına özel katalog, fiyat, stok, hızlı sipariş, teklif talebi ve açık hesap takibi aynı portal deneyiminde birleşir.
+                Şirket hesabınıza bağlı katalog, gerçek cari fiyat, satılabilir stok, teklif talebi, sipariş ve ödeme takibi tek güvenli ekranda birleşir.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -257,7 +257,7 @@ export function B2bPortalPage(): ReactElement {
           </div>
           <Card className="w-full border-emerald-900/10 bg-white/85 shadow-2xl shadow-emerald-950/15 backdrop-blur">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-emerald-950"><Building2 className="h-5 w-5" /> Müşteri girişi</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-emerald-950"><Building2 className="h-5 w-5" /> Müşteri portal girişi</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <form
@@ -357,8 +357,8 @@ export function B2bPortalPage(): ReactElement {
 
           <div className="flex flex-col gap-3 rounded-3xl border border-stone-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-2xl font-black text-slate-950">Ürün kataloğu</h2>
-              <p className="text-sm font-medium text-slate-500">Müşteriye özel fiyat, satılabilir stok ve sepet işlemleri aynı akışta çalışır.</p>
+              <h2 className="text-2xl font-black text-slate-950">B2B ürün kataloğu</h2>
+              <p className="text-sm font-medium text-slate-500">Ürünler herkes tarafından görülebilir; fiyat, stok ve satın alma işlemleri müşteri girişinden sonra açılır.</p>
             </div>
             <div className="relative w-full md:w-80">
               <PackageSearch className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
@@ -372,9 +372,32 @@ export function B2bPortalPage(): ReactElement {
                 <p className="text-xl font-black text-slate-900">Katalog yükleniyor...</p>
               </Card>
             ) : (catalogQuery.data?.data ?? []).length === 0 ? (
-              <Card className="border-dashed border-stone-300 bg-white/75 p-8 shadow-sm md:col-span-2 xl:col-span-3">
-                <p className="text-xl font-black text-slate-900">Yayınlanmış katalog ürünü bulunamadı.</p>
-                <p className="mt-2 max-w-2xl text-sm font-semibold text-slate-500">Admin panelinden ERP stok kartlarını katalog ürünü olarak yayınladığınızda burada görünecek.</p>
+              <Card className="overflow-hidden border-stone-200 bg-white shadow-xl shadow-slate-900/10 md:col-span-2 xl:col-span-3">
+                <div className="grid gap-0 lg:grid-cols-[1fr_320px]">
+                  <div className="p-8">
+                    <Badge className="mb-4 bg-emerald-900 text-white">Katalog hazırlanıyor</Badge>
+                    <p className="text-2xl font-black tracking-tight text-slate-950">Yayınlanmış B2B katalog ürünü bulunamadı.</p>
+                    <p className="mt-3 max-w-2xl text-sm font-semibold leading-6 text-slate-600">
+                      ERP stok kartları katalog ürününe bağlanıp yayına alındığında müşteriler burada ürünleri görür; giriş yapan alıcılar kendi cari fiyatını, satılabilir stoku ve sepet aksiyonlarını kullanır.
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      <Button asChild className="bg-emerald-900 hover:bg-emerald-800">
+                        <Link to="/b2b/catalog">Katalog Yönetimine Git</Link>
+                      </Button>
+                      <Button asChild variant="outline">
+                        <Link to="/b2b/product-matches">ERP Stok Eşleştirme</Link>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="border-t border-stone-200 bg-stone-50 p-6 lg:border-l lg:border-t-0">
+                    <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Yayın akışı</p>
+                    <div className="mt-4 space-y-3 text-sm font-semibold text-slate-700">
+                      <div className="rounded-2xl bg-white p-3 shadow-sm">1. ERP stok kartını seç</div>
+                      <div className="rounded-2xl bg-white p-3 shadow-sm">2. Katalog adı, marka, görsel ve kategori bağla</div>
+                      <div className="rounded-2xl bg-white p-3 shadow-sm">3. Yayına al, müşteri fiyatı otomatik çözülsün</div>
+                    </div>
+                  </div>
+                </div>
               </Card>
             ) : (catalogQuery.data?.data ?? []).map((product) => {
               const resolved = resolvedPrices[product.id];
@@ -425,12 +448,12 @@ export function B2bPortalPage(): ReactElement {
         <aside className="space-y-5">
           <Card className="sticky top-4 border-stone-200 bg-white shadow-2xl shadow-slate-900/10">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2"><ShoppingCart className="h-5 w-5" /> Sepet ve işlem</CardTitle>
+              <CardTitle className="flex items-center gap-2"><ShoppingCart className="h-5 w-5" /> Satın alma özeti</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {!selectedCompany ? (
                 <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950">
-                  Ürünleri görebilirsiniz. Fiyat, satılabilir stok, sepet ve teklif işlemleri için müşteri girişi yapın.
+                  Ürün kataloğunu inceleyebilirsiniz. Size özel fiyat, satılabilir stok, sepet, teklif ve sipariş için müşteri hesabıyla giriş yapın.
                 </div>
               ) : null}
               <div className="grid grid-cols-2 gap-3">
@@ -443,13 +466,13 @@ export function B2bPortalPage(): ReactElement {
                   <p className="text-2xl font-black text-amber-950">{formatMoney(cartTotal, cart?.currencyCode)}</p>
                 </div>
               </div>
-              <Textarea value={customerNote} onChange={(event) => setCustomerNote(event.target.value)} placeholder="Teklif/sipariş notu" />
+              <Textarea value={customerNote} onChange={(event) => setCustomerNote(event.target.value)} placeholder="Satın alma notu, teslimat isteği veya teklif açıklaması" />
               <div className="grid gap-2">
                 <Button type="button" variant="outline" disabled={!cart?.lines.length} onClick={() => quoteMutation.mutate()}>
-                  Teklif Talebi Oluştur
+                  Teklif Talebi Gönder
                 </Button>
                 <Button type="button" className="bg-slate-950 hover:bg-slate-800" disabled={!cart?.lines.length} onClick={() => orderMutation.mutate()}>
-                  Siparişe Çevir <ArrowRight className="ml-2 h-4 w-4" />
+                  Siparişi Onaya Gönder <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
               {portalQuery.data ? (
@@ -471,14 +494,15 @@ export function B2bPortalPage(): ReactElement {
 
           <Card className="border-stone-200 bg-white shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5" /> Hızlı sipariş</CardTitle>
+              <CardTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5" /> Toplu hızlı sipariş</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
+              <p className="text-sm font-semibold text-slate-500">Müşteri stok kodu veya SKU, miktar ve depo kodunu satır satır yapıştırın.</p>
               <Textarea
                 className="min-h-32 font-mono"
                 value={quickOrderText}
                 onChange={(event) => setQuickOrderText(event.target.value)}
-                placeholder={"SKU-001, 5, 1\nABC-002, 2, 1"}
+                placeholder={"STOK-KODU, 5, 1\nMUSTERI-SKU, 2, 1"}
               />
               <Button type="button" className="w-full bg-emerald-800 hover:bg-emerald-700" disabled={!selectedCompany} onClick={() => quickOrderMutation.mutate()}>
                 Satırları Sepete Aktar

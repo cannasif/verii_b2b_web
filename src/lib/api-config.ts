@@ -1,4 +1,4 @@
-export const DEFAULT_API_BASE_URL = 'https://api.v3rii.com';
+export const DEFAULT_API_BASE_URL = 'https://b2bapi.v3rii.com';
 const RUNTIME_CONFIG_FILE_NAME = 'runtime-settings.json';
 const RUNTIME_CONFIG_CACHE_KEY = 'runtime-config-cache';
 
@@ -34,6 +34,18 @@ function isValidApiUrl(value: string | undefined | null): boolean {
 
 function normalizeBaseUrl(url: string): string {
   return url.trim().replace(/\/$/, '');
+}
+
+function isLocalHostName(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+}
+
+function isLocalApiUrl(value: string): boolean {
+  try {
+    return isLocalHostName(new URL(value).hostname);
+  } catch {
+    return false;
+  }
 }
 
 function normalizeAppBasePath(value: string | undefined | null): string {
@@ -135,6 +147,10 @@ function readPersistedRuntimeConfig(): PersistedRuntimeConfig | null {
 
     const apiUrl = parsed.apiUrl as string;
     const baseUrl = parsed.baseUrl as string;
+    if (!isLocalHostName(window.location.hostname) && isLocalApiUrl(apiUrl)) {
+      window.localStorage.removeItem(RUNTIME_CONFIG_CACHE_KEY);
+      return null;
+    }
 
     return {
       apiUrl: normalizeBaseUrl(apiUrl),

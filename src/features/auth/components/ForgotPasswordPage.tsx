@@ -130,7 +130,7 @@ export function ForgotPasswordPage(): React.JSX.Element {
                     type="button"
                     variant="outline"
                     className="h-12 w-full rounded-xl border border-white/10 bg-white/5 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
-                    onClick={() => navigate('/auth/login')}
+                    onClick={() => navigate('/auth/admin-login')}
                   >
                     <ArrowLeft size={18} className="mr-2" />
                     {t('auth.forgotPassword.backToLogin')}

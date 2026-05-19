@@ -56,7 +56,7 @@ export function ResetPasswordPage(): React.JSX.Element {
     if (!token) {
       toast.error(t('auth.resetPassword.invalidToken'));
       setTimeout(() => {
-        navigate('/auth/login', { replace: true });
+        navigate('/auth/admin-login', { replace: true });
       }, 1500);
       return;
     }

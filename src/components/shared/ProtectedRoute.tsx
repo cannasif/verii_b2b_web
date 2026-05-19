@@ -38,7 +38,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps): ReactElement 
   }, [logout, storedToken]);
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth/login" replace />;
+    return <Navigate to="/auth/admin-login" replace />;
   }
 
   return children;

@@ -14,7 +14,7 @@ export const useResetPassword = () => {
       if (response.success) {
         toast.success(response.message || t('auth.resetPassword.successRedirect'));
         setTimeout(() => {
-          navigate('/auth/login', { replace: true });
+          navigate('/auth/admin-login', { replace: true });
         }, 1500);
         return;
       }

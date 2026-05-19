@@ -52,7 +52,7 @@ export function UserProfileModal({
   const handleLogout = (): void => {
     logout();
     onOpenChange(false);
-    navigate('/auth/login');
+    navigate('/auth/admin-login');
   };
 
   return (

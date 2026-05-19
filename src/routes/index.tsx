@@ -26,6 +26,11 @@ export function createAppRouter() {
       element: withRoute(B2bPortalPage, { routeName: 'b2b-public-portal-alias' }),
     },
     {
+      path: '/auth/login',
+      errorElement: <RouteErrorPage />,
+      element: withRoute(B2bPortalPage, { routeName: 'b2b-public-portal-login-entry' }),
+    },
+    {
       path: '/',
       errorElement: <RouteErrorPage />,
       element: (
