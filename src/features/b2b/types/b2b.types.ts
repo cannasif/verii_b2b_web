@@ -20,9 +20,25 @@ export interface CatalogProductDto {
   name: string;
   slug?: string;
   brand?: string;
+  productType?: string;
+  manufacturerCode?: string;
+  barcode?: string;
+  unit?: string;
   categoryPath?: string;
+  shortDescription?: string;
   description?: string;
   primaryImageUrl?: string;
+  bulletPointsJson?: string;
+  attributesJson?: string;
+  mediaGalleryJson?: string;
+  documentsJson?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  searchKeywords?: string;
+  minOrderQuantity?: number;
+  packageQuantity?: number;
+  sortOrder?: number;
+  completenessScore?: number;
   isPublished: boolean;
   defaultStockId?: number;
   variants?: CatalogVariantDto[];
@@ -34,6 +50,11 @@ export interface CatalogVariantDto {
   erpStockId?: number;
   variantSku: string;
   variantName: string;
+  barcode?: string;
+  unit?: string;
+  attributesJson?: string;
+  mediaGalleryJson?: string;
+  sortOrder?: number;
   isActive: boolean;
 }
 

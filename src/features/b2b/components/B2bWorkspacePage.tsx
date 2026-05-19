@@ -281,16 +281,56 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
     submit: b2bApi.createBuyer,
   },
   catalog: {
-    defaults: { sku: '', name: '', slug: '', brand: '', categoryPath: '', description: '', primaryImageUrl: '', defaultStockId: '', isPublished: false },
+    defaults: {
+      sku: '',
+      name: '',
+      slug: '',
+      brand: '',
+      productType: '',
+      manufacturerCode: '',
+      barcode: '',
+      unit: '',
+      categoryPath: '',
+      shortDescription: '',
+      description: '',
+      primaryImageUrl: '',
+      bulletPointsJson: '',
+      attributesJson: '',
+      mediaGalleryJson: '',
+      documentsJson: '',
+      metaTitle: '',
+      metaDescription: '',
+      searchKeywords: '',
+      minOrderQuantity: '',
+      packageQuantity: '',
+      sortOrder: '',
+      defaultStockId: '',
+      isPublished: false,
+    },
     fields: [
       { name: 'defaultStockId', label: 'ERP stok kartı', type: 'lookup', lookupKind: 'stock', required: true, colSpan: 'full', helpText: 'Ürünü buradan seçin; kod, ad, marka ve kategori bilgisi otomatik gelir.' },
       { name: 'sku', label: 'ERP Stok Kodu', hidden: true },
       { name: 'slug', label: 'Portal Adresi', hidden: true },
       { name: 'name', label: 'Müşteriye Görünecek Ürün Adı', required: true, placeholder: 'Örn. 40x60 Alüminyum Profil' },
-      { name: 'brand', label: 'Marka / Üretici', placeholder: 'ERP stoktan otomatik gelir, gerekirse düzeltin.' },
-      { name: 'categoryPath', label: 'Portal Kategorisi', placeholder: 'Örn. Profil / Alüminyum / Aksesuar' },
-      { name: 'primaryImageUrl', label: 'Ürün Görsel Bağlantısı', placeholder: 'https://...', colSpan: 'full', helpText: 'Boş bırakabilirsiniz; ürün yine taslak/yayında kaydedilir.' },
-      { name: 'description', label: 'Müşteriye Görünecek Açıklama', type: 'textarea', placeholder: 'Kısa teknik açıklama, kullanım alanı veya satış notu yazın.', colSpan: 'full' },
+      { name: 'brand', label: 'Marka', placeholder: 'ERP stoktan otomatik gelir, gerekirse düzeltin.' },
+      { name: 'productType', label: 'Ürün Tipi', placeholder: 'Örn. Alüminyum profil, bağlantı elemanı, yedek parça' },
+      { name: 'manufacturerCode', label: 'Üretici Kodu', placeholder: 'Üretici / OEM / tedarikçi ürün kodu' },
+      { name: 'barcode', label: 'Barkod / GTIN', placeholder: 'EAN, UPC veya şirket içi barkod' },
+      { name: 'unit', label: 'Satış Birimi', placeholder: 'Adet, mt, kg, koli' },
+      { name: 'categoryPath', label: 'Portal Kategorisi', placeholder: 'Örn. Profil / Alüminyum / Aksesuar', colSpan: 'full' },
+      { name: 'shortDescription', label: 'Kısa Tanıtım', type: 'textarea', placeholder: 'Liste ve ürün kartında görünecek net satış özeti.', colSpan: 'full' },
+      { name: 'primaryImageUrl', label: 'Ana Görsel Bağlantısı', placeholder: 'https://...', colSpan: 'full', helpText: 'Boş bırakabilirsiniz; ürün yine taslak/yayında kaydedilir.' },
+      { name: 'mediaGalleryJson', label: 'Medya Galerisi JSON', type: 'textarea', placeholder: '[{\"url\":\"https://...\",\"alt\":\"Ön görünüm\"}]', colSpan: 'full', helpText: 'Amazon/Sahibinden tarzı çoklu ürün görselleri için kullanılır.' },
+      { name: 'bulletPointsJson', label: 'Öne Çıkan Maddeler JSON', type: 'textarea', placeholder: '[\"Hızlı montaj\", \"Korozyona dayanıklı\", \"ERP stokla eşleşir\"]', colSpan: 'full' },
+      { name: 'attributesJson', label: 'Teknik Özellikler JSON', type: 'textarea', placeholder: '{\"Malzeme\":\"Alüminyum\", \"Ölçü\":\"40x60\", \"Renk\":\"Eloksal\"}', colSpan: 'full', helpText: 'Filtreleme ve ürün karşılaştırma için yapılandırılmış teknik özellikler.' },
+      { name: 'documentsJson', label: 'Teknik Dokümanlar JSON', type: 'textarea', placeholder: '[{\"name\":\"Teknik föy\", \"url\":\"https://...\"}]', colSpan: 'full' },
+      { name: 'description', label: 'Detaylı Açıklama', type: 'textarea', placeholder: 'Kullanım alanı, teknik notlar, uyumluluk ve satış açıklaması yazın.', colSpan: 'full' },
+      { name: 'minOrderQuantity', label: 'Minimum Sipariş Miktarı', type: 'number' },
+      { name: 'packageQuantity', label: 'Paket / Koli Miktarı', type: 'number' },
+      { name: 'sortOrder', label: 'Sıralama Önceliği', type: 'number' },
+      { name: 'metaTitle', label: 'SEO Başlık', placeholder: 'Portal ve arama sonucu başlığı' },
+      { name: 'metaDescription', label: 'SEO Açıklama', placeholder: 'Kısa arama açıklaması', colSpan: 'full' },
+      { name: 'searchKeywords', label: 'Arama Anahtar Kelimeleri', placeholder: 'muadil kodlar, müşteri kodları, yaygın aramalar', colSpan: 'full' },
       { name: 'isPublished', label: 'Müşteri portalında yayınla', type: 'switch', helpText: 'Kapalı kalırsa ürün taslak olarak kaydedilir, müşteriler görmez.' },
     ],
     mapInitial: (item) => ({
@@ -298,9 +338,24 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
       name: item.name,
       slug: item.slug ?? '',
       brand: item.brand ?? '',
+      productType: item.productType ?? '',
+      manufacturerCode: item.manufacturerCode ?? '',
+      barcode: item.barcode ?? '',
+      unit: item.unit ?? '',
       categoryPath: item.categoryPath ?? '',
+      shortDescription: item.shortDescription ?? '',
       description: item.description ?? '',
       primaryImageUrl: item.primaryImageUrl ?? '',
+      bulletPointsJson: item.bulletPointsJson ?? '',
+      attributesJson: item.attributesJson ?? '',
+      mediaGalleryJson: item.mediaGalleryJson ?? '',
+      documentsJson: item.documentsJson ?? '',
+      metaTitle: item.metaTitle ?? '',
+      metaDescription: item.metaDescription ?? '',
+      searchKeywords: item.searchKeywords ?? '',
+      minOrderQuantity: item.minOrderQuantity ? String(item.minOrderQuantity) : '',
+      packageQuantity: item.packageQuantity ? String(item.packageQuantity) : '',
+      sortOrder: typeof item.sortOrder === 'number' ? String(item.sortOrder) : '',
       defaultStockId: item.defaultStockId ? String(item.defaultStockId) : '',
       isPublished: item.isPublished,
     }),
@@ -312,6 +367,9 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
         sku: trimOptional(values.sku),
         slug: trimOptional(values.slug) ?? slugify(name),
         defaultStockId: toOptionalNumber(values.defaultStockId),
+        minOrderQuantity: toOptionalNumber(values.minOrderQuantity),
+        packageQuantity: toOptionalNumber(values.packageQuantity),
+        sortOrder: toOptionalNumber(values.sortOrder) ?? 0,
       };
     },
     submit: (payload, id) => id ? b2bApi.updateCatalogProduct(id, payload) : b2bApi.createCatalogProduct(payload),
@@ -716,10 +774,10 @@ function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKe
     const values = {
       primary: <span className="font-medium text-slate-900 dark:text-white">{item.name}</span>,
       secondary: <span className="font-mono text-sm">{item.sku}</span>,
-      scope: item.categoryPath || item.brand || '-',
+      scope: item.categoryPath || item.productType || item.brand || '-',
       status: renderStatusBadge(item.isPublished ? 'Yayında' : 'Taslak', item.isPublished),
-      amount: item.defaultStockId ? 'ERP stok bağlı' : '-',
-      date: '-',
+      amount: typeof item.completenessScore === 'number' ? `%${item.completenessScore} doluluk` : item.defaultStockId ? 'ERP stok bağlı' : '-',
+      date: item.defaultStockId ? 'ERP stok bağlı' : '-',
     };
     return values[columnKey];
   }
@@ -1663,6 +1721,9 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
                 name: item.stokAdi,
                 slug: slugify(`${item.stokKodu}-${item.stokAdi}`),
                 brand: item.ureticiKodu || '',
+                manufacturerCode: item.ureticiKodu || '',
+                unit: item.olcuBr1 || '',
+                productType: item.grupKodu || '',
                 categoryPath,
               };
             }
@@ -1999,6 +2060,26 @@ export function B2bRecordDetailPage(): ReactElement {
             <p className="mt-2 text-slate-900 dark:text-white">{catalog.brand || '-'}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Ürün Tipi</p>
+            <p className="mt-2 text-slate-900 dark:text-white">{catalog.productType || '-'}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Üretici Kodu</p>
+            <p className="mt-2 text-slate-900 dark:text-white">{catalog.manufacturerCode || '-'}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Barkod</p>
+            <p className="mt-2 text-slate-900 dark:text-white">{catalog.barcode || '-'}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Birim / Paket</p>
+            <p className="mt-2 text-slate-900 dark:text-white">{[catalog.unit, catalog.packageQuantity ? `${formatNumber(catalog.packageQuantity)} paket` : null].filter(Boolean).join(' / ') || '-'}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Katalog Doluluk</p>
+            <p className="mt-2 text-slate-900 dark:text-white">%{catalog.completenessScore ?? 0}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Kategori</p>
             <p className="mt-2 text-slate-900 dark:text-white">{catalog.categoryPath || '-'}</p>
           </div>
@@ -2007,8 +2088,20 @@ export function B2bRecordDetailPage(): ReactElement {
             <p className="mt-2 text-slate-900 dark:text-white">{catalog.defaultStockId ? 'ERP stok bağlı' : '-'}</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:col-span-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Kısa Tanıtım</p>
+            <p className="mt-2 whitespace-pre-wrap text-slate-900 dark:text-white">{catalog.shortDescription || '-'}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:col-span-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Açıklama</p>
             <p className="mt-2 whitespace-pre-wrap text-slate-900 dark:text-white">{catalog.description || '-'}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:col-span-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Teknik Özellikler</p>
+            <p className="mt-2 whitespace-pre-wrap font-mono text-xs text-slate-900 dark:text-white">{catalog.attributesJson || '-'}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:col-span-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Görseller ve Dokümanlar</p>
+            <p className="mt-2 whitespace-pre-wrap font-mono text-xs text-slate-900 dark:text-white">{[catalog.mediaGalleryJson, catalog.documentsJson].filter(Boolean).join('\n') || '-'}</p>
           </div>
         </div> : null}
         {priceList ? (

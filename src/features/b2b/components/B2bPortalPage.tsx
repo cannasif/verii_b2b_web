@@ -406,13 +406,21 @@ export function B2bPortalPage(): ReactElement {
               return (
                 <Card key={product.id} className="group overflow-hidden border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl">
                   <div className="h-36 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.25),transparent_35%),linear-gradient(135deg,#102f25,#2f855a)] p-4 text-white">
-                    <Badge className="bg-white/15 text-white">{product.brand || 'B2B katalog'}</Badge>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge className="bg-white/15 text-white">{product.brand || 'B2B katalog'}</Badge>
+                      {product.productType ? <Badge className="bg-cyan-300/20 text-cyan-50">{product.productType}</Badge> : null}
+                    </div>
                     <h3 className="mt-4 line-clamp-2 text-xl font-black">{product.name}</h3>
                   </div>
                   <CardContent className="space-y-4 p-4">
                     <div>
                       <p className="font-mono text-xs font-bold text-emerald-700">{productSku(product)}</p>
-                      <p className="mt-1 line-clamp-2 text-sm text-slate-500">{product.categoryPath || product.description || 'Yayınlanmış katalog ürünü'}</p>
+                      <p className="mt-1 line-clamp-2 text-sm text-slate-500">{product.shortDescription || product.categoryPath || product.description || 'Yayınlanmış katalog ürünü'}</p>
+                      <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-wide text-slate-500">
+                        {product.categoryPath ? <span className="rounded-full bg-stone-100 px-2 py-1">{product.categoryPath}</span> : null}
+                        {product.manufacturerCode ? <span className="rounded-full bg-stone-100 px-2 py-1">Üretici: {product.manufacturerCode}</span> : null}
+                        {product.unit ? <span className="rounded-full bg-stone-100 px-2 py-1">Birim: {product.unit}</span> : null}
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="rounded-2xl bg-stone-50 p-3">
