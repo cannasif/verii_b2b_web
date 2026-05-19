@@ -1,12 +1,13 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, CheckCircle2, Clock3, FileText, GitBranchPlus, Plus, RefreshCw, ShoppingCart, Trash2, TriangleAlert } from 'lucide-react';
+import { ArrowDown, ArrowUp, CheckCircle2, Clock3, Edit, FileText, GitBranchPlus, Plus, RefreshCw, ShoppingCart, Trash2, TriangleAlert, X } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { DetailPageShell, FormPageShell, PagedDataGrid, PagedLookupDialog, type PagedDataGridColumn } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -1559,6 +1560,8 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
   const recordId = id ? Number(id) : undefined;
   const [values, setValues] = useState<Record<string, string | boolean>>(() => formConfig?.defaults ?? {});
   const [quoteLines, setQuoteLines] = useState<QuoteLineFormState[]>(() => [createEmptyQuoteLine()]);
+  const [quoteLineDraft, setQuoteLineDraft] = useState<QuoteLineFormState | null>(null);
+  const [quoteLineDialogOpen, setQuoteLineDialogOpen] = useState(false);
   const [lookupLabels, setLookupLabels] = useState<Record<string, string>>({});
   const [activeLookupField, setActiveLookupField] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -1809,131 +1812,233 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
     return null;
   }
 
-  function updateQuoteLine(clientId: string, patch: Partial<QuoteLineFormState>): void {
+  function updateQuoteLineDraft(patch: Partial<QuoteLineFormState>): void {
     setFormError(null);
-    setQuoteLines((current) => current.map((line) => line.clientId === clientId ? { ...line, ...patch } : line));
+    setQuoteLineDraft((current) => current ? { ...current, ...patch } : current);
   }
 
   function removeQuoteLine(clientId: string): void {
     setFormError(null);
-    setQuoteLines((current) => current.length > 1 ? current.filter((line) => line.clientId !== clientId) : current);
+    setQuoteLines((current) => {
+      const next = current.filter((line) => line.clientId !== clientId);
+      return next.length > 0 ? next : [createEmptyQuoteLine()];
+    });
+  }
+
+  function openQuoteLineDialog(line?: QuoteLineFormState): void {
+    setFormError(null);
+    setQuoteLineDraft(line ? { ...line } : createEmptyQuoteLine());
+    setQuoteLineDialogOpen(true);
+  }
+
+  function saveQuoteLineDraft(): void {
+    if (!quoteLineDraft) return;
+    const hasProduct = Boolean(
+      quoteLineDraft.erpStockId ||
+      quoteLineDraft.catalogProductId ||
+      quoteLineDraft.requestedSku.trim() ||
+      quoteLineDraft.requestedName.trim()
+    );
+    if (!hasProduct) {
+      setFormError('Kalem için ERP stok, katalog ürünü veya ürün bilgisi seçin.');
+      return;
+    }
+    if ((toOptionalNumber(quoteLineDraft.quantity) ?? 0) <= 0) {
+      setFormError('Kalem miktarı sıfırdan büyük olmalı.');
+      return;
+    }
+    setQuoteLines((current) => {
+      const exists = current.some((line) => line.clientId === quoteLineDraft.clientId);
+      if (exists) {
+        return current.map((line) => line.clientId === quoteLineDraft.clientId ? quoteLineDraft : line);
+      }
+      return [...current, quoteLineDraft];
+    });
+    setQuoteLineDialogOpen(false);
+    setQuoteLineDraft(null);
   }
 
   function renderQuoteLinesEditor(): ReactElement | null {
     if (kind !== 'quotes') return null;
 
+    const visibleLines = quoteLines.filter((line) =>
+      line.erpStockId || line.catalogProductId || line.requestedSku.trim() || line.requestedName.trim()
+    );
+    const draft = quoteLineDraft;
+    const draftStockLookupKey = draft ? `quote-line-stock-${draft.clientId}` : 'quote-line-stock';
+    const draftCatalogLookupKey = draft ? `quote-line-catalog-${draft.clientId}` : 'quote-line-catalog';
+
     return (
-      <div className="space-y-4 md:col-span-2">
-        <div className="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:flex-row md:items-center md:justify-between">
+      <div className="md:col-span-2 rounded-3xl border border-slate-200 bg-white/85 shadow-sm dark:border-white/10 dark:bg-white/5">
+        <div className="flex flex-col gap-3 border-b border-slate-200 p-4 dark:border-white/10 md:flex-row md:items-center md:justify-between">
           <div>
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">Talep / teklif kalemleri</h3>
-            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">CRM’deki gibi her ürün ayrı satırdır; stok seç, miktar ve hedef fiyat gir, gerekiyorsa yeni satır ekle.</p>
+            <h3 className="text-base font-black text-slate-900 dark:text-white">Teklif kalemleri</h3>
+            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+              {visibleLines.length > 0 ? `${visibleLines.length} kalem eklendi.` : 'Henüz kalem yok. CRM akışı gibi kalemi ayrı pencerede ekleyin.'}
+            </p>
           </div>
-          <Button type="button" variant="outline" onClick={() => setQuoteLines((current) => [...current, createEmptyQuoteLine()])}>
+          <Button type="button" onClick={() => openQuoteLineDialog()} className="bg-linear-to-r from-pink-600 to-orange-600 text-white hover:from-pink-700 hover:to-orange-700">
             <Plus className="mr-2 h-4 w-4" />
             Kalem Ekle
           </Button>
         </div>
-        <div className="space-y-3">
-          {quoteLines.map((line, index) => {
-            const stockLookupKey = `quote-line-stock-${line.clientId}`;
-            const catalogLookupKey = `quote-line-catalog-${line.clientId}`;
-            return (
-              <div key={line.clientId} className="rounded-3xl border border-slate-200 bg-white/85 p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-black text-slate-900 dark:text-white">Kalem {index + 1}</p>
-                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{line.erpStockLabel || line.catalogProductLabel || line.requestedName || 'Ürün seçilmedi'}</p>
-                  </div>
-                  <Button type="button" variant="ghost" size="sm" disabled={quoteLines.length === 1} onClick={() => removeQuoteLine(line.clientId)}>
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Sil
-                  </Button>
-                </div>
-                <div className="grid gap-3 md:grid-cols-12">
-                  <div className="space-y-2 md:col-span-6">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">ERP Stok</span>
-                    <PagedLookupDialog<StockLookup>
-                      open={activeLookupField === stockLookupKey}
-                      onOpenChange={(open) => setActiveLookupField(open ? stockLookupKey : null)}
-                      value={line.erpStockLabel || null}
-                      placeholder="ERP stok seç"
-                      searchPlaceholder="Stok kodu, adı veya üretici kodu ara"
-                      queryKey={['b2b-quote-line-stock', line.clientId]}
-                      title="Teklif Kalemi İçin ERP Stok Seç"
-                      description="CRM teklif/sipariş mantığı gibi satıra ürün kartı bağlayın."
-                      emptyText="Stok bulunamadı."
-                      fetchPage={({ pageNumber, pageSize, search, signal }) => lookupApi.getProductsPaged({ pageNumber, pageSize, search }, { signal })}
-                      getKey={(item) => String(item.id)}
-                      getLabel={(item) => `${item.stokKodu} - ${item.stokAdi}`}
-                      onSelect={(item) => updateQuoteLine(line.clientId, {
-                        erpStockId: String(item.id),
-                        erpStockLabel: `${item.stokKodu} - ${item.stokAdi}`,
-                        requestedSku: item.stokKodu,
-                        requestedName: item.stokAdi,
-                      })}
-                    />
-                  </div>
-                  <div className="space-y-2 md:col-span-6">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Katalog Ürün</span>
-                    <PagedLookupDialog<CatalogProductDto>
-                      open={activeLookupField === catalogLookupKey}
-                      onOpenChange={(open) => setActiveLookupField(open ? catalogLookupKey : null)}
-                      value={line.catalogProductLabel || null}
-                      placeholder="Katalog ürünü seç"
-                      searchPlaceholder="SKU, ürün adı, marka ara"
-                      queryKey={['b2b-quote-line-catalog', line.clientId]}
-                      title="Teklif Kalemi İçin Katalog Ürünü Seç"
-                      description="Portal kataloğundaki ürün kartlarından seçim yapın."
-                      emptyText="Katalog ürünü bulunamadı."
-                      fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getCatalogProducts({ pageNumber, pageSize, search })}
-                      getKey={(item) => String(item.id)}
-                      getLabel={(item) => `${item.sku} - ${item.name}`}
-                      onSelect={(item) => updateQuoteLine(line.clientId, {
-                        catalogProductId: String(item.id),
-                        catalogProductLabel: `${item.sku} - ${item.name}`,
-                        requestedSku: item.sku,
-                        requestedName: item.name,
-                      })}
-                    />
-                  </div>
-                  <label className="space-y-2 md:col-span-3">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Talep SKU</span>
-                    <Input value={line.requestedSku} onChange={(event) => updateQuoteLine(line.clientId, { requestedSku: event.target.value })} />
-                  </label>
-                  <label className="space-y-2 md:col-span-5">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ürün Adı</span>
-                    <Input value={line.requestedName} onChange={(event) => updateQuoteLine(line.clientId, { requestedName: event.target.value })} />
-                  </label>
-                  <label className="space-y-2 md:col-span-2">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Miktar</span>
-                    <Input type="number" min="0" value={line.quantity} onChange={(event) => updateQuoteLine(line.clientId, { quantity: event.target.value })} />
-                  </label>
-                  <label className="space-y-2 md:col-span-2">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">KDV %</span>
-                    <Input type="number" value={line.vatRate} onChange={(event) => updateQuoteLine(line.clientId, { vatRate: event.target.value })} />
-                  </label>
-                  <label className="space-y-2 md:col-span-3">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Hedef Fiyat</span>
-                    <Input type="number" value={line.targetUnitPrice} onChange={(event) => updateQuoteLine(line.clientId, { targetUnitPrice: event.target.value })} />
-                  </label>
-                  <label className="space-y-2 md:col-span-3">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">İskonto %</span>
-                    <Input type="number" value={line.discountRate1} onChange={(event) => updateQuoteLine(line.clientId, { discountRate1: event.target.value })} />
-                  </label>
-                  <label className="space-y-2 md:col-span-3">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">İskonto Tutar</span>
-                    <Input type="number" value={line.discountAmount1} onChange={(event) => updateQuoteLine(line.clientId, { discountAmount1: event.target.value })} />
-                  </label>
-                  <label className="space-y-2 md:col-span-3">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Satır Notu</span>
-                    <Input value={line.description} onChange={(event) => updateQuoteLine(line.clientId, { description: event.target.value })} />
-                  </label>
-                </div>
+        <div className="p-0">
+          {visibleLines.length === 0 ? (
+            <div className="flex flex-col items-center justify-center px-4 py-14 text-center">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 ring-1 ring-slate-100 dark:bg-white/5 dark:ring-white/10">
+                <ShoppingCart className="h-7 w-7 text-slate-300 dark:text-slate-500" />
               </div>
-            );
-          })}
+              <h4 className="text-lg font-bold text-slate-900 dark:text-white">Kalem eklenmedi</h4>
+              <p className="mt-2 max-w-sm text-sm font-medium text-slate-500 dark:text-slate-400">Teklif/talep satırları ürün seçme penceresiyle eklenir; kullanıcı ID yazmaz, stok veya katalogdan seçer.</p>
+            </div>
+          ) : (
+            <div className="w-full overflow-x-auto">
+              <table className="w-full min-w-[980px] text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-black uppercase tracking-wide text-slate-500 dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
+                    <th className="px-4 py-3">Ürün</th>
+                    <th className="px-4 py-3 text-right">Miktar</th>
+                    <th className="px-4 py-3 text-right">Hedef Fiyat</th>
+                    <th className="px-4 py-3 text-right">İskonto</th>
+                    <th className="px-4 py-3 text-right">KDV</th>
+                    <th className="px-4 py-3">Not</th>
+                    <th className="px-4 py-3 text-right">İşlem</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleLines.map((line) => (
+                    <tr key={line.clientId} className="border-b border-slate-100 last:border-0 dark:border-white/10">
+                      <td className="px-4 py-3">
+                        <div className="font-mono font-bold text-slate-900 dark:text-white">{line.requestedSku || '-'}</div>
+                        <div className="mt-1 line-clamp-1 text-xs font-semibold text-slate-500">{line.requestedName || line.erpStockLabel || line.catalogProductLabel || '-'}</div>
+                      </td>
+                      <td className="px-4 py-3 text-right font-bold">{line.quantity || '0'}</td>
+                      <td className="px-4 py-3 text-right">{line.targetUnitPrice || '-'}</td>
+                      <td className="px-4 py-3 text-right">%{line.discountRate1 || 0}</td>
+                      <td className="px-4 py-3 text-right">%{line.vatRate || 0}</td>
+                      <td className="px-4 py-3 text-slate-500">{line.description || '-'}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end gap-1">
+                          <Button type="button" variant="ghost" size="sm" onClick={() => openQuoteLineDialog(line)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Düzenle
+                          </Button>
+                          <Button type="button" variant="ghost" size="sm" onClick={() => removeQuoteLine(line.clientId)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Sil
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
+        <Dialog open={quoteLineDialogOpen} onOpenChange={setQuoteLineDialogOpen}>
+          <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-5xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-pink-500 to-orange-500 text-white">
+                  <Plus className="h-5 w-5" />
+                </span>
+                Teklif kalemi
+              </DialogTitle>
+            </DialogHeader>
+            {draft ? (
+              <div className="grid gap-4 md:grid-cols-12">
+                <div className="space-y-2 md:col-span-6">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">ERP Stok</span>
+                  <PagedLookupDialog<StockLookup>
+                    open={activeLookupField === draftStockLookupKey}
+                    onOpenChange={(open) => setActiveLookupField(open ? draftStockLookupKey : null)}
+                    value={draft.erpStockLabel || null}
+                    placeholder="ERP stok seç"
+                    searchPlaceholder="Stok kodu, adı veya üretici kodu ara"
+                    queryKey={['b2b-quote-line-stock', draft.clientId]}
+                    title="Teklif Kalemi İçin ERP Stok Seç"
+                    description="CRM teklif/sipariş mantığı gibi satıra ürün kartı bağlayın."
+                    emptyText="Stok bulunamadı."
+                    fetchPage={({ pageNumber, pageSize, search, signal }) => lookupApi.getProductsPaged({ pageNumber, pageSize, search }, { signal })}
+                    getKey={(item) => String(item.id)}
+                    getLabel={(item) => `${item.stokKodu} - ${item.stokAdi}`}
+                    onSelect={(item) => updateQuoteLineDraft({
+                      erpStockId: String(item.id),
+                      erpStockLabel: `${item.stokKodu} - ${item.stokAdi}`,
+                      requestedSku: item.stokKodu,
+                      requestedName: item.stokAdi,
+                    })}
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-6">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Katalog Ürün</span>
+                  <PagedLookupDialog<CatalogProductDto>
+                    open={activeLookupField === draftCatalogLookupKey}
+                    onOpenChange={(open) => setActiveLookupField(open ? draftCatalogLookupKey : null)}
+                    value={draft.catalogProductLabel || null}
+                    placeholder="Katalog ürünü seç"
+                    searchPlaceholder="SKU, ürün adı, marka ara"
+                    queryKey={['b2b-quote-line-catalog', draft.clientId]}
+                    title="Teklif Kalemi İçin Katalog Ürünü Seç"
+                    description="Portal kataloğundaki ürün kartlarından seçim yapın."
+                    emptyText="Katalog ürünü bulunamadı."
+                    fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getCatalogProducts({ pageNumber, pageSize, search })}
+                    getKey={(item) => String(item.id)}
+                    getLabel={(item) => `${item.sku} - ${item.name}`}
+                    onSelect={(item) => updateQuoteLineDraft({
+                      catalogProductId: String(item.id),
+                      catalogProductLabel: `${item.sku} - ${item.name}`,
+                      requestedSku: item.sku,
+                      requestedName: item.name,
+                    })}
+                  />
+                </div>
+                <label className="space-y-2 md:col-span-3">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Talep SKU</span>
+                  <Input value={draft.requestedSku} onChange={(event) => updateQuoteLineDraft({ requestedSku: event.target.value })} />
+                </label>
+                <label className="space-y-2 md:col-span-5">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ürün Adı</span>
+                  <Input value={draft.requestedName} onChange={(event) => updateQuoteLineDraft({ requestedName: event.target.value })} />
+                </label>
+                <label className="space-y-2 md:col-span-2">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Miktar</span>
+                  <Input type="number" min="0" value={draft.quantity} onChange={(event) => updateQuoteLineDraft({ quantity: event.target.value })} />
+                </label>
+                <label className="space-y-2 md:col-span-2">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">KDV %</span>
+                  <Input type="number" value={draft.vatRate} onChange={(event) => updateQuoteLineDraft({ vatRate: event.target.value })} />
+                </label>
+                <label className="space-y-2 md:col-span-3">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Hedef Fiyat</span>
+                  <Input type="number" value={draft.targetUnitPrice} onChange={(event) => updateQuoteLineDraft({ targetUnitPrice: event.target.value })} />
+                </label>
+                <label className="space-y-2 md:col-span-3">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">İskonto %</span>
+                  <Input type="number" value={draft.discountRate1} onChange={(event) => updateQuoteLineDraft({ discountRate1: event.target.value })} />
+                </label>
+                <label className="space-y-2 md:col-span-3">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">İskonto Tutar</span>
+                  <Input type="number" value={draft.discountAmount1} onChange={(event) => updateQuoteLineDraft({ discountAmount1: event.target.value })} />
+                </label>
+                <label className="space-y-2 md:col-span-3">
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Satır Notu</span>
+                  <Input value={draft.description} onChange={(event) => updateQuoteLineDraft({ description: event.target.value })} />
+                </label>
+              </div>
+            ) : null}
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setQuoteLineDialogOpen(false)}>
+                <X className="mr-2 h-4 w-4" />
+                Vazgeç
+              </Button>
+              <Button type="button" onClick={saveQuoteLineDraft}>
+                Kalemi Kaydet
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
