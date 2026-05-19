@@ -52,6 +52,7 @@ export interface OrderDto {
   id: number;
   orderNumber: string;
   customerId: number;
+  buyerId?: number;
   userId?: number;
   status: string;
   currencyCode: string;
@@ -115,6 +116,7 @@ export interface OrderLineDto {
 export interface CartDto {
   id: number;
   customerId: number;
+  buyerId?: number;
   userId?: number;
   status: string;
   currencyCode: string;
@@ -151,6 +153,7 @@ export interface QuickOrderLineDto {
 
 export interface QuickOrderDto {
   customerId: number;
+  buyerId?: number;
   userId?: number;
   customerGroupCode?: string;
   currencyCode?: string;
@@ -254,6 +257,7 @@ export interface QuoteRequestDto {
   id: number;
   quoteNumber: string;
   customerId: number;
+  buyerId?: number;
   userId?: number;
   status: string;
   currencyCode: string;
@@ -315,6 +319,7 @@ export interface QuoteRequestLineDto {
 
 export interface ConvertQuoteToCartDto {
   quoteId?: number;
+  buyerId?: number;
   userId?: number;
   allowBackorder?: boolean;
 }
@@ -346,11 +351,15 @@ export interface B2bPortalSessionDto {
   token: string;
   expiresAt: string;
   company: B2bCompanyDto;
+  buyer?: B2bBuyerDto;
+  scope?: string;
+  canViewCompanyHistory?: boolean;
 }
 
 export interface B2bBuyerDto {
   id: number;
   companyId: number;
+  userId?: number;
   email: string;
   fullName: string;
   roleCode: string;

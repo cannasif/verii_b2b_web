@@ -34,6 +34,7 @@ const portalCapabilities = [
 
 export function B2bPortalPage(): ReactElement {
   const [companyCode, setCompanyCode] = useState('');
+  const [buyerEmail, setBuyerEmail] = useState('');
   const [companyLookupOpen, setCompanyLookupOpen] = useState(false);
   const [companyLookupLabel, setCompanyLookupLabel] = useState('');
   const [catalogSearch, setCatalogSearch] = useState('');
@@ -55,15 +56,23 @@ export function B2bPortalPage(): ReactElement {
   const [message, setMessage] = useState<string | null>(null);
 
   const selectedCompany = portalSession?.company ?? null;
+  const selectedBuyer = portalSession?.buyer ?? null;
   const portalToken = portalSession?.token ?? '';
   const customerId = resolveCustomerId(selectedCompany);
+  const portalUserPayload = useMemo(
+    () => ({
+      buyerId: selectedBuyer?.id,
+      userId: selectedBuyer?.userId,
+    }),
+    [selectedBuyer],
+  );
 
   const sessionMutation = useMutation({
-    mutationFn: (selectedCompanyCode: string) => b2bApi.createPortalSession(selectedCompanyCode),
+    mutationFn: (input: { selectedCompanyCode: string; selectedBuyerEmail: string }) => b2bApi.createPortalSession(input.selectedCompanyCode, input.selectedBuyerEmail),
     onSuccess: (session) => {
       setPortalSession(session);
       window.localStorage.setItem(PORTAL_SESSION_STORAGE_KEY, JSON.stringify(session));
-      setMessage(`${session.company.companyName} portal oturumu açıldı.`);
+      setMessage(`${session.buyer?.fullName || session.company.companyName} için portal oturumu açıldı.`);
       if (session.company.customerId) {
         void b2bApi.getPublicDraftCart(session.company.customerId, session.token).then(setCart).catch(() => undefined);
       }
@@ -77,7 +86,7 @@ export function B2bPortalPage(): ReactElement {
   });
 
   const portalQuery = useQuery({
-    queryKey: ['b2b-public-portal-summary', customerId, portalToken],
+    queryKey: ['b2b-public-portal-summary', customerId, selectedBuyer?.id, portalToken],
     queryFn: () => b2bApi.getPublicCustomerPortalSummary(customerId, portalToken),
     enabled: customerId > 0 && Boolean(portalToken),
   });
@@ -112,6 +121,7 @@ export function B2bPortalPage(): ReactElement {
       const quantity = quantities[product.id] || 1;
       return b2bApi.publicAddCartLine({
         customerId,
+        ...portalUserPayload,
         customerGroupCode: selectedCompany?.customerGroupCode,
         catalogProductId: product.id,
         erpStockId: product.defaultStockId,
@@ -145,6 +155,7 @@ export function B2bPortalPage(): ReactElement {
       if (lines.length === 0) throw new Error('En az bir hızlı sipariş satırı girin.');
       return b2bApi.publicQuickOrder({
         customerId,
+        ...portalUserPayload,
         customerGroupCode: selectedCompany?.customerGroupCode,
         currencyCode: 'TRY',
         allowBackorder: true,
@@ -164,6 +175,7 @@ export function B2bPortalPage(): ReactElement {
       if (!cart || cart.lines.length === 0) throw new Error('Teklif talebi için sepette ürün olmalı.');
       return b2bApi.createPublicQuote({
         customerId,
+        ...portalUserPayload,
         currencyCode: cart.currencyCode || 'TRY',
         offerType: 'B2B Portal',
         customerNote,
@@ -252,7 +264,7 @@ export function B2bPortalPage(): ReactElement {
                 className="space-y-3"
                 onSubmit={(event) => {
                   event.preventDefault();
-                  sessionMutation.mutate(companyCode);
+                  sessionMutation.mutate({ selectedCompanyCode: companyCode, selectedBuyerEmail: buyerEmail });
                 }}
               >
                 <PagedLookupDialog<B2bCompanyDto>
@@ -273,7 +285,15 @@ export function B2bPortalPage(): ReactElement {
                     setCompanyLookupLabel(`${item.companyName} - ${item.companyCode}`);
                   }}
                 />
-                <Button type="submit" className="h-11 w-full bg-emerald-800 font-black hover:bg-emerald-700" disabled={!companyCode.trim() || sessionMutation.isPending}>
+                <Input
+                  type="email"
+                  value={buyerEmail}
+                  onChange={(event) => setBuyerEmail(event.target.value)}
+                  placeholder="Size tanımlanan kullanıcı e-postası"
+                  autoComplete="email"
+                  className="h-11 bg-white"
+                />
+                <Button type="submit" className="h-11 w-full bg-emerald-800 font-black hover:bg-emerald-700" disabled={!companyCode.trim() || !buyerEmail.trim() || sessionMutation.isPending}>
                   Müşteri Olarak Devam Et
                 </Button>
               </form>
@@ -284,6 +304,16 @@ export function B2bPortalPage(): ReactElement {
                     <p className="text-lg font-black">{selectedCompany.companyName}</p>
                     <p className="text-xs text-emerald-100/70">{selectedCompany.companyCode}</p>
                   </div>
+                  {selectedBuyer ? (
+                    <div className="rounded-2xl bg-white/10 p-3">
+                      <p className="text-xs text-emerald-100/70">Portal kullanıcısı</p>
+                      <p className="font-black">{selectedBuyer.fullName}</p>
+                      <p className="text-xs text-emerald-100/70">{selectedBuyer.email}</p>
+                      <p className="mt-1 text-xs text-emerald-100/80">
+                        {portalSession?.canViewCompanyHistory ? 'Şirket genel geçmişini görebilir.' : 'Yalnızca kendi sepet, teklif, sipariş ve ödeme geçmişini görür.'}
+                      </p>
+                    </div>
+                  ) : null}
                   <button
                     type="button"
                     className="text-xs font-black text-emerald-100 underline"

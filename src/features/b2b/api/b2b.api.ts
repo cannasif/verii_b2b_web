@@ -80,10 +80,10 @@ export const b2bApi = {
     return normalizePaged(response);
   },
 
-  async createPortalSession(companyCode: string): Promise<B2bPortalSessionDto> {
+  async createPortalSession(companyCode: string, buyerEmail?: string): Promise<B2bPortalSessionDto> {
     const response = await api.post<ApiResponse<B2bPortalSessionDto>>(
       '/api/b2b/portal/session',
-      { companyCode },
+      { companyCode, buyerEmail },
       publicRequestConfig,
     );
     return extractData(response);
