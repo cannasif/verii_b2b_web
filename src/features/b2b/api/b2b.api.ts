@@ -19,6 +19,8 @@ import type {
   InventorySnapshotDto,
   OrderDto,
   PaymentTransactionDto,
+  CreatePaytrIframeTokenDto,
+  PaytrIframeTokenDto,
   PurchaseApprovalRuleDto,
   QuickOrderDto,
   QuickOrderResultDto,
@@ -342,6 +344,15 @@ export const b2bApi = {
 
   async createPayment(payload: Record<string, unknown>): Promise<PaymentTransactionDto> {
     const response = await api.post<ApiResponse<PaymentTransactionDto>>('/api/b2b/payments', payload);
+    return extractData(response);
+  },
+
+  async createPaytrIframeToken(payload: CreatePaytrIframeTokenDto, portalToken?: string): Promise<PaytrIframeTokenDto> {
+    const response = await api.post<ApiResponse<PaytrIframeTokenDto>>(
+      '/api/b2b/payments/paytr/iframe-token',
+      payload,
+      portalToken ? portalRequestConfig(portalToken) : undefined,
+    );
     return extractData(response);
   },
 

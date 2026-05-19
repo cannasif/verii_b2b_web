@@ -214,6 +214,28 @@ export interface PaymentTransactionDto {
   completedDate?: string;
 }
 
+export interface CreatePaytrIframeTokenDto {
+  orderId: number;
+  email: string;
+  userName: string;
+  userAddress: string;
+  userPhone: string;
+  okUrl?: string;
+  failUrl?: string;
+  userIp?: string;
+}
+
+export interface PaytrIframeTokenDto {
+  paymentTransactionId: number;
+  orderId: number;
+  merchantOid: string;
+  iframeToken: string;
+  iframeUrl: string;
+  amount: number;
+  currencyCode: string;
+  testMode: boolean;
+}
+
 export interface CustomerPriceListDto {
   id: number;
   code: string;
