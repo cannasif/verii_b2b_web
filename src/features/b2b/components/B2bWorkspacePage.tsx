@@ -1,6 +1,6 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, CheckCircle2, Clock3, FileText, GitBranchPlus, RefreshCw, ShoppingCart, TriangleAlert } from 'lucide-react';
+import { ArrowDown, ArrowUp, CheckCircle2, Clock3, FileText, GitBranchPlus, Plus, RefreshCw, ShoppingCart, Trash2, TriangleAlert } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { DetailPageShell, FormPageShell, PagedDataGrid, PagedLookupDialog, type PagedDataGridColumn } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
@@ -207,6 +207,40 @@ type B2bFormConfig = {
   transform?: (values: Record<string, string | boolean>) => Record<string, unknown>;
 };
 
+type QuoteLineFormState = {
+  clientId: string;
+  requestedSku: string;
+  requestedName: string;
+  erpStockId: string;
+  erpStockLabel: string;
+  catalogProductId: string;
+  catalogProductLabel: string;
+  quantity: string;
+  targetUnitPrice: string;
+  discountRate1: string;
+  discountAmount1: string;
+  vatRate: string;
+  description: string;
+};
+
+function createEmptyQuoteLine(): QuoteLineFormState {
+  return {
+    clientId: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    requestedSku: '',
+    requestedName: '',
+    erpStockId: '',
+    erpStockLabel: '',
+    catalogProductId: '',
+    catalogProductLabel: '',
+    quantity: '1',
+    targetUnitPrice: '',
+    discountRate1: '0',
+    discountAmount1: '0',
+    vatRate: '20',
+    description: '',
+  };
+}
+
 function toOptionalNumber(value: string | boolean): number | undefined {
   if (typeof value === 'boolean' || value === '') return undefined;
   const parsed = Number(value);
@@ -246,6 +280,50 @@ function baseTransform(values: Record<string, string | boolean>): Record<string,
       return [key, trimmed.length > 0 ? trimmed : undefined];
     }),
   );
+}
+
+function buildQuotePayload(values: Record<string, string | boolean>, quoteLines: QuoteLineFormState[]): Record<string, unknown> {
+  const lines = quoteLines
+    .map((line) => ({
+      requestedSku: trimOptional(line.requestedSku),
+      requestedName: trimOptional(line.requestedName),
+      erpStockId: toOptionalNumber(line.erpStockId),
+      catalogProductId: toOptionalNumber(line.catalogProductId),
+      quantity: toRequiredNumber(line.quantity),
+      targetUnitPrice: toOptionalNumber(line.targetUnitPrice),
+      discountRate1: toOptionalNumber(line.discountRate1) ?? 0,
+      discountAmount1: toOptionalNumber(line.discountAmount1) ?? 0,
+      discountRate2: 0,
+      discountAmount2: 0,
+      discountRate3: 0,
+      discountAmount3: 0,
+      vatRate: toOptionalNumber(line.vatRate) ?? 20,
+      description: trimOptional(line.description),
+      erpProjectCode: trimOptional(values.erpProjectCode),
+    }))
+    .filter((line) => line.quantity > 0 && (line.erpStockId || line.catalogProductId || line.requestedSku || line.requestedName));
+
+  if (lines.length === 0) {
+    throw new Error('En az bir teklif/talep kalemi ekleyin.');
+  }
+
+  return {
+    customerId: toRequiredNumber(values.customerId),
+    userId: toOptionalNumber(values.userId),
+    currencyCode: trimOptional(values.currencyCode) ?? 'TRY',
+    offerType: trimOptional(values.offerType),
+    offerDate: trimOptional(values.offerDate),
+    offerNo: trimOptional(values.offerNo),
+    revisionNo: trimOptional(values.revisionNo),
+    validUntil: trimOptional(values.validUntil),
+    deliveryDate: trimOptional(values.deliveryDate),
+    deliveryMethod: trimOptional(values.deliveryMethod),
+    erpProjectCode: trimOptional(values.erpProjectCode),
+    generalDiscountRate: toOptionalNumber(values.generalDiscountRate),
+    generalDiscountAmount: toOptionalNumber(values.generalDiscountAmount),
+    customerNote: trimOptional(values.customerNote),
+    lines,
+  };
 }
 
 const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
@@ -474,23 +552,6 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
       generalDiscountRate: '',
       generalDiscountAmount: '',
       customerNote: '',
-      requestedSku: '',
-      requestedName: '',
-      erpStockId: '',
-      catalogProductId: '',
-      quantity: '1',
-      targetUnitPrice: '',
-      discountRate1: '0',
-      discountAmount1: '0',
-      discountRate2: '0',
-      discountAmount2: '0',
-      discountRate3: '0',
-      discountAmount3: '0',
-      vatRate: '20',
-      description: '',
-      description1: '',
-      description2: '',
-      description3: '',
     },
     fields: [
       { name: 'customerId', label: 'Cari', type: 'lookup', lookupKind: 'customer', required: true },
@@ -506,23 +567,6 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
       { name: 'erpProjectCode', label: 'ERP Proje Kodu' },
       { name: 'generalDiscountRate', label: 'Genel İskonto %', type: 'number' },
       { name: 'generalDiscountAmount', label: 'Genel İskonto Tutarı', type: 'number' },
-      { name: 'requestedSku', label: 'Talep SKU' },
-      { name: 'requestedName', label: 'Talep Ürün Adı' },
-      { name: 'erpStockId', label: 'ERP Stok', type: 'lookup', lookupKind: 'stock' },
-      { name: 'catalogProductId', label: 'Katalog Ürün', type: 'lookup', lookupKind: 'catalogProduct' },
-      { name: 'quantity', label: 'Miktar', type: 'number', required: true },
-      { name: 'targetUnitPrice', label: 'Hedef Birim Fiyat', type: 'number' },
-      { name: 'discountRate1', label: 'İskonto 1 %', type: 'number' },
-      { name: 'discountAmount1', label: 'İskonto 1 Tutar', type: 'number' },
-      { name: 'discountRate2', label: 'İskonto 2 %', type: 'number' },
-      { name: 'discountAmount2', label: 'İskonto 2 Tutar', type: 'number' },
-      { name: 'discountRate3', label: 'İskonto 3 %', type: 'number' },
-      { name: 'discountAmount3', label: 'İskonto 3 Tutar', type: 'number' },
-      { name: 'vatRate', label: 'KDV %', type: 'number' },
-      { name: 'description', label: 'Satır Açıklaması', type: 'textarea', colSpan: 'full' },
-      { name: 'description1', label: 'Teknik Not', type: 'textarea', colSpan: 'full' },
-      { name: 'description2', label: 'Teslimat Notu', type: 'textarea', colSpan: 'full' },
-      { name: 'description3', label: 'Satın Alma Notu', type: 'textarea', colSpan: 'full' },
       { name: 'customerNote', label: 'Müşteri Notu', type: 'textarea', colSpan: 'full' },
     ],
     transform: (values) => ({
@@ -540,26 +584,6 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
       generalDiscountRate: toOptionalNumber(values.generalDiscountRate),
       generalDiscountAmount: toOptionalNumber(values.generalDiscountAmount),
       customerNote: trimOptional(values.customerNote),
-      lines: [{
-        requestedSku: trimOptional(values.requestedSku),
-        requestedName: trimOptional(values.requestedName),
-        erpStockId: toOptionalNumber(values.erpStockId),
-        catalogProductId: toOptionalNumber(values.catalogProductId),
-        quantity: toRequiredNumber(values.quantity),
-        targetUnitPrice: toOptionalNumber(values.targetUnitPrice),
-        discountRate1: toOptionalNumber(values.discountRate1) ?? 0,
-        discountAmount1: toOptionalNumber(values.discountAmount1) ?? 0,
-        discountRate2: toOptionalNumber(values.discountRate2) ?? 0,
-        discountAmount2: toOptionalNumber(values.discountAmount2) ?? 0,
-        discountRate3: toOptionalNumber(values.discountRate3) ?? 0,
-        discountAmount3: toOptionalNumber(values.discountAmount3) ?? 0,
-        vatRate: toOptionalNumber(values.vatRate) ?? 0,
-        description: trimOptional(values.description),
-        description1: trimOptional(values.description1),
-        description2: trimOptional(values.description2),
-        description3: trimOptional(values.description3),
-        erpProjectCode: trimOptional(values.erpProjectCode),
-      }],
     }),
     submit: b2bApi.createQuote,
   },
@@ -1534,6 +1558,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
   const isEdit = mode === 'edit';
   const recordId = id ? Number(id) : undefined;
   const [values, setValues] = useState<Record<string, string | boolean>>(() => formConfig?.defaults ?? {});
+  const [quoteLines, setQuoteLines] = useState<QuoteLineFormState[]>(() => [createEmptyQuoteLine()]);
   const [lookupLabels, setLookupLabels] = useState<Record<string, string>>({});
   const [activeLookupField, setActiveLookupField] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -1557,7 +1582,9 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
         return typeof value === 'boolean' ? false : !value?.trim();
       });
       if (missingField) throw new Error(`${missingField.label} zorunlu.`);
-      const payload = formConfig.transform ? formConfig.transform(values) : baseTransform(values);
+      const payload = kind === 'quotes'
+        ? buildQuotePayload(values, quoteLines)
+        : formConfig.transform ? formConfig.transform(values) : baseTransform(values);
       return formConfig.submit(payload, recordId);
     },
     onSuccess: () => {
@@ -1583,6 +1610,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
     if (!isEdit) {
       setValues(formConfig.defaults);
       setLookupLabels({});
+      if (kind === 'quotes') setQuoteLines([createEmptyQuoteLine()]);
     }
   }, [detailQuery.data, formConfig, isEdit]);
 
@@ -1781,6 +1809,135 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
     return null;
   }
 
+  function updateQuoteLine(clientId: string, patch: Partial<QuoteLineFormState>): void {
+    setFormError(null);
+    setQuoteLines((current) => current.map((line) => line.clientId === clientId ? { ...line, ...patch } : line));
+  }
+
+  function removeQuoteLine(clientId: string): void {
+    setFormError(null);
+    setQuoteLines((current) => current.length > 1 ? current.filter((line) => line.clientId !== clientId) : current);
+  }
+
+  function renderQuoteLinesEditor(): ReactElement | null {
+    if (kind !== 'quotes') return null;
+
+    return (
+      <div className="space-y-4 md:col-span-2">
+        <div className="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h3 className="text-lg font-black text-slate-900 dark:text-white">Talep / teklif kalemleri</h3>
+            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">CRM’deki gibi her ürün ayrı satırdır; stok seç, miktar ve hedef fiyat gir, gerekiyorsa yeni satır ekle.</p>
+          </div>
+          <Button type="button" variant="outline" onClick={() => setQuoteLines((current) => [...current, createEmptyQuoteLine()])}>
+            <Plus className="mr-2 h-4 w-4" />
+            Kalem Ekle
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {quoteLines.map((line, index) => {
+            const stockLookupKey = `quote-line-stock-${line.clientId}`;
+            const catalogLookupKey = `quote-line-catalog-${line.clientId}`;
+            return (
+              <div key={line.clientId} className="rounded-3xl border border-slate-200 bg-white/85 p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-black text-slate-900 dark:text-white">Kalem {index + 1}</p>
+                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{line.erpStockLabel || line.catalogProductLabel || line.requestedName || 'Ürün seçilmedi'}</p>
+                  </div>
+                  <Button type="button" variant="ghost" size="sm" disabled={quoteLines.length === 1} onClick={() => removeQuoteLine(line.clientId)}>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Sil
+                  </Button>
+                </div>
+                <div className="grid gap-3 md:grid-cols-12">
+                  <div className="space-y-2 md:col-span-6">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">ERP Stok</span>
+                    <PagedLookupDialog<StockLookup>
+                      open={activeLookupField === stockLookupKey}
+                      onOpenChange={(open) => setActiveLookupField(open ? stockLookupKey : null)}
+                      value={line.erpStockLabel || null}
+                      placeholder="ERP stok seç"
+                      searchPlaceholder="Stok kodu, adı veya üretici kodu ara"
+                      queryKey={['b2b-quote-line-stock', line.clientId]}
+                      title="Teklif Kalemi İçin ERP Stok Seç"
+                      description="CRM teklif/sipariş mantığı gibi satıra ürün kartı bağlayın."
+                      emptyText="Stok bulunamadı."
+                      fetchPage={({ pageNumber, pageSize, search, signal }) => lookupApi.getProductsPaged({ pageNumber, pageSize, search }, { signal })}
+                      getKey={(item) => String(item.id)}
+                      getLabel={(item) => `${item.stokKodu} - ${item.stokAdi}`}
+                      onSelect={(item) => updateQuoteLine(line.clientId, {
+                        erpStockId: String(item.id),
+                        erpStockLabel: `${item.stokKodu} - ${item.stokAdi}`,
+                        requestedSku: item.stokKodu,
+                        requestedName: item.stokAdi,
+                      })}
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-6">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Katalog Ürün</span>
+                    <PagedLookupDialog<CatalogProductDto>
+                      open={activeLookupField === catalogLookupKey}
+                      onOpenChange={(open) => setActiveLookupField(open ? catalogLookupKey : null)}
+                      value={line.catalogProductLabel || null}
+                      placeholder="Katalog ürünü seç"
+                      searchPlaceholder="SKU, ürün adı, marka ara"
+                      queryKey={['b2b-quote-line-catalog', line.clientId]}
+                      title="Teklif Kalemi İçin Katalog Ürünü Seç"
+                      description="Portal kataloğundaki ürün kartlarından seçim yapın."
+                      emptyText="Katalog ürünü bulunamadı."
+                      fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getCatalogProducts({ pageNumber, pageSize, search })}
+                      getKey={(item) => String(item.id)}
+                      getLabel={(item) => `${item.sku} - ${item.name}`}
+                      onSelect={(item) => updateQuoteLine(line.clientId, {
+                        catalogProductId: String(item.id),
+                        catalogProductLabel: `${item.sku} - ${item.name}`,
+                        requestedSku: item.sku,
+                        requestedName: item.name,
+                      })}
+                    />
+                  </div>
+                  <label className="space-y-2 md:col-span-3">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Talep SKU</span>
+                    <Input value={line.requestedSku} onChange={(event) => updateQuoteLine(line.clientId, { requestedSku: event.target.value })} />
+                  </label>
+                  <label className="space-y-2 md:col-span-5">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Ürün Adı</span>
+                    <Input value={line.requestedName} onChange={(event) => updateQuoteLine(line.clientId, { requestedName: event.target.value })} />
+                  </label>
+                  <label className="space-y-2 md:col-span-2">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Miktar</span>
+                    <Input type="number" min="0" value={line.quantity} onChange={(event) => updateQuoteLine(line.clientId, { quantity: event.target.value })} />
+                  </label>
+                  <label className="space-y-2 md:col-span-2">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">KDV %</span>
+                    <Input type="number" value={line.vatRate} onChange={(event) => updateQuoteLine(line.clientId, { vatRate: event.target.value })} />
+                  </label>
+                  <label className="space-y-2 md:col-span-3">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Hedef Fiyat</span>
+                    <Input type="number" value={line.targetUnitPrice} onChange={(event) => updateQuoteLine(line.clientId, { targetUnitPrice: event.target.value })} />
+                  </label>
+                  <label className="space-y-2 md:col-span-3">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">İskonto %</span>
+                    <Input type="number" value={line.discountRate1} onChange={(event) => updateQuoteLine(line.clientId, { discountRate1: event.target.value })} />
+                  </label>
+                  <label className="space-y-2 md:col-span-3">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">İskonto Tutar</span>
+                    <Input type="number" value={line.discountAmount1} onChange={(event) => updateQuoteLine(line.clientId, { discountAmount1: event.target.value })} />
+                  </label>
+                  <label className="space-y-2 md:col-span-3">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Satır Notu</span>
+                    <Input value={line.description} onChange={(event) => updateQuoteLine(line.clientId, { description: event.target.value })} />
+                  </label>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full space-y-6 crm-page">
       <Breadcrumb
@@ -1933,6 +2090,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
               </label>
             );
           })}
+          {renderQuoteLinesEditor()}
           {formError ? (
             <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200 md:col-span-2">
               {formError}
