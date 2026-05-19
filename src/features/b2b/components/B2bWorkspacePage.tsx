@@ -1,6 +1,6 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, CheckCircle2, Clock3, FileText, GitBranchPlus, RefreshCw, ShoppingCart, TriangleAlert } from 'lucide-react';
+import { ArrowDown, ArrowUp, Box, CheckCircle2, Clock3, FileText, GitBranchPlus, Image as ImageIcon, Info, Layers, RefreshCw, ShoppingCart, Tag, TriangleAlert } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { DetailPageShell, FormPageShell, PagedDataGrid, PagedLookupDialog, type PagedDataGridColumn } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { VoiceSearchButton } from '@/components/ui/voice-search-button';
 import { useColumnPreferences } from '@/hooks/useColumnPreferences';
@@ -1776,6 +1777,158 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
     return null;
   }
 
+  function renderFormField(field: B2bFormField): ReactElement | null {
+    if (field.hidden) return null;
+    const value = values[field.name] ?? '';
+    const fieldId = `b2b-${kind}-${field.name}`;
+    const wrapperClass = field.colSpan === 'full' ? 'space-y-2 md:col-span-2' : 'space-y-2';
+    if (field.type === 'switch') {
+      return (
+        <label key={field.name} htmlFor={fieldId} className={`${wrapperClass} flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 dark:border-white/10 dark:bg-white/5`}>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{field.label}</span>
+          <Switch id={fieldId} checked={Boolean(value)} onCheckedChange={(checked) => updateValue(field.name, checked)} />
+        </label>
+      );
+    }
+    if (field.type === 'lookup') {
+      return (
+        <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            {field.label}{field.required ? ' *' : ''}
+          </span>
+          {renderLookupField(field)}
+          {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
+        </label>
+      );
+    }
+    if (field.type === 'currency') {
+      return (
+        <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            {field.label}{field.required ? ' *' : ''}
+          </span>
+          <Select value={String(value || 'TRY')} onValueChange={(selectedValue) => updateValue(field.name, selectedValue)}>
+            <SelectTrigger id={fieldId} className="h-12 w-full rounded-2xl border-slate-200 bg-white/85 px-4 text-sm font-semibold text-slate-800 dark:border-white/10 dark:bg-white/5 dark:text-slate-100">
+              <SelectValue placeholder={isCurrencyLoading ? 'Para birimleri yükleniyor' : 'Para birimi seç'} />
+            </SelectTrigger>
+            <SelectContent>
+              {currencyOptions.map((option) => (
+                <SelectItem key={`${option.code}-${option.dovizTipi}`} value={option.code}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
+        </label>
+      );
+    }
+    if (field.type === 'select') {
+      return (
+        <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            {field.label}{field.required ? ' *' : ''}
+          </span>
+          <Select value={String(value || '')} onValueChange={(selectedValue) => updateValue(field.name, selectedValue)}>
+            <SelectTrigger id={fieldId} className="h-12 w-full rounded-2xl border-slate-200 bg-white/85 px-4 text-sm font-semibold text-slate-800 dark:border-white/10 dark:bg-white/5 dark:text-slate-100">
+              <SelectValue placeholder={`${field.label} seç`} />
+            </SelectTrigger>
+            <SelectContent>
+              {(field.options ?? []).map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
+        </label>
+      );
+    }
+    return (
+      <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
+        <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+          {field.label}{field.required ? ' *' : ''}
+        </span>
+        {field.type === 'textarea' ? (
+          <Textarea
+            id={fieldId}
+            value={String(value)}
+            placeholder={field.placeholder}
+            onChange={(event) => updateValue(field.name, event.target.value)}
+          />
+        ) : (
+          <Input
+            id={fieldId}
+            type={field.type === 'number' ? 'number' : field.type === 'date' ? 'datetime-local' : 'text'}
+            value={String(value)}
+            placeholder={field.placeholder}
+            onChange={(event) => updateValue(field.name, event.target.value)}
+          />
+        )}
+        {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
+      </label>
+    );
+  }
+
+  function renderCatalogFormSections(): ReactElement {
+    const fieldsByName = new Map(formConfig?.fields.map((field) => [field.name, field]) ?? []);
+    const renderNamedFields = (names: string[]) => names.map((name) => {
+      const field = fieldsByName.get(name);
+      return field ? renderFormField(field) : null;
+    });
+    const sections = [
+      {
+        title: 'Kaynak ürün',
+        description: 'CRM stok kartı mantığı gibi önce kaynak stok seçilir; kod, ad, marka ve kategori otomatik gelir.',
+        icon: Box,
+        fields: ['defaultStockId'],
+      },
+      {
+        title: 'Portal kimliği',
+        description: 'Müşterinin katalogda gördüğü ürün adı, marka, kategori ve arama bilgileri.',
+        icon: Tag,
+        fields: ['name', 'slug', 'brand', 'productType', 'manufacturerCode', 'barcode', 'categoryPath', 'searchKeywords'],
+      },
+      {
+        title: 'İçerik ve medya',
+        description: 'Amazon/Sahibinden mantığında ürün kartını güçlendiren kısa metin, açıklama, teknik özellik, görsel ve dokümanlar.',
+        icon: ImageIcon,
+        fields: ['shortDescription', 'description', 'bulletPointsJson', 'attributesJson', 'primaryImageUrl', 'mediaGalleryJson', 'documentsJson', 'metaTitle', 'metaDescription'],
+      },
+      {
+        title: 'Satış ve yayın',
+        description: 'Birim, paket, minimum sipariş ve portal görünürlüğü.',
+        icon: Layers,
+        fields: ['unit', 'minOrderQuantity', 'packageQuantity', 'sortOrder', 'isPublished'],
+      },
+    ];
+
+    return (
+      <div className="md:col-span-2 space-y-5">
+        {sections.map((section) => {
+          const Icon = section.icon;
+          return (
+            <section key={section.title} className="rounded-3xl border border-slate-200 bg-white/75 p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-200">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">{section.title}</h3>
+                  <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">{section.description}</p>
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                {renderNamedFields(section.fields)}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    );
+  }
+
   function renderQuoteLinesEditor(): ReactElement | null {
     if (kind !== 'quotes') return null;
 
@@ -1843,99 +1996,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
               ) : null}
             </div>
           ) : null}
-          {formConfig.fields.map((field) => {
-            if (field.hidden) return null;
-            const value = values[field.name] ?? '';
-            const fieldId = `b2b-${kind}-${field.name}`;
-            const wrapperClass = field.colSpan === 'full' ? 'space-y-2 md:col-span-2' : 'space-y-2';
-            if (field.type === 'switch') {
-              return (
-                <label key={field.name} htmlFor={fieldId} className={`${wrapperClass} flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 dark:border-white/10 dark:bg-white/5`}>
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{field.label}</span>
-                  <Switch id={fieldId} checked={Boolean(value)} onCheckedChange={(checked) => updateValue(field.name, checked)} />
-                </label>
-              );
-            }
-            if (field.type === 'lookup') {
-              return (
-                <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                    {field.label}{field.required ? ' *' : ''}
-                  </span>
-                  {renderLookupField(field)}
-                  {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
-                </label>
-              );
-            }
-            if (field.type === 'currency') {
-              return (
-                <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                    {field.label}{field.required ? ' *' : ''}
-                  </span>
-                  <Select value={String(value || 'TRY')} onValueChange={(selectedValue) => updateValue(field.name, selectedValue)}>
-                    <SelectTrigger id={fieldId} className="h-12 w-full rounded-2xl border-slate-200 bg-white/85 px-4 text-sm font-semibold text-slate-800 dark:border-white/10 dark:bg-white/5 dark:text-slate-100">
-                      <SelectValue placeholder={isCurrencyLoading ? 'Para birimleri yükleniyor' : 'Para birimi seç'} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {currencyOptions.map((option) => (
-                        <SelectItem key={`${option.code}-${option.dovizTipi}`} value={option.code}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
-                </label>
-              );
-            }
-            if (field.type === 'select') {
-              return (
-                <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                    {field.label}{field.required ? ' *' : ''}
-                  </span>
-                  <Select value={String(value || '')} onValueChange={(selectedValue) => updateValue(field.name, selectedValue)}>
-                    <SelectTrigger id={fieldId} className="h-12 w-full rounded-2xl border-slate-200 bg-white/85 px-4 text-sm font-semibold text-slate-800 dark:border-white/10 dark:bg-white/5 dark:text-slate-100">
-                      <SelectValue placeholder={`${field.label} seç`} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(field.options ?? []).map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
-                </label>
-              );
-            }
-            return (
-              <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                  {field.label}{field.required ? ' *' : ''}
-                </span>
-                {field.type === 'textarea' ? (
-                  <Textarea
-                    id={fieldId}
-                    value={String(value)}
-                    placeholder={field.placeholder}
-                    onChange={(event) => updateValue(field.name, event.target.value)}
-                  />
-                ) : (
-                  <Input
-                    id={fieldId}
-                    type={field.type === 'number' ? 'number' : field.type === 'date' ? 'datetime-local' : 'text'}
-                    value={String(value)}
-                    placeholder={field.placeholder}
-                    onChange={(event) => updateValue(field.name, event.target.value)}
-                  />
-                )}
-                {field.helpText ? <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{field.helpText}</span> : null}
-              </label>
-            );
-          })}
+          {kind === 'catalog' ? renderCatalogFormSections() : formConfig.fields.map(renderFormField)}
           {renderQuoteLinesEditor()}
           {formError ? (
             <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200 md:col-span-2">
@@ -1955,6 +2016,30 @@ export function B2bRecordCreatePage(): ReactElement {
 
 export function B2bRecordEditPage(): ReactElement {
   return <B2bRecordFormPage mode="edit" />;
+}
+
+function CatalogInfoCard({
+  label,
+  value,
+  featured = false,
+  multiline = false,
+  mono = false,
+}: {
+  label: string;
+  value?: string | number | null;
+  featured?: boolean;
+  multiline?: boolean;
+  mono?: boolean;
+}): ReactElement {
+  const displayValue = value == null || String(value).trim().length === 0 ? '-' : String(value);
+  return (
+    <div className={`rounded-2xl border border-slate-200 p-4 shadow-sm dark:border-white/10 ${featured ? 'bg-slate-50/90 dark:bg-white/7' : 'bg-white/75 dark:bg-white/5'}`}>
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+      <p className={`mt-2 text-slate-900 dark:text-white ${featured ? 'font-black' : 'font-semibold'} ${multiline ? 'whitespace-pre-wrap break-words leading-7' : 'truncate'} ${mono ? 'font-mono text-xs' : ''}`}>
+        {displayValue}
+      </p>
+    </div>
+  );
 }
 
 export function B2bRecordDetailPage(): ReactElement {
@@ -2046,68 +2131,79 @@ export function B2bRecordDetailPage(): ReactElement {
         )}
         className="border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3"
       >
-        {catalog ? <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">SKU</p>
-            <p className="mt-2 font-mono text-slate-900 dark:text-white">{catalog.sku}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Ürün Adı</p>
-            <p className="mt-2 font-semibold text-slate-900 dark:text-white">{catalog.name}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Durum</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{catalog.isPublished ? 'Yayında' : 'Taslak'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Marka</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{catalog.brand || '-'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Ürün Tipi</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{catalog.productType || '-'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Üretici Kodu</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{catalog.manufacturerCode || '-'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Barkod</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{catalog.barcode || '-'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Birim / Paket</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{[catalog.unit, catalog.packageQuantity ? `${formatNumber(catalog.packageQuantity)} paket` : null].filter(Boolean).join(' / ') || '-'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Katalog Doluluk</p>
-            <p className="mt-2 text-slate-900 dark:text-white">%{catalog.completenessScore ?? 0}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Kategori</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{catalog.categoryPath || '-'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">ERP Stok</p>
-            <p className="mt-2 text-slate-900 dark:text-white">{catalog.defaultStockId ? 'ERP stok bağlı' : '-'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:col-span-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Kısa Tanıtım</p>
-            <p className="mt-2 whitespace-pre-wrap text-slate-900 dark:text-white">{catalog.shortDescription || '-'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:col-span-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Açıklama</p>
-            <p className="mt-2 whitespace-pre-wrap text-slate-900 dark:text-white">{catalog.description || '-'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:col-span-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Teknik Özellikler</p>
-            <p className="mt-2 whitespace-pre-wrap font-mono text-xs text-slate-900 dark:text-white">{catalog.attributesJson || '-'}</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-white/5 md:col-span-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Görseller ve Dokümanlar</p>
-            <p className="mt-2 whitespace-pre-wrap font-mono text-xs text-slate-900 dark:text-white">{[catalog.mediaGalleryJson, catalog.documentsJson].filter(Boolean).join('\n') || '-'}</p>
-          </div>
-        </div> : null}
+        {catalog ? (
+          <Tabs defaultValue="summary" className="space-y-5">
+            <TabsList className="flex h-auto w-full flex-wrap justify-start gap-2 rounded-3xl bg-slate-100 p-2 dark:bg-white/5">
+              <TabsTrigger value="summary" className="rounded-2xl px-4 py-2 font-black">
+                <Info className="mr-2 h-4 w-4" />
+                Özet
+              </TabsTrigger>
+              <TabsTrigger value="content" className="rounded-2xl px-4 py-2 font-black">
+                <FileText className="mr-2 h-4 w-4" />
+                İçerik
+              </TabsTrigger>
+              <TabsTrigger value="media" className="rounded-2xl px-4 py-2 font-black">
+                <ImageIcon className="mr-2 h-4 w-4" />
+                Medya ve SEO
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="summary" className="mt-0">
+              <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
+                <div className="rounded-3xl border border-slate-200 bg-slate-50/80 p-5 dark:border-white/10 dark:bg-white/5">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-200">
+                      <Box className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Ürün kartı</p>
+                      <p className="text-lg font-black text-slate-950 dark:text-white">{catalog.isPublished ? 'Yayında' : 'Taslak'}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3 text-sm">
+                    <div className="rounded-2xl bg-white p-3 dark:bg-white/5">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">SKU</p>
+                      <p className="mt-1 font-mono font-black text-slate-900 dark:text-white">{catalog.sku}</p>
+                    </div>
+                    <div className="rounded-2xl bg-white p-3 dark:bg-white/5">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Doluluk</p>
+                      <p className="mt-1 text-2xl font-black text-slate-900 dark:text-white">%{catalog.completenessScore ?? 0}</p>
+                    </div>
+                    <div className="rounded-2xl bg-white p-3 dark:bg-white/5">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Kaynak stok</p>
+                      <p className="mt-1 font-semibold text-slate-900 dark:text-white">{catalog.defaultStockId ? 'ERP stok bağlı' : 'Bağlı değil'}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <CatalogInfoCard label="Ürün Adı" value={catalog.name} featured />
+                  <CatalogInfoCard label="Marka" value={catalog.brand} />
+                  <CatalogInfoCard label="Ürün Tipi" value={catalog.productType} />
+                  <CatalogInfoCard label="Üretici Kodu" value={catalog.manufacturerCode} />
+                  <CatalogInfoCard label="Barkod" value={catalog.barcode} />
+                  <CatalogInfoCard label="Birim / Paket" value={[catalog.unit, catalog.packageQuantity ? `${formatNumber(catalog.packageQuantity)} paket` : null].filter(Boolean).join(' / ')} />
+                  <CatalogInfoCard label="Minimum Sipariş" value={catalog.minOrderQuantity ? formatNumber(catalog.minOrderQuantity) : '-'} />
+                  <CatalogInfoCard label="Kategori" value={catalog.categoryPath} featured />
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="content" className="mt-0 space-y-4">
+              <CatalogInfoCard label="Kısa Tanıtım" value={catalog.shortDescription} multiline featured />
+              <CatalogInfoCard label="Açıklama" value={catalog.description} multiline featured />
+              <CatalogInfoCard label="Madde Madde Özellikler" value={catalog.bulletPointsJson} multiline mono />
+              <CatalogInfoCard label="Teknik Özellikler" value={catalog.attributesJson} multiline mono />
+            </TabsContent>
+            <TabsContent value="media" className="mt-0 space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <CatalogInfoCard label="Ana Görsel URL" value={catalog.primaryImageUrl} multiline />
+                <CatalogInfoCard label="Arama Kelimeleri" value={catalog.searchKeywords} multiline />
+                <CatalogInfoCard label="Meta Başlık" value={catalog.metaTitle} />
+                <CatalogInfoCard label="Meta Açıklama" value={catalog.metaDescription} multiline />
+              </div>
+              <CatalogInfoCard label="Galeri" value={catalog.mediaGalleryJson} multiline mono />
+              <CatalogInfoCard label="Dokümanlar" value={catalog.documentsJson} multiline mono />
+            </TabsContent>
+          </Tabs>
+        ) : null}
         {priceList ? (
           <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-4">
