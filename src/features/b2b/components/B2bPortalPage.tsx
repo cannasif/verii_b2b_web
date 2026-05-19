@@ -233,103 +233,133 @@ export function B2bPortalPage(): ReactElement {
             </div>
           </header>
 
-          <div className="grid gap-8 lg:grid-cols-[1fr_420px] lg:items-center">
-          <div className="max-w-4xl space-y-6">
-            <Badge className="w-fit border-emerald-900/10 bg-emerald-800 text-white">Müşteri Portalı</Badge>
-            <div>
-              <h1 className="max-w-4xl text-4xl font-black leading-[0.95] tracking-tight text-emerald-950 md:text-7xl">Kurumsal satın alma portalınız.</h1>
-              <p className="mt-4 max-w-2xl text-base font-medium text-emerald-950/70">
-                Şirket hesabınıza bağlı katalog, gerçek cari fiyat, satılabilir stok, teklif talebi, sipariş ve ödeme takibi tek güvenli ekranda birleşir.
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {portalCapabilities.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.title} className="rounded-3xl border border-emerald-950/10 bg-white/65 p-4 shadow-sm backdrop-blur">
-                    <Icon className="mb-3 h-5 w-5 text-emerald-800" />
-                    <p className="font-black text-emerald-950">{item.title}</p>
-                    <p className="mt-1 text-xs font-semibold leading-5 text-emerald-950/60">{item.text}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <Card className="w-full border-emerald-900/10 bg-white/85 shadow-2xl shadow-emerald-950/15 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-emerald-950"><Building2 className="h-5 w-5" /> Müşteri portal girişi</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <form
-                className="space-y-3"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  sessionMutation.mutate({ selectedCompanyCode: companyCode, selectedBuyerEmail: buyerEmail });
-                }}
-              >
-                <PagedLookupDialog<B2bCompanyDto>
-                  open={companyLookupOpen}
-                  onOpenChange={setCompanyLookupOpen}
-                  value={companyLookupLabel}
-                  placeholder="Müşteri hesabı seç"
-                  searchPlaceholder="Şirket adı veya ERP cari kodu ara"
-                  title="Müşteri Hesabı Seç"
-                  description="Fiyat, stok, sepet ve hesap özeti için bağlı müşteri hesabını seçin."
-                  emptyText="Müşteri hesabı bulunamadı."
-                  queryKey={['b2b-public-portal-companies']}
-                  fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getPublicCompanies({ pageNumber, pageSize, search })}
-                  getKey={(item) => String(item.id)}
-                  getLabel={(item) => `${item.companyName} - ${item.companyCode}`}
-                  onSelect={(item) => {
-                    setCompanyCode(item.companyCode);
-                    setCompanyLookupLabel(`${item.companyName} - ${item.companyCode}`);
-                  }}
-                />
-                <Input
-                  type="email"
-                  value={buyerEmail}
-                  onChange={(event) => setBuyerEmail(event.target.value)}
-                  placeholder="Size tanımlanan kullanıcı e-postası"
-                  autoComplete="email"
-                  className="h-11 bg-white"
-                />
-                <Button type="submit" className="h-11 w-full bg-emerald-800 font-black hover:bg-emerald-700" disabled={!companyCode.trim() || !buyerEmail.trim() || sessionMutation.isPending}>
-                  Müşteri Olarak Devam Et
-                </Button>
-              </form>
-              {selectedCompany ? (
-                <div className="space-y-3 rounded-3xl bg-emerald-950 px-4 py-4 text-sm font-semibold text-white">
-                  <div>
-                    <p className="text-xs text-emerald-100/70">Aktif şirket</p>
-                    <p className="text-lg font-black">{selectedCompany.companyName}</p>
-                    <p className="text-xs text-emerald-100/70">{selectedCompany.companyCode}</p>
-                  </div>
-                  {selectedBuyer ? (
-                    <div className="rounded-2xl bg-white/10 p-3">
-                      <p className="text-xs text-emerald-100/70">Portal kullanıcısı</p>
-                      <p className="font-black">{selectedBuyer.fullName}</p>
-                      <p className="text-xs text-emerald-100/70">{selectedBuyer.email}</p>
-                      <p className="mt-1 text-xs text-emerald-100/80">
-                        {portalSession?.canViewCompanyHistory ? 'Şirket genel geçmişini görebilir.' : 'Yalnızca kendi sepet, teklif, sipariş ve ödeme geçmişini görür.'}
-                      </p>
+          <div className="grid gap-6 lg:grid-cols-[1fr_440px] lg:items-start">
+            <div className="space-y-5">
+              <Badge className="w-fit border-emerald-900/10 bg-emerald-800 text-white">Satın alma portalı</Badge>
+              <div>
+                <h1 className="max-w-4xl text-4xl font-black leading-[0.98] tracking-tight text-emerald-950 md:text-6xl">Katalogdan sepete, sepetten teklif veya siparişe.</h1>
+                <p className="mt-4 max-w-2xl text-base font-semibold text-emerald-950/70">
+                  Ürünü bulun, miktarı girin, sepete aktarın. Giriş yapan alıcı kendi fiyatını, satılabilir stoğu, geçmiş siparişlerini ve ödeme durumunu aynı ekranda görür.
+                </p>
+              </div>
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="rounded-3xl border border-emerald-950/10 bg-white/70 p-4 shadow-sm backdrop-blur">
+                  <PackageSearch className="mb-3 h-5 w-5 text-emerald-800" />
+                  <p className="font-black text-emerald-950">1. Ürün ara</p>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-emerald-950/60">SKU, ürün adı, marka veya kategoriyle katalogdan bulun.</p>
+                </div>
+                <div className="rounded-3xl border border-emerald-950/10 bg-white/70 p-4 shadow-sm backdrop-blur">
+                  <ShoppingCart className="mb-3 h-5 w-5 text-emerald-800" />
+                  <p className="font-black text-emerald-950">2. Sepete ekle</p>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-emerald-950/60">Miktarı girin; fiyat ve satılabilir stok müşteri hesabına göre açılır.</p>
+                </div>
+                <div className="rounded-3xl border border-emerald-950/10 bg-white/70 p-4 shadow-sm backdrop-blur">
+                  <FileText className="mb-3 h-5 w-5 text-emerald-800" />
+                  <p className="font-black text-emerald-950">3. İşleme gönder</p>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-emerald-950/60">Sepeti teklif talebine veya sipariş onayına çevirin.</p>
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-4">
+                {portalCapabilities.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="rounded-2xl border border-emerald-950/10 bg-white/45 px-3 py-2 text-sm font-black text-emerald-950">
+                      <Icon className="mr-2 inline h-4 w-4 text-emerald-800" />
+                      {item.title}
                     </div>
-                  ) : null}
-                  <button
-                    type="button"
-                    className="text-xs font-black text-emerald-100 underline"
-                    onClick={() => {
-                      setPortalSession(null);
-                      setCart(null);
-                      window.localStorage.removeItem(PORTAL_SESSION_STORAGE_KEY);
-                      setMessage('Portal oturumu kapatıldı.');
+                  );
+                })}
+              </div>
+            </div>
+
+            <Card className="w-full overflow-hidden border-emerald-900/10 bg-white/90 shadow-2xl shadow-emerald-950/15 backdrop-blur">
+              <CardHeader className="border-b border-emerald-950/10 bg-emerald-950 text-white">
+                <CardTitle className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2"><ShoppingCart className="h-5 w-5" /> Sepet ve müşteri girişi</span>
+                  <Badge className="bg-white text-emerald-950 hover:bg-white">{cartLineCount} ürün</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 p-5">
+                {!selectedCompany ? (
+                  <form
+                    className="space-y-3 rounded-3xl border border-stone-200 bg-stone-50 p-4"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      sessionMutation.mutate({ selectedCompanyCode: companyCode, selectedBuyerEmail: buyerEmail });
                     }}
                   >
-                    Oturumu kapat
-                  </button>
+                    <p className="flex items-center gap-2 text-sm font-black text-emerald-950"><Building2 className="h-4 w-4" /> Müşteri hesabıyla devam edin</p>
+                    <PagedLookupDialog<B2bCompanyDto>
+                      open={companyLookupOpen}
+                      onOpenChange={setCompanyLookupOpen}
+                      value={companyLookupLabel}
+                      placeholder="Müşteri hesabı seç"
+                      searchPlaceholder="Şirket adı veya ERP cari kodu ara"
+                      title="Müşteri Hesabı Seç"
+                      description="Fiyat, stok, sepet ve hesap özeti için bağlı müşteri hesabını seçin."
+                      emptyText="Müşteri hesabı bulunamadı."
+                      queryKey={['b2b-public-portal-companies']}
+                      fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getPublicCompanies({ pageNumber, pageSize, search })}
+                      getKey={(item) => String(item.id)}
+                      getLabel={(item) => `${item.companyName} - ${item.companyCode}`}
+                      onSelect={(item) => {
+                        setCompanyCode(item.companyCode);
+                        setCompanyLookupLabel(`${item.companyName} - ${item.companyCode}`);
+                      }}
+                    />
+                    <Input
+                      type="email"
+                      value={buyerEmail}
+                      onChange={(event) => setBuyerEmail(event.target.value)}
+                      placeholder="Size tanımlanan kullanıcı e-postası"
+                      autoComplete="email"
+                      className="h-11 bg-white"
+                    />
+                    <Button type="submit" className="h-11 w-full bg-emerald-800 font-black hover:bg-emerald-700" disabled={!companyCode.trim() || !buyerEmail.trim() || sessionMutation.isPending}>
+                      Müşteri Olarak Devam Et
+                    </Button>
+                  </form>
+                ) : (
+                  <div className="rounded-3xl border border-emerald-900/10 bg-emerald-50 p-4 text-sm font-semibold text-emerald-950">
+                    <p className="text-xs text-emerald-900/60">Aktif hesap</p>
+                    <p className="text-lg font-black">{selectedCompany.companyName}</p>
+                    <p className="text-xs text-emerald-900/60">{selectedBuyer?.fullName || selectedCompany.companyCode}</p>
+                    <button
+                      type="button"
+                      className="mt-3 text-xs font-black text-emerald-800 underline"
+                      onClick={() => {
+                        setPortalSession(null);
+                        setCart(null);
+                        window.localStorage.removeItem(PORTAL_SESSION_STORAGE_KEY);
+                        setMessage('Portal oturumu kapatıldı.');
+                      }}
+                    >
+                      Oturumu kapat
+                    </button>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-3xl bg-emerald-50 p-4">
+                    <p className="text-xs font-bold text-emerald-700">Sepet miktarı</p>
+                    <p className="text-3xl font-black text-emerald-950">{cartLineCount}</p>
+                  </div>
+                  <div className="rounded-3xl bg-amber-50 p-4">
+                    <p className="text-xs font-bold text-amber-700">Ara toplam</p>
+                    <p className="text-2xl font-black text-amber-950">{formatMoney(cartTotal, cart?.currencyCode)}</p>
+                  </div>
                 </div>
-              ) : null}
-            </CardContent>
-          </Card>
+                <Textarea value={customerNote} onChange={(event) => setCustomerNote(event.target.value)} placeholder="Satın alma notu veya teklif açıklaması" />
+                <div className="grid gap-2">
+                  <Button type="button" variant="outline" disabled={!cart?.lines.length} onClick={() => quoteMutation.mutate()}>
+                    Teklif Talebi Gönder
+                  </Button>
+                  <Button type="button" className="bg-slate-950 hover:bg-slate-800" disabled={!cart?.lines.length} onClick={() => orderMutation.mutate()}>
+                    Siparişi Onaya Gönder <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -357,8 +387,8 @@ export function B2bPortalPage(): ReactElement {
 
           <div className="flex flex-col gap-3 rounded-3xl border border-stone-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-2xl font-black text-slate-950">B2B ürün kataloğu</h2>
-              <p className="text-sm font-medium text-slate-500">Ürünler herkes tarafından görülebilir; fiyat, stok ve satın alma işlemleri müşteri girişinden sonra açılır.</p>
+              <h2 className="text-2xl font-black text-slate-950">Ürün seç ve sepete ekle</h2>
+              <p className="text-sm font-medium text-slate-500">Katalogdan ürün bulun, miktarı girin, müşteri girişinden sonra fiyat/stok kontrolüyle sepete aktarın.</p>
             </div>
             <div className="relative w-full md:w-80">
               <PackageSearch className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
@@ -456,12 +486,12 @@ export function B2bPortalPage(): ReactElement {
         <aside className="space-y-5">
           <Card className="sticky top-4 border-stone-200 bg-white shadow-2xl shadow-slate-900/10">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2"><ShoppingCart className="h-5 w-5" /> Satın alma özeti</CardTitle>
+              <CardTitle className="flex items-center gap-2"><ShoppingCart className="h-5 w-5" /> Sepet detayları</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {!selectedCompany ? (
                 <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950">
-                  Ürün kataloğunu inceleyebilirsiniz. Size özel fiyat, satılabilir stok, sepet, teklif ve sipariş için müşteri hesabıyla giriş yapın.
+                  Ürünleri inceleyebilirsiniz. Sepete eklemek, fiyat görmek ve siparişe çevirmek için müşteri hesabıyla giriş yapın.
                 </div>
               ) : null}
               <div className="grid grid-cols-2 gap-3">
@@ -473,6 +503,22 @@ export function B2bPortalPage(): ReactElement {
                   <p className="text-xs font-bold text-amber-700">Ara toplam</p>
                   <p className="text-2xl font-black text-amber-950">{formatMoney(cartTotal, cart?.currencyCode)}</p>
                 </div>
+              </div>
+              <div className="space-y-2">
+                {(cart?.lines ?? []).slice(0, 6).map((line) => (
+                  <div key={line.id} className="flex items-center justify-between gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm">
+                    <div>
+                      <p className="font-black text-slate-950">Stok #{line.erpStockId || line.catalogProductId}</p>
+                      <p className="text-xs font-semibold text-slate-500">{line.quantity} adet x {formatMoney(line.unitPrice, line.currencyCode)}</p>
+                    </div>
+                    <p className="font-black text-slate-950">{formatMoney(line.quantity * line.unitPrice, line.currencyCode)}</p>
+                  </div>
+                ))}
+                {(cart?.lines ?? []).length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 p-4 text-center text-sm font-semibold text-slate-500">
+                    Sepet boş. Katalogdan ürün seçip “Sepete Ekle” ile başlayın.
+                  </div>
+                ) : null}
               </div>
               <Textarea value={customerNote} onChange={(event) => setCustomerNote(event.target.value)} placeholder="Satın alma notu, teslimat isteği veya teklif açıklaması" />
               <div className="grid gap-2">
