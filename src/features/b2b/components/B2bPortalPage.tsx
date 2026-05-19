@@ -220,7 +220,7 @@ export function B2bPortalPage(): ReactElement {
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-900 text-sm font-black text-white shadow-lg shadow-emerald-900/20">V3</div>
               <div>
                 <p className="text-sm font-black text-emerald-950">V3RII B2B Portal</p>
-                <p className="text-xs font-semibold text-emerald-900/60">ERP uyumlu müşteri satın alma çalışma alanı</p>
+                <p className="text-xs font-semibold text-emerald-900/60">Müşteri satın alma çalışma alanı</p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">

@@ -505,7 +505,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Welcome to the ERP-ready B2B customer portal",
+    "subtitle": "Welcome to the customer portal",
     "totalStock": "Catalog Products",
     "totalStockChange": "compared to last month",
     "goodsReceipt": "Quote Requests",

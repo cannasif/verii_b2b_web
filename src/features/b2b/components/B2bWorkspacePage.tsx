@@ -1008,7 +1008,7 @@ export function B2bInsightsPage(): ReactElement {
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-[radial-gradient(circle_at_top_right,_rgba(34,197,94,0.20),_transparent_30%),linear-gradient(135deg,_#f8fafc,_#ecfeff)] p-8 shadow-sm dark:border-slate-800 dark:bg-[radial-gradient(circle_at_top_right,_rgba(20,184,166,0.16),_transparent_30%),linear-gradient(135deg,_#020617,_#0f172a)]">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-3xl space-y-3">
-            <Badge variant="secondary" className="w-fit">ERP uyumlu B2B hazırlık</Badge>
+            <Badge variant="secondary" className="w-fit">Hazırlık paneli</Badge>
             <h1 className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">B2B Hazırlık Paneli</h1>
             <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
               Araştırmada öne çıkan B2B başarı başlıklarını tek yerde topluyoruz: katalog kalitesi, müşteri SKU eşleşmesi,
@@ -1174,7 +1174,7 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-2">
-          <Badge variant="secondary" className="w-fit">ERP uyumlu B2B</Badge>
+          <Badge variant="secondary" className="w-fit">Yönetim ekranı</Badge>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{config.title}</h1>
             <p className="mt-1 max-w-4xl text-sm font-medium text-slate-500 dark:text-slate-400">{config.description}</p>

@@ -505,7 +505,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "ERP uyumlu B2B müşteri portalına hoş geldiniz",
+    "subtitle": "Müşteri portalına hoş geldiniz",
     "totalStock": "Katalog Ürünü",
     "totalStockChange": "geçen aya göre",
     "goodsReceipt": "Teklif Talepleri",
