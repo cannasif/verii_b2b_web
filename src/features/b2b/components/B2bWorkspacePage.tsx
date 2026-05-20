@@ -2,7 +2,7 @@ import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ArrowDown, ArrowUp, Box, CheckCircle2, Clock3, FileText, GitBranchPlus, Image as ImageIcon, Info, Layers, PackageSearch, RefreshCw, ShoppingCart, Tag, TriangleAlert } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
-import { DetailPageShell, FormPageShell, PagedDataGrid, PagedLookupDialog, type PagedDataGridColumn } from '@/components/shared';
+import { DataTableActionBar, DetailPageShell, FormPageShell, PagedDataGrid, PagedLookupDialog, type PagedDataGridColumn } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
@@ -759,6 +759,17 @@ function getCatalogReadiness(rows: WorkspaceRow[]) {
   return { total: catalogRows.length, publishedCount, draftCount, erpLinkedCount, contentReadyCount, mediaReadyCount, averageCompleteness };
 }
 
+function getCatalogMissingLabels(item: CatalogProductDto): string[] {
+  const missing: string[] = [];
+  if (!item.defaultStockId) missing.push('Stok bağı');
+  if (!item.categoryPath?.trim()) missing.push('Kategori');
+  if (!item.shortDescription?.trim()) missing.push('Kısa tanıtım');
+  if (!item.attributesJson?.trim()) missing.push('Teknik özellik');
+  if (!item.primaryImageUrl?.trim() && !item.mediaGalleryJson?.trim()) missing.push('Görsel');
+  if (!item.searchKeywords?.trim()) missing.push('Arama kelimesi');
+  return missing;
+}
+
 function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKey: WorkspaceColumnKey): ReactElement | string {
   if (kind === 'companies') {
     const item = row as B2bCompanyDto;
@@ -1169,6 +1180,7 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
   const exportRows = useMemo(() => rows.map((row) => workspaceExportRow(kind, row)), [kind, rows]);
   const commercialMetrics = useMemo(() => getCommercialMetrics(kind, rows), [kind, rows]);
   const catalogReadiness = useMemo(() => getCatalogReadiness(rows), [rows]);
+  const catalogRows = useMemo(() => rows.filter(isCatalogProduct), [rows]);
   const renderSortIcon = (columnKey: WorkspaceColumnKey): ReactElement | null => {
     if (columnKey !== pagedGrid.sortBy) return null;
     return pagedGrid.sortDirection === 'asc' ? <ArrowUp className="ml-1 h-3.5 w-3.5" /> : <ArrowDown className="ml-1 h-3.5 w-3.5" />;
@@ -1447,6 +1459,159 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
+          {kind === 'catalog' ? (
+            <div className="space-y-5">
+              <DataTableActionBar
+                pageKey={tableConfig.pageKey}
+                userId={userId}
+                columns={tableConfig.columns.map(({ key, label }) => ({ key, label }))}
+                visibleColumns={visibleColumns}
+                columnOrder={columnOrder}
+                onVisibleColumnsChange={setVisibleColumns}
+                onColumnOrderChange={setColumnOrder}
+                exportFileName={tableConfig.pageKey}
+                exportColumns={exportColumns}
+                exportRows={exportRows}
+                filterColumns={tableConfig.filterColumns}
+                defaultFilterColumn="primary"
+                draftFilterRows={pagedGrid.draftFilterRows}
+                onDraftFilterRowsChange={pagedGrid.setDraftFilterRows}
+                filterLogic={pagedGrid.filterLogic}
+                onFilterLogicChange={pagedGrid.setFilterLogic}
+                onApplyFilters={pagedGrid.applyAdvancedFilters}
+                onClearFilters={pagedGrid.clearAdvancedFilters}
+                appliedFilterCount={pagedGrid.appliedAdvancedFilters.length}
+                search={{
+                  value: pagedGrid.searchInput,
+                  onValueChange: pagedGrid.searchConfig.onValueChange,
+                  onSearchChange: pagedGrid.searchConfig.onSearchChange,
+                  placeholder: 'SKU, ürün adı, marka veya kategori ara...',
+                }}
+                refresh={{
+                  onRefresh: () => void refetch(),
+                  isLoading,
+                  label: 'Yenile',
+                }}
+                leftSlot={<VoiceSearchButton onResult={pagedGrid.handleVoiceSearch} size="sm" variant="outline" />}
+              />
+              {isLoading ? (
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <div key={index} className="h-72 animate-pulse rounded-3xl border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-white/5" />
+                  ))}
+                </div>
+              ) : error ? (
+                <div className="rounded-3xl border border-red-200 bg-red-50 p-6 text-sm font-semibold text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200">
+                  Veri alınamadı: {(error as Error).message}
+                </div>
+              ) : catalogRows.length === 0 ? (
+                <div className="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center dark:border-white/10 dark:bg-white/5">
+                  <PackageSearch className="mx-auto h-10 w-10 text-slate-400" />
+                  <p className="mt-4 text-lg font-black text-slate-950 dark:text-white">{config.emptyState}</p>
+                  <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">Katalog ürünü oluşturduğunuzda burada görsel, kategori, doluluk ve yayın durumu ile listelenecek.</p>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {catalogRows.map((item) => {
+                    const missingLabels = getCatalogMissingLabels(item);
+                    const completeness = item.completenessScore ?? 0;
+                    return (
+                      <article
+                        key={item.id}
+                        className="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-xl dark:border-white/10 dark:bg-white/5 dark:hover:border-emerald-400/40"
+                      >
+                        <div className="relative h-44 overflow-hidden bg-slate-100 dark:bg-slate-900">
+                          {item.primaryImageUrl ? (
+                            <img src={item.primaryImageUrl} alt={item.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.25),transparent_35%),linear-gradient(135deg,#0f172a,#134e4a)] text-white">
+                              <PackageSearch className="h-12 w-12 opacity-75" />
+                            </div>
+                          )}
+                          <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+                            <Badge className={item.isPublished ? 'bg-emerald-700 text-white hover:bg-emerald-700' : 'bg-amber-500 text-white hover:bg-amber-500'}>
+                              {item.isPublished ? 'Yayında' : 'Taslak'}
+                            </Badge>
+                            <Badge className="bg-white/90 text-slate-800 hover:bg-white">%{completeness} dolu</Badge>
+                          </div>
+                        </div>
+                        <div className="space-y-4 p-4">
+                          <div>
+                            <p className="font-mono text-xs font-black text-emerald-700 dark:text-emerald-300">{item.sku}</p>
+                            <h3 className="mt-1 line-clamp-2 text-lg font-black leading-snug text-slate-950 dark:text-white">{item.name}</h3>
+                            <p className="mt-2 line-clamp-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+                              {item.shortDescription || item.description || 'Kısa tanıtım eklenmedi.'}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-wide text-slate-500">
+                            {item.brand ? <span className="rounded-full bg-slate-100 px-2 py-1 dark:bg-white/10">{item.brand}</span> : null}
+                            {item.productType ? <span className="rounded-full bg-slate-100 px-2 py-1 dark:bg-white/10">{item.productType}</span> : null}
+                            {item.categoryPath ? <span className="rounded-full bg-slate-100 px-2 py-1 dark:bg-white/10">{item.categoryPath}</span> : null}
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 text-xs">
+                            <div className="rounded-2xl bg-slate-50 p-3 dark:bg-white/5">
+                              <p className="font-black text-slate-400">Stok</p>
+                              <p className="mt-1 font-black text-slate-900 dark:text-white">{item.defaultStockId ? 'Bağlı' : 'Eksik'}</p>
+                            </div>
+                            <div className="rounded-2xl bg-slate-50 p-3 dark:bg-white/5">
+                              <p className="font-black text-slate-400">Birim</p>
+                              <p className="mt-1 font-black text-slate-900 dark:text-white">{item.unit || '-'}</p>
+                            </div>
+                            <div className="rounded-2xl bg-slate-50 p-3 dark:bg-white/5">
+                              <p className="font-black text-slate-400">Min.</p>
+                              <p className="mt-1 font-black text-slate-900 dark:text-white">{item.minOrderQuantity ?? '-'}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
+                              <div className="h-full rounded-full bg-linear-to-r from-emerald-500 to-cyan-500" style={{ width: `${Math.min(100, Math.max(0, completeness))}%` }} />
+                            </div>
+                            {missingLabels.length > 0 ? (
+                              <div className="mt-3 flex flex-wrap gap-1.5">
+                                {missingLabels.slice(0, 4).map((label) => (
+                                  <span key={label} className="rounded-full bg-amber-50 px-2 py-1 text-[11px] font-black text-amber-700 dark:bg-amber-500/10 dark:text-amber-200">
+                                    {label} eksik
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="mt-3 text-xs font-black text-emerald-700 dark:text-emerald-300">Katalog kartı yayına hazır görünüyor.</p>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between gap-2 border-t border-slate-100 pt-3 dark:border-white/10">
+                            <Button type="button" size="sm" variant="ghost" onClick={() => navigate(`/b2b/${routeSlug}/${item.id}`)}>
+                              Detay
+                            </Button>
+                            <Button type="button" size="sm" onClick={() => navigate(`/b2b/${routeSlug}/${item.id}/edit`)}>
+                              Düzenle
+                            </Button>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
+              <div className="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-slate-50/70 p-3 dark:border-white/10 dark:bg-white/5 sm:flex-row sm:items-center sm:justify-between">
+                <Select value={String(data?.pageSize ?? pagedGrid.pageSize)} onValueChange={(value) => pagedGrid.handlePageSizeChange(Number(value))}>
+                  <SelectTrigger className="h-10 w-28 rounded-2xl bg-white dark:bg-slate-950">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {pagedGrid.pageSizeOptions.map((option) => (
+                      <SelectItem key={option} value={String(option)}>{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="text-sm font-semibold text-slate-500 dark:text-slate-400">{paginationInfoText}</div>
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" disabled={!data?.hasPreviousPage} onClick={pagedGrid.goToPreviousPage}>Önceki</Button>
+                  <Button type="button" variant="outline" disabled={!data?.hasNextPage} onClick={pagedGrid.goToNextPage}>Sonraki</Button>
+                </div>
+              </div>
+            </div>
+          ) : null}
+          {kind !== 'catalog' ? (
           <PagedDataGrid<WorkspaceRow, WorkspaceColumnKey>
             pageKey={tableConfig.pageKey}
             columns={tableConfig.columns}
@@ -1575,6 +1740,7 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
               leftSlot: <VoiceSearchButton onResult={pagedGrid.handleVoiceSearch} size="sm" variant="outline" />,
             }}
           />
+          ) : null}
         </CardContent>
       </Card>
     </div>
