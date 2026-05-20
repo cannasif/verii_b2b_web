@@ -1,6 +1,6 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, Box, CheckCircle2, Clock3, FileText, GitBranchPlus, Image as ImageIcon, Info, Layers, RefreshCw, ShoppingCart, Tag, TriangleAlert } from 'lucide-react';
+import { ArrowDown, ArrowUp, Box, CheckCircle2, Clock3, FileText, GitBranchPlus, Image as ImageIcon, Info, Layers, PackageSearch, RefreshCw, ShoppingCart, Tag, TriangleAlert } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { DetailPageShell, FormPageShell, PagedDataGrid, PagedLookupDialog, type PagedDataGridColumn } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
@@ -586,6 +586,10 @@ function isQuote(row: unknown): row is QuoteRequestDto {
   return typeof row === 'object' && row !== null && 'quoteNumber' in row && 'estimatedTotal' in row;
 }
 
+function isCatalogProduct(row: unknown): row is CatalogProductDto {
+  return typeof row === 'object' && row !== null && 'sku' in row && 'name' in row && 'isPublished' in row;
+}
+
 function formatMoney(value: number, currency: string): string {
   return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(value || 0);
 }
@@ -734,6 +738,25 @@ function getCommercialMetrics(kind: B2bWorkspaceKind, rows: WorkspaceRow[]) {
   }, 0);
 
   return { count: commercialRows.length, waitingCount, approvedCount, riskCount, total };
+}
+
+function getCatalogReadiness(rows: WorkspaceRow[]) {
+  const catalogRows = rows.filter(isCatalogProduct);
+  const publishedCount = catalogRows.filter((item) => item.isPublished).length;
+  const draftCount = catalogRows.length - publishedCount;
+  const erpLinkedCount = catalogRows.filter((item) => Boolean(item.defaultStockId)).length;
+  const contentReadyCount = catalogRows.filter((item) =>
+    Boolean(item.name?.trim()) &&
+    Boolean(item.categoryPath?.trim()) &&
+    Boolean(item.shortDescription?.trim()) &&
+    Boolean(item.attributesJson?.trim())
+  ).length;
+  const mediaReadyCount = catalogRows.filter((item) => Boolean(item.primaryImageUrl?.trim()) || Boolean(item.mediaGalleryJson?.trim())).length;
+  const averageCompleteness = catalogRows.length === 0
+    ? 0
+    : Math.round(catalogRows.reduce((total, item) => total + (item.completenessScore ?? 0), 0) / catalogRows.length);
+
+  return { total: catalogRows.length, publishedCount, draftCount, erpLinkedCount, contentReadyCount, mediaReadyCount, averageCompleteness };
 }
 
 function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKey: WorkspaceColumnKey): ReactElement | string {
@@ -1145,6 +1168,7 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
   );
   const exportRows = useMemo(() => rows.map((row) => workspaceExportRow(kind, row)), [kind, rows]);
   const commercialMetrics = useMemo(() => getCommercialMetrics(kind, rows), [kind, rows]);
+  const catalogReadiness = useMemo(() => getCatalogReadiness(rows), [rows]);
   const renderSortIcon = (columnKey: WorkspaceColumnKey): ReactElement | null => {
     if (columnKey !== pagedGrid.sortBy) return null;
     return pagedGrid.sortDirection === 'asc' ? <ArrowUp className="ml-1 h-3.5 w-3.5" /> : <ArrowDown className="ml-1 h-3.5 w-3.5" />;
@@ -1238,6 +1262,46 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700 dark:text-rose-200">Riskli kayıt</p>
                 <p className="text-2xl font-black text-rose-950 dark:text-rose-50">{commercialMetrics.riskCount}</p>
               </div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : null}
+
+      {kind === 'catalog' ? (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          <Card className="overflow-hidden border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3">
+            <CardContent className="flex items-center gap-4 p-5">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-950">
+                <PackageSearch className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Toplam ürün</p>
+                <p className="text-2xl font-black text-slate-950 dark:text-white">{catalogReadiness.total}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="overflow-hidden border-emerald-200/80 bg-emerald-50/60 shadow-sm dark:border-emerald-400/20 dark:bg-emerald-500/10">
+            <CardContent className="p-5">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-200">Yayında / Taslak</p>
+              <p className="mt-2 text-2xl font-black text-emerald-950 dark:text-emerald-50">{catalogReadiness.publishedCount} / {catalogReadiness.draftCount}</p>
+            </CardContent>
+          </Card>
+          <Card className="overflow-hidden border-cyan-200/80 bg-cyan-50/60 shadow-sm dark:border-cyan-400/20 dark:bg-cyan-500/10">
+            <CardContent className="p-5">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-700 dark:text-cyan-200">Stok bağlı</p>
+              <p className="mt-2 text-2xl font-black text-cyan-950 dark:text-cyan-50">{catalogReadiness.erpLinkedCount}</p>
+            </CardContent>
+          </Card>
+          <Card className="overflow-hidden border-amber-200/80 bg-amber-50/60 shadow-sm dark:border-amber-400/20 dark:bg-amber-500/10">
+            <CardContent className="p-5">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-700 dark:text-amber-200">İçerik hazır</p>
+              <p className="mt-2 text-2xl font-black text-amber-950 dark:text-amber-50">{catalogReadiness.contentReadyCount}</p>
+            </CardContent>
+          </Card>
+          <Card className="overflow-hidden border-rose-200/80 bg-rose-50/60 shadow-sm dark:border-rose-400/20 dark:bg-rose-500/10">
+            <CardContent className="p-5">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-700 dark:text-rose-200">Ortalama doluluk</p>
+              <p className="mt-2 text-2xl font-black text-rose-950 dark:text-rose-50">%{catalogReadiness.averageCompleteness}</p>
             </CardContent>
           </Card>
         </div>
