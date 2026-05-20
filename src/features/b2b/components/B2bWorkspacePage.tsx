@@ -1,7 +1,7 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ArrowDown, ArrowUp, Box, CheckCircle2, Clock3, FileText, GitBranchPlus, Image as ImageIcon, Info, Layers, PackageSearch, RefreshCw, ShoppingCart, Tag, TriangleAlert } from 'lucide-react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DataTableActionBar, DetailPageShell, FormPageShell, PagedDataGrid, PagedLookupDialog, type PagedDataGridColumn } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
@@ -770,6 +770,76 @@ function getCatalogMissingLabels(item: CatalogProductDto): string[] {
   return missing;
 }
 
+function getCatalogMissingFocus(label: string): 'source' | 'identity' | 'content' | 'sales' {
+  if (label === 'Stok bağı') return 'source';
+  if (label === 'Kategori' || label === 'Arama kelimesi') return 'identity';
+  if (label === 'Görsel' || label === 'Kısa tanıtım' || label === 'Teknik özellik') return 'content';
+  return 'sales';
+}
+
+function parseCatalogJson<T>(value: string | boolean | undefined, fallback: T): T {
+  if (typeof value !== 'string' || value.trim().length === 0) return fallback;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function jsonArrayToLines(value: string | boolean | undefined): string {
+  const items = parseCatalogJson<unknown[]>(value, []);
+  return items.map((item) => typeof item === 'string' ? item : String(item ?? '')).filter(Boolean).join('\n');
+}
+
+function linesToJsonArray(value: string): string | undefined {
+  const items = value.split('\n').map((line) => line.trim()).filter(Boolean);
+  return items.length > 0 ? JSON.stringify(items) : undefined;
+}
+
+function jsonObjectToLines(value: string | boolean | undefined): string {
+  const data = parseCatalogJson<Record<string, unknown>>(value, {});
+  return Object.entries(data).map(([key, itemValue]) => `${key}: ${String(itemValue ?? '')}`).join('\n');
+}
+
+function keyValueLinesToJson(value: string): string | undefined {
+  const entries = value
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const separatorIndex = line.indexOf(':');
+      if (separatorIndex === -1) return [line, ''] as const;
+      return [line.slice(0, separatorIndex).trim(), line.slice(separatorIndex + 1).trim()] as const;
+    })
+    .filter(([key]) => key.length > 0);
+  return entries.length > 0 ? JSON.stringify(Object.fromEntries(entries)) : undefined;
+}
+
+function jsonLinkArrayToLines(value: string | boolean | undefined, mode: 'media' | 'document'): string {
+  const items = parseCatalogJson<Array<Record<string, unknown>>>(value, []);
+  return items
+    .map((item) => {
+      const url = String(item.url ?? '').trim();
+      const label = String((mode === 'media' ? item.alt : item.name) ?? '').trim();
+      return [url, label].filter(Boolean).join(' | ');
+    })
+    .filter(Boolean)
+    .join('\n');
+}
+
+function linkLinesToJson(value: string, mode: 'media' | 'document'): string | undefined {
+  const items = value
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [url = '', label = ''] = line.split('|').map((part) => part.trim());
+      return mode === 'media' ? { url, alt: label } : { name: label || url, url };
+    })
+    .filter((item) => item.url.length > 0);
+  return items.length > 0 ? JSON.stringify(items) : undefined;
+}
+
 function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKey: WorkspaceColumnKey): ReactElement | string {
   if (kind === 'companies') {
     const item = row as B2bCompanyDto;
@@ -1160,6 +1230,7 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
   const [portalCustomerLabel, setPortalCustomerLabel] = useState<string | null>(null);
   const [portalSummary, setPortalSummary] = useState<CustomerPortalSummaryDto | null>(null);
   const [customerLookupTarget, setCustomerLookupTarget] = useState<'quick' | 'portal' | null>(null);
+  const [selectedCatalogIds, setSelectedCatalogIds] = useState<number[]>([]);
   const { userId, columnOrder, visibleColumns, orderedVisibleColumns, setColumnOrder, setVisibleColumns } = useColumnPreferences({
     pageKey: tableConfig.pageKey,
     columns: tableConfig.columns.map(({ key, label }) => ({ key, label })),
@@ -1181,10 +1252,32 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
   const commercialMetrics = useMemo(() => getCommercialMetrics(kind, rows), [kind, rows]);
   const catalogReadiness = useMemo(() => getCatalogReadiness(rows), [rows]);
   const catalogRows = useMemo(() => rows.filter(isCatalogProduct), [rows]);
+  const selectedCatalogRows = useMemo(
+    () => catalogRows.filter((item) => selectedCatalogIds.includes(item.id)),
+    [catalogRows, selectedCatalogIds],
+  );
+  const bulkCatalogMutation = useMutation({
+    mutationFn: async ({ ids, isPublished }: { ids: number[]; isPublished: boolean }) => {
+      await Promise.all(ids.map((id) => b2bApi.updateCatalogProduct(id, { isPublished })));
+      return ids.length;
+    },
+    onSuccess: async (count, variables) => {
+      setSelectedCatalogIds([]);
+      setActionMessage(`${count} katalog ürünü ${variables.isPublished ? 'yayına alındı' : 'taslağa çekildi'}.`);
+      await refetch();
+    },
+    onError: (mutationError) => {
+      setActionMessage((mutationError as Error).message);
+    },
+  });
   const renderSortIcon = (columnKey: WorkspaceColumnKey): ReactElement | null => {
     if (columnKey !== pagedGrid.sortBy) return null;
     return pagedGrid.sortDirection === 'asc' ? <ArrowUp className="ml-1 h-3.5 w-3.5" /> : <ArrowDown className="ml-1 h-3.5 w-3.5" />;
   };
+
+  useEffect(() => {
+    setSelectedCatalogIds([]);
+  }, [kind, pagedGrid.pageNumber, pagedGrid.pageSize, pagedGrid.searchTerm, pagedGrid.sortBy, pagedGrid.sortDirection]);
 
   async function runAction(action: () => Promise<string>) {
     setIsActionBusy(true);
@@ -1494,6 +1587,51 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
                 }}
                 leftSlot={<VoiceSearchButton onResult={pagedGrid.handleVoiceSearch} size="sm" variant="outline" />}
               />
+              <div className="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-slate-50/80 p-3 dark:border-white/10 dark:bg-white/5 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p className="text-sm font-black text-slate-950 dark:text-white">Toplu katalog işlemleri</p>
+                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    {selectedCatalogRows.length > 0 ? `${selectedCatalogRows.length} ürün seçili.` : 'Kartlardan ürün seçip tek işlemle yayına alın veya taslağa çekin.'}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={catalogRows.length === 0}
+                    onClick={() => setSelectedCatalogIds(catalogRows.map((item) => item.id))}
+                  >
+                    Görünenleri Seç
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={selectedCatalogRows.length === 0}
+                    onClick={() => setSelectedCatalogIds([])}
+                  >
+                    Seçimi Temizle
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled={selectedCatalogRows.length === 0 || bulkCatalogMutation.isPending}
+                    onClick={() => bulkCatalogMutation.mutate({ ids: selectedCatalogIds, isPublished: true })}
+                  >
+                    Seçilenleri Yayınla
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={selectedCatalogRows.length === 0 || bulkCatalogMutation.isPending}
+                    onClick={() => bulkCatalogMutation.mutate({ ids: selectedCatalogIds, isPublished: false })}
+                  >
+                    Taslağa Çek
+                  </Button>
+                </div>
+              </div>
               {isLoading ? (
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                   {Array.from({ length: 6 }).map((_, index) => (
@@ -1518,9 +1656,22 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
                     return (
                       <article
                         key={item.id}
-                        className="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-xl dark:border-white/10 dark:bg-white/5 dark:hover:border-emerald-400/40"
+                        className={`group overflow-hidden rounded-[1.75rem] border bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-xl dark:bg-white/5 dark:hover:border-emerald-400/40 ${selectedCatalogIds.includes(item.id) ? 'border-emerald-400 ring-2 ring-emerald-400/25 dark:border-emerald-400/70' : 'border-slate-200 dark:border-white/10'}`}
                       >
                         <div className="relative h-44 overflow-hidden bg-slate-100 dark:bg-slate-900">
+                          <label className="absolute right-3 top-3 z-10 flex cursor-pointer items-center gap-2 rounded-full bg-white/95 px-3 py-2 text-xs font-black text-slate-800 shadow-lg dark:bg-slate-950/90 dark:text-white">
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4 accent-emerald-600"
+                              checked={selectedCatalogIds.includes(item.id)}
+                              onChange={(event) => {
+                                setSelectedCatalogIds((current) => event.target.checked
+                                  ? Array.from(new Set([...current, item.id]))
+                                  : current.filter((selectedId) => selectedId !== item.id));
+                              }}
+                            />
+                            Seç
+                          </label>
                           {item.primaryImageUrl ? (
                             <img src={item.primaryImageUrl} alt={item.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                           ) : (
@@ -1569,9 +1720,14 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
                             {missingLabels.length > 0 ? (
                               <div className="mt-3 flex flex-wrap gap-1.5">
                                 {missingLabels.slice(0, 4).map((label) => (
-                                  <span key={label} className="rounded-full bg-amber-50 px-2 py-1 text-[11px] font-black text-amber-700 dark:bg-amber-500/10 dark:text-amber-200">
+                                  <button
+                                    key={label}
+                                    type="button"
+                                    className="rounded-full bg-amber-50 px-2 py-1 text-[11px] font-black text-amber-700 transition hover:bg-amber-100 hover:text-amber-900 dark:bg-amber-500/10 dark:text-amber-200 dark:hover:bg-amber-500/20"
+                                    onClick={() => navigate(`/b2b/${routeSlug}/${item.id}/edit?focus=${getCatalogMissingFocus(label)}`)}
+                                  >
                                     {label} eksik
-                                  </span>
+                                  </button>
                                 ))}
                               </div>
                             ) : (
@@ -1750,11 +1906,13 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
 export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactElement {
   const { workspaceKind, id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const kind = resolveRouteKind(workspaceKind);
   const config = configs[kind];
   const formConfig = b2bFormConfigs[kind];
   const isEdit = mode === 'edit';
   const recordId = id ? Number(id) : undefined;
+  const focusedCatalogSection = searchParams.get('focus');
   const [values, setValues] = useState<Record<string, string | boolean>>(() => formConfig?.defaults ?? {});
   const [quoteLines, setQuoteLines] = useState<QuoteLineFormState[]>(() => [createEmptyQuoteLine()]);
   const [lookupLabels, setLookupLabels] = useState<Record<string, string>>({});
@@ -1811,6 +1969,13 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
       if (kind === 'quotes') setQuoteLines([createEmptyQuoteLine()]);
     }
   }, [detailQuery.data, formConfig, isEdit]);
+
+  useEffect(() => {
+    if (kind !== 'catalog' || !focusedCatalogSection) return;
+    window.requestAnimationFrame(() => {
+      document.getElementById(`catalog-section-${focusedCatalogSection}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, [focusedCatalogSection, kind]);
 
   if (!formConfig) {
     return <Navigate to={`/b2b/${routeSlugByKind[kind]}`} replace />;
@@ -2075,6 +2240,62 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
         </label>
       );
     }
+    if (kind === 'catalog' && field.name === 'bulletPointsJson') {
+      return (
+        <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Öne çıkan maddeler</span>
+          <Textarea
+            id={fieldId}
+            value={jsonArrayToLines(value)}
+            placeholder={"Her satıra bir satış maddesi yazın.\nÖrn. Hızlı montaj\nKorozyona dayanıklı"}
+            onChange={(event) => updateValue(field.name, linesToJsonArray(event.target.value) ?? '')}
+          />
+          <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">Müşteri kartında madde madde görünür; JSON yazmanız gerekmez.</span>
+        </label>
+      );
+    }
+    if (kind === 'catalog' && field.name === 'attributesJson') {
+      return (
+        <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Teknik özellikler</span>
+          <Textarea
+            id={fieldId}
+            value={jsonObjectToLines(value)}
+            placeholder={"Her satır: Özellik: Değer\nÖrn. Malzeme: Alüminyum\nÖlçü: 40x60"}
+            onChange={(event) => updateValue(field.name, keyValueLinesToJson(event.target.value) ?? '')}
+          />
+          <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">Filtreleme ve ürün karşılaştırma için yapılandırılmış alan olarak kaydedilir.</span>
+        </label>
+      );
+    }
+    if (kind === 'catalog' && field.name === 'mediaGalleryJson') {
+      return (
+        <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Medya galerisi</span>
+          <Textarea
+            id={fieldId}
+            value={jsonLinkArrayToLines(value, 'media')}
+            placeholder={"Her satır: Görsel URL | Açıklama\nÖrn. https://site.com/on.jpg | Ön görünüm"}
+            onChange={(event) => updateValue(field.name, linkLinesToJson(event.target.value, 'media') ?? '')}
+          />
+          <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">Birden fazla ürün görseli için satır satır bağlantı ekleyin.</span>
+        </label>
+      );
+    }
+    if (kind === 'catalog' && field.name === 'documentsJson') {
+      return (
+        <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
+          <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Teknik dokümanlar</span>
+          <Textarea
+            id={fieldId}
+            value={jsonLinkArrayToLines(value, 'document')}
+            placeholder={"Her satır: Doküman URL | Doküman adı\nÖrn. https://site.com/foy.pdf | Teknik föy"}
+            onChange={(event) => updateValue(field.name, linkLinesToJson(event.target.value, 'document') ?? '')}
+          />
+          <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">PDF, teknik föy veya sertifika bağlantılarını burada yönetin.</span>
+        </label>
+      );
+    }
     return (
       <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
         <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
@@ -2109,24 +2330,28 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
     });
     const sections = [
       {
+        id: 'source',
         title: 'Kaynak ürün',
         description: 'CRM stok kartı mantığı gibi önce kaynak stok seçilir; kod, ad, marka ve kategori otomatik gelir.',
         icon: Box,
         fields: ['defaultStockId'],
       },
       {
+        id: 'identity',
         title: 'Portal kimliği',
         description: 'Müşterinin katalogda gördüğü ürün adı, marka, kategori ve arama bilgileri.',
         icon: Tag,
         fields: ['name', 'slug', 'brand', 'productType', 'manufacturerCode', 'barcode', 'categoryPath', 'searchKeywords'],
       },
       {
+        id: 'content',
         title: 'İçerik ve medya',
         description: 'Amazon/Sahibinden mantığında ürün kartını güçlendiren kısa metin, açıklama, teknik özellik, görsel ve dokümanlar.',
         icon: ImageIcon,
         fields: ['shortDescription', 'description', 'bulletPointsJson', 'attributesJson', 'primaryImageUrl', 'mediaGalleryJson', 'documentsJson', 'metaTitle', 'metaDescription'],
       },
       {
+        id: 'sales',
         title: 'Satış ve yayın',
         description: 'Birim, paket, minimum sipariş ve portal görünürlüğü.',
         icon: Layers,
@@ -2139,7 +2364,11 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
         {sections.map((section) => {
           const Icon = section.icon;
           return (
-            <section key={section.title} className="rounded-3xl border border-slate-200 bg-white/75 p-4 shadow-sm dark:border-white/10 dark:bg-white/5">
+            <section
+              id={`catalog-section-${section.id}`}
+              key={section.title}
+              className={`scroll-mt-28 rounded-3xl border bg-white/75 p-4 shadow-sm transition dark:bg-white/5 ${focusedCatalogSection === section.id ? 'border-emerald-400 ring-2 ring-emerald-400/25 dark:border-emerald-400/70' : 'border-slate-200 dark:border-white/10'}`}
+            >
               <div className="mb-4 flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-200">
                   <Icon className="h-5 w-5" />
