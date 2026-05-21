@@ -44,6 +44,32 @@ export interface CatalogProductDto {
   variants?: CatalogVariantDto[];
 }
 
+export interface CatalogProductFavoriteDto {
+  id: number;
+  companyId: number;
+  companyName?: string;
+  buyerId?: number;
+  buyerName?: string;
+  userId?: number;
+  catalogProductId?: number;
+  catalogVariantId?: number;
+  erpStockId?: number;
+  favoriteKey: string;
+  sku?: string;
+  productName?: string;
+  productImageUrl?: string;
+  brand?: string;
+  categoryPath?: string;
+  variantName?: string;
+  note?: string;
+}
+
+export interface CatalogFavoriteToggleResultDto {
+  isFavorite: boolean;
+  favoriteId?: number;
+  favoriteKey: string;
+}
+
 export interface CatalogVariantDto {
   id: number;
   catalogProductId: number;

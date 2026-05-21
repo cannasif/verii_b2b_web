@@ -10,7 +10,9 @@ import type {
   B2bBuyerDto,
   B2bCompanyDto,
   CartDto,
+  CatalogFavoriteToggleResultDto,
   CatalogProductDto,
+  CatalogProductFavoriteDto,
   CatalogVisibilityRuleDto,
   ConvertQuoteToCartDto,
   CustomerPortalSummaryDto,
@@ -122,6 +124,33 @@ export const b2bApi = {
       portalToken ? portalRequestConfig(portalToken) : publicRequestConfig,
     );
     return normalizePaged(response);
+  },
+
+  async getPublicCatalogProductFavorites(
+    companyId: number,
+    portalToken: string,
+    params: PagedParams = {},
+    buyerId?: number,
+    userId?: number,
+  ): Promise<PagedResponse<CatalogProductFavoriteDto>> {
+    const response = await api.post<ApiResponse<PagedResponse<CatalogProductFavoriteDto>>>(
+      '/api/b2b/catalog/favorites/paged',
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 100, sortBy: 'Id', sortDirection: 'desc' }),
+      {
+        ...portalRequestConfig(portalToken),
+        params: { companyId, buyerId, userId },
+      },
+    );
+    return normalizePaged(response);
+  },
+
+  async togglePublicCatalogProductFavorite(payload: Record<string, unknown>, portalToken: string): Promise<CatalogFavoriteToggleResultDto> {
+    const response = await api.post<ApiResponse<CatalogFavoriteToggleResultDto>>(
+      '/api/b2b/catalog/favorites/toggle',
+      payload,
+      portalRequestConfig(portalToken),
+    );
+    return extractData(response);
   },
 
   async getCatalogProduct(id: number): Promise<CatalogProductDto> {

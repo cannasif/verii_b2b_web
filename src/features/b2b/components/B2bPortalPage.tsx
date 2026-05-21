@@ -1,6 +1,6 @@
 import { type ReactElement, useMemo, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { ArrowRight, BarChart3, Building2, CheckCircle2, ClipboardList, FileText, PackageSearch, Repeat2, ShoppingCart, Sparkles, Upload } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowRight, BarChart3, Building2, CheckCircle2, ClipboardList, FileText, Heart, PackageSearch, Repeat2, ShoppingCart, Sparkles, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,7 @@ const portalCapabilities = [
 ];
 
 export function B2bPortalPage(): ReactElement {
+  const queryClient = useQueryClient();
   const [companyCode, setCompanyCode] = useState('');
   const [buyerEmail, setBuyerEmail] = useState('');
   const [companyLookupOpen, setCompanyLookupOpen] = useState(false);
@@ -91,6 +92,23 @@ export function B2bPortalPage(): ReactElement {
     enabled: customerId > 0 && Boolean(portalToken),
   });
 
+  const favoritesQuery = useQuery({
+    queryKey: ['b2b-public-catalog-favorites', selectedCompany?.id, selectedBuyer?.id, selectedBuyer?.userId, portalToken],
+    queryFn: () => b2bApi.getPublicCatalogProductFavorites(
+      selectedCompany!.id,
+      portalToken,
+      { pageNumber: 1, pageSize: 200 },
+      selectedBuyer?.id,
+      selectedBuyer?.userId,
+    ),
+    enabled: Boolean(selectedCompany?.id && portalToken),
+  });
+
+  const favoriteProductIds = useMemo(
+    () => new Set((favoritesQuery.data?.data ?? []).map((item) => item.catalogProductId).filter((id): id is number => Boolean(id))),
+    [favoritesQuery.data],
+  );
+
   const cartLineCount = useMemo(() => cart?.lines.reduce((total, line) => total + line.quantity, 0) ?? 0, [cart]);
   const cartTotal = useMemo(() => cart?.lines.reduce((total, line) => total + line.quantity * line.unitPrice, 0) ?? 0, [cart]);
 
@@ -133,6 +151,27 @@ export function B2bPortalPage(): ReactElement {
     onSuccess: (data) => {
       setCart(data);
       setMessage('Ürün sepete eklendi.');
+    },
+    onError: (error) => setMessage((error as Error).message),
+  });
+
+  const favoriteMutation = useMutation({
+    mutationFn: async (product: CatalogProductDto) => {
+      if (!selectedCompany?.id || !portalToken) throw new Error('Favoriye eklemek için müşteri girişi yapın.');
+      const isFavorite = favoriteProductIds.has(product.id);
+      return b2bApi.togglePublicCatalogProductFavorite({
+        companyId: selectedCompany.id,
+        buyerId: selectedBuyer?.id,
+        userId: selectedBuyer?.userId,
+        catalogProductId: product.id,
+        erpStockId: product.defaultStockId,
+        sku: product.sku,
+        isFavorite: !isFavorite,
+      }, portalToken);
+    },
+    onSuccess: (result) => {
+      void queryClient.invalidateQueries({ queryKey: ['b2b-public-catalog-favorites'] });
+      setMessage(result.isFavorite ? 'Ürün favorilere eklendi.' : 'Ürün favorilerden kaldırıldı.');
     },
     onError: (error) => setMessage((error as Error).message),
   });
@@ -433,13 +472,25 @@ export function B2bPortalPage(): ReactElement {
               const resolved = resolvedPrices[product.id];
               const quantity = quantities[product.id] || 1;
               const isCustomerSessionOpen = Boolean(selectedCompany);
+              const isFavorite = favoriteProductIds.has(product.id);
               return (
                 <Card key={product.id} className="group overflow-hidden border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl">
-                  <div className="h-36 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.25),transparent_35%),linear-gradient(135deg,#102f25,#2f855a)] p-4 text-white">
-                    <div className="flex flex-wrap gap-2">
-                      <Badge className="bg-white/15 text-white">{product.brand || 'B2B katalog'}</Badge>
+                  <div className="relative h-36 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.25),transparent_35%),linear-gradient(135deg,#102f25,#2f855a)] p-4 text-white">
+                    <div className="flex flex-wrap gap-2 pr-12">
+                      <Badge className="bg-white/15 text-white">{product.brand || 'Katalog'}</Badge>
                       {product.productType ? <Badge className="bg-cyan-300/20 text-cyan-50">{product.productType}</Badge> : null}
                     </div>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      className="absolute right-3 top-3 h-10 w-10 rounded-full bg-white/15 text-white backdrop-blur hover:bg-white/25 hover:text-white disabled:opacity-50"
+                      disabled={!isCustomerSessionOpen || favoriteMutation.isPending}
+                      onClick={() => favoriteMutation.mutate(product)}
+                      title={isFavorite ? 'Favorilerden kaldır' : 'Favorilere ekle'}
+                    >
+                      <Heart className={`h-5 w-5 ${isFavorite ? 'fill-rose-400 text-rose-400' : ''}`} />
+                    </Button>
                     <h3 className="mt-4 line-clamp-2 text-xl font-black">{product.name}</h3>
                   </div>
                   <CardContent className="space-y-4 p-4">
