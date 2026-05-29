@@ -13,7 +13,78 @@ export type B2bWorkspaceKind =
   | 'orders'
   | 'payments'
   | 'payment-operations'
+  | 'marketplace-channels'
+  | 'marketplace-listings'
+  | 'marketplace-events'
   | 'integrations';
+
+export interface MarketplaceCapabilityDto {
+  providerKey: string;
+  name: string;
+  supportsProductCreate: boolean;
+  supportsPriceUpdate: boolean;
+  supportsStockUpdate: boolean;
+  supportsOrderImport: boolean;
+  documentationUrl: string;
+  notes: string;
+}
+
+export interface MarketplaceChannelDto {
+  id: number;
+  code: string;
+  name: string;
+  providerKey: string;
+  sellerId?: string;
+  apiBaseUrl?: string;
+  authType: string;
+  supportsProductCreate: boolean;
+  supportsPriceUpdate: boolean;
+  supportsStockUpdate: boolean;
+  supportsOrderImport: boolean;
+  isActive: boolean;
+  lastSyncDate?: string;
+  notes?: string;
+}
+
+export interface MarketplaceListingDto {
+  id: number;
+  channelId: number;
+  channelName?: string;
+  providerKey?: string;
+  catalogProductId?: number;
+  catalogProductName?: string;
+  erpStockId?: number;
+  sku: string;
+  barcode?: string;
+  marketplaceProductId?: string;
+  marketplaceListingId?: string;
+  status: string;
+  lastPushedPrice?: number;
+  lastPushedQuantity?: number;
+  currencyCode: string;
+  lastProductSyncDate?: string;
+  lastPriceSyncDate?: string;
+  lastStockSyncDate?: string;
+  errorMessage?: string;
+}
+
+export interface MarketplaceSyncEventDto {
+  id: number;
+  channelId: number;
+  channelName?: string;
+  providerKey?: string;
+  listingId?: number;
+  sku?: string;
+  operationType: string;
+  status: string;
+  externalBatchId?: string;
+  requestJson?: string;
+  responseJson?: string;
+  errorMessage?: string;
+  retryCount: number;
+  requestedDate: string;
+  processedDate?: string;
+}
 
 export interface CatalogProductDto {
   id: number;

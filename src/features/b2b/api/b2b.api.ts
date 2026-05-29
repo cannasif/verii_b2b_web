@@ -19,6 +19,10 @@ import type {
   CustomerPriceListDto,
   CustomerProductAliasDto,
   InventorySnapshotDto,
+  MarketplaceCapabilityDto,
+  MarketplaceChannelDto,
+  MarketplaceListingDto,
+  MarketplaceSyncEventDto,
   OrderDto,
   PaymentTransactionDto,
   PaymentBinLookupDto,
@@ -484,5 +488,49 @@ export const b2bApi = {
       buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
     );
     return normalizePaged(response);
+  },
+
+  async getMarketplaceCapabilities(): Promise<MarketplaceCapabilityDto[]> {
+    const response = await api.get<ApiResponse<MarketplaceCapabilityDto[]>>('/api/b2b/marketplaces/capabilities');
+    return extractData(response);
+  },
+
+  async getMarketplaceChannels(params: PagedParams = {}): Promise<PagedResponse<MarketplaceChannelDto>> {
+    const response = await api.post<ApiResponse<PagedResponse<MarketplaceChannelDto>>>(
+      '/api/b2b/marketplaces/channels/paged',
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Name', sortDirection: 'asc' }),
+    );
+    return normalizePaged(response);
+  },
+
+  async createMarketplaceChannel(payload: Record<string, unknown>): Promise<MarketplaceChannelDto> {
+    const response = await api.post<ApiResponse<MarketplaceChannelDto>>('/api/b2b/marketplaces/channels', payload);
+    return extractData(response);
+  },
+
+  async getMarketplaceListings(params: PagedParams = {}): Promise<PagedResponse<MarketplaceListingDto>> {
+    const response = await api.post<ApiResponse<PagedResponse<MarketplaceListingDto>>>(
+      '/api/b2b/marketplaces/listings/paged',
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
+    );
+    return normalizePaged(response);
+  },
+
+  async upsertMarketplaceListing(payload: Record<string, unknown>): Promise<MarketplaceListingDto> {
+    const response = await api.post<ApiResponse<MarketplaceListingDto>>('/api/b2b/marketplaces/listings', payload);
+    return extractData(response);
+  },
+
+  async getMarketplaceSyncEvents(params: PagedParams = {}): Promise<PagedResponse<MarketplaceSyncEventDto>> {
+    const response = await api.post<ApiResponse<PagedResponse<MarketplaceSyncEventDto>>>(
+      '/api/b2b/marketplaces/sync-events/paged',
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'RequestedDate', sortDirection: 'desc' }),
+    );
+    return normalizePaged(response);
+  },
+
+  async queueMarketplaceProviderOperation(provider: string, operation: 'product-create' | 'price-update' | 'stock-update' | 'order-import', payload: Record<string, unknown>): Promise<MarketplaceSyncEventDto> {
+    const response = await api.post<ApiResponse<MarketplaceSyncEventDto>>(`/api/b2b/marketplaces/${provider}/${operation}`, payload);
+    return extractData(response);
   },
 };

@@ -11,6 +11,9 @@ import type {
   CustomerPriceListDto,
   CustomerProductAliasDto,
   InventorySnapshotDto,
+  MarketplaceChannelDto,
+  MarketplaceListingDto,
+  MarketplaceSyncEventDto,
   OrderDto,
   PaymentProviderOperationDto,
   PaymentTransactionDto,
@@ -33,6 +36,9 @@ type WorkspaceRow =
   | OrderDto
   | PaymentTransactionDto
   | PaymentProviderOperationDto
+  | MarketplaceChannelDto
+  | MarketplaceListingDto
+  | MarketplaceSyncEventDto
   | B2bIntegrationEventDto;
 
 export function useB2bWorkspaceQuery(kind: B2bWorkspaceKind, params: PagedParams = {}) {
@@ -76,6 +82,12 @@ export function useB2bWorkspaceQuery(kind: B2bWorkspaceKind, params: PagedParams
           return b2bApi.getPayments(params) as Promise<PagedResponse<WorkspaceRow>>;
         case 'payment-operations':
           return b2bApi.getPaymentProviderOperations(params) as Promise<PagedResponse<WorkspaceRow>>;
+        case 'marketplace-channels':
+          return b2bApi.getMarketplaceChannels(params) as Promise<PagedResponse<WorkspaceRow>>;
+        case 'marketplace-listings':
+          return b2bApi.getMarketplaceListings(params) as Promise<PagedResponse<WorkspaceRow>>;
+        case 'marketplace-events':
+          return b2bApi.getMarketplaceSyncEvents(params) as Promise<PagedResponse<WorkspaceRow>>;
         case 'integrations':
           return b2bApi.getIntegrationEvents(params) as Promise<PagedResponse<WorkspaceRow>>;
       }

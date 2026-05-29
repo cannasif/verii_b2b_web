@@ -38,6 +38,9 @@ import type {
   CustomerProductAliasDto,
   CustomerPortalSummaryDto,
   InventorySnapshotDto,
+  MarketplaceChannelDto,
+  MarketplaceListingDto,
+  MarketplaceSyncEventDto,
   OrderDto,
   PaymentProviderOperationDto,
   PaymentTransactionDto,
@@ -67,10 +70,13 @@ type WorkspaceRow =
   | OrderDto
   | PaymentTransactionDto
   | PaymentProviderOperationDto
+  | MarketplaceChannelDto
+  | MarketplaceListingDto
+  | MarketplaceSyncEventDto
   | B2bIntegrationEventDto;
 
 type WorkspaceColumnKey = 'primary' | 'secondary' | 'scope' | 'status' | 'amount' | 'date';
-type B2bLookupKind = 'company' | 'buyer' | 'customer' | 'user' | 'stock' | 'catalogProduct' | 'warehouse' | 'order' | 'paymentTransaction';
+type B2bLookupKind = 'company' | 'buyer' | 'customer' | 'user' | 'stock' | 'catalogProduct' | 'warehouse' | 'order' | 'paymentTransaction' | 'marketplaceChannel';
 
 interface WorkspaceTableConfig {
   pageKey: string;
@@ -165,6 +171,24 @@ const configs: Record<B2bWorkspaceKind, WorkspaceConfig> = {
     breadcrumb: 'Ödeme Operasyonları',
     emptyState: 'Henüz ödeme operasyonu yok.',
   },
+  'marketplace-channels': {
+    title: 'Pazar Yeri Kanalları',
+    description: 'Trendyol, Hepsiburada, Amazon ve Etsy mağaza bağlantılarını ayrı kanal olarak yönetin.',
+    breadcrumb: 'Pazar Yerleri',
+    emptyState: 'Henüz pazar yeri kanalı yok.',
+  },
+  'marketplace-listings': {
+    title: 'Pazar Yeri Ürün Yayınları',
+    description: 'B2B katalog ürünlerini pazar yeri SKU/listing kayıtlarıyla eşleştirip fiyat ve stok aktarımını hazırlayın.',
+    breadcrumb: 'Ürün Yayınları',
+    emptyState: 'Henüz pazar yeri ürün yayını yok.',
+  },
+  'marketplace-events': {
+    title: 'Pazar Yeri Aktarım Kuyruğu',
+    description: 'Ürün ekleme, fiyat güncelleme, stok güncelleme ve sipariş çekme operasyonlarını sağlayıcı bazında takip edin.',
+    breadcrumb: 'Aktarım Kuyruğu',
+    emptyState: 'Henüz pazar yeri aktarım kaydı yok.',
+  },
   integrations: {
     title: 'ERP Entegrasyon Kuyruğu',
     description: 'Sipariş, teklif ve ödeme gibi kritik olayların ERP’ye aktarım durumunu izleyin.',
@@ -188,6 +212,9 @@ const routeSlugByKind: Record<B2bWorkspaceKind, string> = {
   orders: 'orders',
   payments: 'payments',
   'payment-operations': 'payment-operations',
+  'marketplace-channels': 'marketplace-channels',
+  'marketplace-listings': 'marketplace-listings',
+  'marketplace-events': 'marketplace-events',
   integrations: 'integrations',
 };
 
@@ -608,6 +635,91 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
     }),
     submit: (payload) => b2bApi.createPaymentProviderOperation(payload as unknown as Parameters<typeof b2bApi.createPaymentProviderOperation>[0]),
   },
+  'marketplace-channels': {
+    defaults: {
+      providerKey: 'Trendyol',
+      code: '',
+      name: '',
+      sellerId: '',
+      apiBaseUrl: '',
+      authType: 'ApiKey',
+      credentialsJson: '',
+      supportsProductCreate: true,
+      supportsPriceUpdate: true,
+      supportsStockUpdate: true,
+      supportsOrderImport: true,
+      isActive: true,
+      notes: '',
+    },
+    fields: [
+      { name: 'providerKey', label: 'Pazar Yeri', type: 'select', required: true, options: [
+        { label: 'Trendyol', value: 'Trendyol' },
+        { label: 'Hepsiburada', value: 'Hepsiburada' },
+        { label: 'Amazon SP-API', value: 'Amazon' },
+        { label: 'Etsy', value: 'Etsy' },
+      ] },
+      { name: 'code', label: 'Kanal Kodu', required: true, placeholder: 'Örn. TRENDYOL-ANA-MAGAZA' },
+      { name: 'name', label: 'Kanal Adı', required: true, placeholder: 'Örn. Trendyol Ana Mağaza' },
+      { name: 'sellerId', label: 'Satıcı / Mağaza No' },
+      { name: 'apiBaseUrl', label: 'API Adresi', placeholder: 'Boş bırakılırsa sağlayıcı varsayılanı kullanılır.' },
+      { name: 'authType', label: 'Kimlik Doğrulama', type: 'select', options: [
+        { label: 'API Key', value: 'ApiKey' },
+        { label: 'Basic Auth', value: 'Basic' },
+        { label: 'OAuth / SP-API', value: 'OAuth' },
+      ] },
+      { name: 'credentialsJson', label: 'Gizli Bilgi JSON', type: 'textarea', colSpan: 'full', helpText: 'Canlıda secret vault/KMS ile taşınmalı; burada kanal şeması için tutulur.' },
+      { name: 'supportsProductCreate', label: 'Ürün ekleme aktif', type: 'switch' },
+      { name: 'supportsPriceUpdate', label: 'Fiyat güncelleme aktif', type: 'switch' },
+      { name: 'supportsStockUpdate', label: 'Stok güncelleme aktif', type: 'switch' },
+      { name: 'supportsOrderImport', label: 'Sipariş çekme aktif', type: 'switch' },
+      { name: 'isActive', label: 'Kanal aktif', type: 'switch' },
+      { name: 'notes', label: 'Not', type: 'textarea', colSpan: 'full' },
+    ],
+    transform: baseTransform,
+    submit: b2bApi.createMarketplaceChannel,
+  },
+  'marketplace-listings': {
+    defaults: {
+      channelId: '',
+      catalogProductId: '',
+      erpStockId: '',
+      sku: '',
+      barcode: '',
+      marketplaceProductId: '',
+      marketplaceListingId: '',
+      status: 'Draft',
+      lastPushedPrice: '',
+      lastPushedQuantity: '',
+      currencyCode: 'TRY',
+    },
+    fields: [
+      { name: 'channelId', label: 'Pazar Yeri Kanalı', type: 'lookup', lookupKind: 'marketplaceChannel', required: true },
+      { name: 'catalogProductId', label: 'B2B Katalog Ürünü', type: 'lookup', lookupKind: 'catalogProduct', required: true },
+      { name: 'erpStockId', label: 'ERP Stok', type: 'lookup', lookupKind: 'stock' },
+      { name: 'sku', label: 'Pazar Yeri SKU', required: true },
+      { name: 'barcode', label: 'Barkod / GTIN' },
+      { name: 'marketplaceProductId', label: 'Pazar Yeri Ürün No' },
+      { name: 'marketplaceListingId', label: 'Pazar Yeri Listing No' },
+      { name: 'status', label: 'Durum', type: 'select', options: [
+        { label: 'Taslak', value: 'Draft' },
+        { label: 'Yayına Hazır', value: 'Ready' },
+        { label: 'Yayında', value: 'Published' },
+        { label: 'Hatalı', value: 'Failed' },
+      ] },
+      { name: 'lastPushedPrice', label: 'Son Aktarılan Fiyat', type: 'number' },
+      { name: 'lastPushedQuantity', label: 'Son Aktarılan Stok', type: 'number' },
+      { name: 'currencyCode', label: 'Para Birimi', type: 'currency' },
+    ],
+    transform: (values) => ({
+      ...baseTransform(values),
+      channelId: toRequiredNumber(values.channelId),
+      catalogProductId: toOptionalNumber(values.catalogProductId),
+      erpStockId: toOptionalNumber(values.erpStockId),
+      lastPushedPrice: toOptionalNumber(values.lastPushedPrice),
+      lastPushedQuantity: toOptionalNumber(values.lastPushedQuantity),
+    }),
+    submit: b2bApi.upsertMarketplaceListing,
+  },
 };
 
 function resolveRouteKind(slug?: string): B2bWorkspaceKind {
@@ -723,6 +835,9 @@ function getWorkspaceTableConfig(kind: B2bWorkspaceKind): WorkspaceTableConfig {
     orders: { primary: 'OrderNumber', scope: 'CustomerId', status: 'Status', amount: 'GrandTotal', date: 'SubmittedDate' },
     payments: { primary: 'ProviderKey', secondary: 'ExternalTransactionId', scope: 'OrderId', status: 'Status', amount: 'Amount', date: 'CompletedDate' },
     'payment-operations': { primary: 'OperationType', secondary: 'ExternalOperationId', scope: 'PaymentTransactionId', status: 'Status', amount: 'Amount', date: 'RequestedDate' },
+    'marketplace-channels': { primary: 'Name', secondary: 'Code', scope: 'ProviderKey', status: 'IsActive', date: 'LastSyncDate' },
+    'marketplace-listings': { primary: 'Sku', secondary: 'MarketplaceListingId', scope: 'ChannelId', status: 'Status', amount: 'LastPushedPrice', date: 'LastPriceSyncDate' },
+    'marketplace-events': { primary: 'OperationType', secondary: 'ExternalBatchId', scope: 'ChannelId', status: 'Status', date: 'RequestedDate' },
     integrations: { primary: 'EventType', secondary: 'EntityName', scope: 'EntityId', status: 'Status', date: 'ProcessedDate' },
   };
 
@@ -1042,6 +1157,48 @@ function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKe
     };
     return values[columnKey];
   }
+  if (kind === 'marketplace-channels') {
+    const item = row as MarketplaceChannelDto;
+    const capabilities = [
+      item.supportsProductCreate ? 'Ürün' : null,
+      item.supportsPriceUpdate ? 'Fiyat' : null,
+      item.supportsStockUpdate ? 'Stok' : null,
+      item.supportsOrderImport ? 'Sipariş' : null,
+    ].filter(Boolean).join(' / ');
+    const values = {
+      primary: <span className="font-medium text-slate-900 dark:text-white">{item.name}</span>,
+      secondary: <span className="font-mono text-sm">{item.code}</span>,
+      scope: `${item.providerKey}${item.sellerId ? ` / ${item.sellerId}` : ''}`,
+      status: renderStatusBadge(item.isActive ? 'Aktif' : 'Pasif', item.isActive),
+      amount: capabilities || '-',
+      date: item.lastSyncDate ? formatDate(item.lastSyncDate) : '-',
+    };
+    return values[columnKey];
+  }
+  if (kind === 'marketplace-listings') {
+    const item = row as MarketplaceListingDto;
+    const values = {
+      primary: <span className="font-mono text-sm">{item.sku}</span>,
+      secondary: item.catalogProductName || item.marketplaceListingId || item.marketplaceProductId || '-',
+      scope: `${item.providerKey || '-'} / ${item.channelName || 'Kanal'}`,
+      status: renderStatusBadge(item.status),
+      amount: item.lastPushedPrice ? formatMoney(item.lastPushedPrice, item.currencyCode) : item.lastPushedQuantity ? `${formatNumber(item.lastPushedQuantity)} stok` : '-',
+      date: item.lastPriceSyncDate || item.lastStockSyncDate || item.lastProductSyncDate ? formatDate(item.lastPriceSyncDate || item.lastStockSyncDate || item.lastProductSyncDate) : '-',
+    };
+    return values[columnKey];
+  }
+  if (kind === 'marketplace-events') {
+    const item = row as MarketplaceSyncEventDto;
+    const values = {
+      primary: item.operationType,
+      secondary: item.sku || item.externalBatchId || '-',
+      scope: `${item.providerKey || '-'} / ${item.channelName || 'Kanal'}`,
+      status: renderStatusBadge(item.status),
+      amount: item.retryCount > 0 ? `${item.retryCount} retry` : '-',
+      date: formatDate(item.processedDate || item.requestedDate),
+    };
+    return values[columnKey];
+  }
   if (kind === 'integrations') {
     const item = row as B2bIntegrationEventDto;
     const values = {
@@ -1109,6 +1266,18 @@ function workspaceExportRow(kind: B2bWorkspaceKind, row: WorkspaceRow): Record<s
   if (kind === 'payment-operations') {
     const item = row as PaymentProviderOperationDto;
     return { primary: item.operationType, secondary: item.externalOperationId || item.idempotencyKey, scope: item.paymentTransactionId, status: item.status, amount: item.amount, date: formatDate(item.processedDate || item.requestedDate) };
+  }
+  if (kind === 'marketplace-channels') {
+    const item = row as MarketplaceChannelDto;
+    return { primary: item.name, secondary: item.code, scope: item.providerKey, status: item.isActive ? 'Aktif' : 'Pasif', amount: item.sellerId, date: formatDate(item.lastSyncDate) };
+  }
+  if (kind === 'marketplace-listings') {
+    const item = row as MarketplaceListingDto;
+    return { primary: item.sku, secondary: item.catalogProductName || item.marketplaceListingId, scope: item.channelName || item.providerKey, status: item.status, amount: item.lastPushedPrice || item.lastPushedQuantity, date: formatDate(item.lastPriceSyncDate || item.lastStockSyncDate || item.lastProductSyncDate) };
+  }
+  if (kind === 'marketplace-events') {
+    const item = row as MarketplaceSyncEventDto;
+    return { primary: item.operationType, secondary: item.sku || item.externalBatchId, scope: item.channelName || item.providerKey, status: item.status, amount: item.retryCount, date: formatDate(item.processedDate || item.requestedDate) };
   }
   if (kind === 'integrations') {
     const item = row as B2bIntegrationEventDto;
@@ -2269,6 +2438,21 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
       );
     }
 
+    if (field.lookupKind === 'marketplaceChannel') {
+      return (
+        <PagedLookupDialog<MarketplaceChannelDto>
+          {...commonProps}
+          title="Pazar Yeri Kanalı Seç"
+          description="Trendyol, Hepsiburada, Amazon veya Etsy mağaza kanallarında arama yapın."
+          emptyText="Pazar yeri kanalı bulunamadı."
+          fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getMarketplaceChannels({ pageNumber, pageSize, search })}
+          getKey={(item) => String(item.id)}
+          getLabel={(item) => `${item.providerKey} - ${item.name}`}
+          onSelect={(item) => setLookupValue(field.name, item.id, `${item.providerKey} - ${item.name}`)}
+        />
+      );
+    }
+
     return null;
   }
 
@@ -2937,6 +3121,18 @@ export function B2bPaymentsPage(): ReactElement {
 
 export function B2bPaymentOperationsPage(): ReactElement {
   return <B2bWorkspacePage kind="payment-operations" />;
+}
+
+export function B2bMarketplaceChannelsPage(): ReactElement {
+  return <B2bWorkspacePage kind="marketplace-channels" />;
+}
+
+export function B2bMarketplaceListingsPage(): ReactElement {
+  return <B2bWorkspacePage kind="marketplace-listings" />;
+}
+
+export function B2bMarketplaceEventsPage(): ReactElement {
+  return <B2bWorkspacePage kind="marketplace-events" />;
 }
 
 export function B2bIntegrationsPage(): ReactElement {
