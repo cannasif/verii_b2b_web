@@ -630,6 +630,10 @@ function isCatalogProduct(row: unknown): row is CatalogProductDto {
   return typeof row === 'object' && row !== null && 'sku' in row && 'name' in row && 'isPublished' in row;
 }
 
+function isPaymentProviderOperation(row: unknown): row is PaymentProviderOperationDto {
+  return typeof row === 'object' && row !== null && 'operationType' in row && 'paymentTransactionId' in row && 'providerKey' in row;
+}
+
 function formatMoney(value: number, currency: string): string {
   return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(value || 0);
 }
@@ -1907,6 +1911,27 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
                       }}
                     >
                       Sepete Çevir
+                    </Button>
+                  </div>
+                );
+              }
+              if (isPaymentProviderOperation(row)) {
+                return (
+                  <div className="flex justify-end gap-1">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      disabled={isActionBusy || row.status !== 'Pending' || !['REFUND', 'CANCEL'].includes(row.operationType)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        void runAction(async () => {
+                          const result = await b2bApi.executePaymentProviderOperation(row.id);
+                          return `${result.operationType} operasyonu sağlayıcıya gönderildi. Durum: ${result.status}.`;
+                        });
+                      }}
+                    >
+                      Sağlayıcıya Gönder
                     </Button>
                   </div>
                 );

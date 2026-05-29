@@ -473,6 +473,11 @@ export const b2bApi = {
     return extractData(response);
   },
 
+  async executePaymentProviderOperation(operationId: number): Promise<PaymentProviderOperationDto> {
+    const response = await api.post<ApiResponse<PaymentProviderOperationDto>>(`/api/b2b/payments/operations/${operationId}/execute`, {});
+    return extractData(response);
+  },
+
   async getIntegrationEvents(params: PagedParams = {}): Promise<PagedResponse<B2bIntegrationEventDto>> {
     const response = await api.post<ApiResponse<PagedResponse<B2bIntegrationEventDto>>>(
       '/api/b2b/integration-events/paged',
