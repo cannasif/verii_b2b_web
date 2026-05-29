@@ -1922,7 +1922,7 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
                       type="button"
                       size="sm"
                       variant="ghost"
-                      disabled={isActionBusy || row.status !== 'Pending' || !['REFUND', 'CANCEL'].includes(row.operationType)}
+                      disabled={isActionBusy || !['Pending', 'Failed'].includes(row.status) || !['REFUND', 'CANCEL'].includes(row.operationType)}
                       onClick={(event) => {
                         event.stopPropagation();
                         void runAction(async () => {
