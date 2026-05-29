@@ -28,6 +28,10 @@ import type {
   PaymentOrderDto,
   CreatePaymentOrderDto,
   PaymentMethodOptionDto,
+  CreateIyzico3dsPaymentDto,
+  Iyzico3dsInitializeDto,
+  CreatePaymentProviderOperationDto,
+  PaymentProviderOperationDto,
   ResolvePaymentMethodsDto,
   SelectPaymentProviderInstallmentDto,
   CreatePaytrIframeTokenDto,
@@ -444,6 +448,28 @@ export const b2bApi = {
       payload,
       portalToken ? portalRequestConfig(portalToken) : undefined,
     );
+    return extractData(response);
+  },
+
+  async createIyzico3dsPayment(payload: CreateIyzico3dsPaymentDto, portalToken?: string): Promise<Iyzico3dsInitializeDto> {
+    const response = await api.post<ApiResponse<Iyzico3dsInitializeDto>>(
+      '/api/b2b/payments/iyzico/3ds/initialize',
+      payload,
+      portalToken ? portalRequestConfig(portalToken) : undefined,
+    );
+    return extractData(response);
+  },
+
+  async getPaymentProviderOperations(params: PagedParams = {}): Promise<PagedResponse<PaymentProviderOperationDto>> {
+    const response = await api.post<ApiResponse<PagedResponse<PaymentProviderOperationDto>>>(
+      '/api/b2b/payments/operations/paged',
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
+    );
+    return normalizePaged(response);
+  },
+
+  async createPaymentProviderOperation(payload: CreatePaymentProviderOperationDto): Promise<PaymentProviderOperationDto> {
+    const response = await api.post<ApiResponse<PaymentProviderOperationDto>>('/api/b2b/payments/operations', payload);
     return extractData(response);
   },
 

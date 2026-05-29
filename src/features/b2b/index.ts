@@ -12,6 +12,7 @@ export {
   B2bInsightsPage,
   B2bInventoryPage,
   B2bOrdersPage,
+  B2bPaymentOperationsPage,
   B2bPaymentsPage,
   B2bPricingPage,
   B2bProductMatchesPage,

@@ -12,6 +12,7 @@ export type B2bWorkspaceKind =
   | 'quotes'
   | 'orders'
   | 'payments'
+  | 'payment-operations'
   | 'integrations';
 
 export interface CatalogProductDto {
@@ -435,6 +436,65 @@ export interface PaymentMethodOptionDto {
   requiresApproval: boolean;
   isProviderHosted: boolean;
   isDeferredPayment: boolean;
+}
+
+export interface Iyzico3dsInitializeDto {
+  paymentTransactionId: number;
+  orderId: number;
+  conversationId: string;
+  paymentId?: string;
+  status: string;
+  threeDSHtmlContent?: string;
+  paymentPageUrl?: string;
+  amount: number;
+  currencyCode: string;
+}
+
+export interface CreateIyzico3dsPaymentDto {
+  orderId: number;
+  email: string;
+  buyerName: string;
+  buyerSurname: string;
+  buyerPhone: string;
+  buyerAddress: string;
+  city: string;
+  country: string;
+  cardHolderName: string;
+  cardNumber: string;
+  expireMonth: string;
+  expireYear: string;
+  cvc: string;
+  installmentCount: number;
+  callbackUrl?: string;
+  buyerIp?: string;
+}
+
+export interface PaymentProviderOperationDto {
+  id: number;
+  paymentTransactionId: number;
+  paymentOrderId?: number;
+  paymentInstallmentId?: number;
+  providerKey: string;
+  operationType: string;
+  status: string;
+  amount: number;
+  currencyCode: string;
+  externalOperationId?: string;
+  idempotencyKey?: string;
+  reason?: string;
+  errorMessage?: string;
+  requestedDate: string;
+  processedDate?: string;
+}
+
+export interface CreatePaymentProviderOperationDto {
+  paymentTransactionId: number;
+  paymentInstallmentId?: number;
+  operationType: string;
+  amount: number;
+  currencyCode: string;
+  idempotencyKey?: string;
+  reason?: string;
 }
 
 export interface ResolvePaymentMethodsDto {

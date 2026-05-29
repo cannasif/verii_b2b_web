@@ -39,6 +39,7 @@ import type {
   CustomerPortalSummaryDto,
   InventorySnapshotDto,
   OrderDto,
+  PaymentProviderOperationDto,
   PaymentTransactionDto,
   PurchaseApprovalRuleDto,
   QuoteRequestDto,
@@ -65,10 +66,11 @@ type WorkspaceRow =
   | QuoteRequestDto
   | OrderDto
   | PaymentTransactionDto
+  | PaymentProviderOperationDto
   | B2bIntegrationEventDto;
 
 type WorkspaceColumnKey = 'primary' | 'secondary' | 'scope' | 'status' | 'amount' | 'date';
-type B2bLookupKind = 'company' | 'buyer' | 'customer' | 'user' | 'stock' | 'catalogProduct' | 'warehouse' | 'order';
+type B2bLookupKind = 'company' | 'buyer' | 'customer' | 'user' | 'stock' | 'catalogProduct' | 'warehouse' | 'order' | 'paymentTransaction';
 
 interface WorkspaceTableConfig {
   pageKey: string;
@@ -157,6 +159,12 @@ const configs: Record<B2bWorkspaceKind, WorkspaceConfig> = {
     breadcrumb: 'Ödemeler',
     emptyState: 'Henüz ödeme işlem kaydı yok.',
   },
+  'payment-operations': {
+    title: 'Ödeme Operasyonları',
+    description: 'İade, iptal, kısmi ödeme ve mutabakat işlemlerini sağlayıcı ve ERP aktarım durumuyla izleyin.',
+    breadcrumb: 'Ödeme Operasyonları',
+    emptyState: 'Henüz ödeme operasyonu yok.',
+  },
   integrations: {
     title: 'ERP Entegrasyon Kuyruğu',
     description: 'Sipariş, teklif ve ödeme gibi kritik olayların ERP’ye aktarım durumunu izleyin.',
@@ -179,6 +187,7 @@ const routeSlugByKind: Record<B2bWorkspaceKind, string> = {
   quotes: 'quotes',
   orders: 'orders',
   payments: 'payments',
+  'payment-operations': 'payment-operations',
   integrations: 'integrations',
 };
 
@@ -568,6 +577,37 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
     transform: (values) => ({ ...baseTransform(values), orderId: toRequiredNumber(values.orderId), amount: toRequiredNumber(values.amount) }),
     submit: b2bApi.createPayment,
   },
+  'payment-operations': {
+    defaults: { paymentTransactionId: '', operationType: 'REFUND', amount: '', currencyCode: 'TRY', idempotencyKey: '', reason: '' },
+    fields: [
+      { name: 'paymentTransactionId', label: 'Ödeme İşlemi', type: 'lookup', lookupKind: 'paymentTransaction', required: true },
+      {
+        name: 'operationType',
+        label: 'Operasyon',
+        type: 'select',
+        required: true,
+        options: [
+          { label: 'İade', value: 'REFUND' },
+          { label: 'İptal', value: 'CANCEL' },
+          { label: 'Kısmi Ödeme', value: 'PARTIAL_PAYMENT' },
+          { label: 'Mutabakat', value: 'RECONCILIATION' },
+        ],
+      },
+      { name: 'amount', label: 'Tutar', type: 'number', required: true },
+      { name: 'currencyCode', label: 'Para Birimi', type: 'currency', required: true },
+      { name: 'idempotencyKey', label: 'Tekrar Koruma Anahtarı' },
+      { name: 'reason', label: 'Açıklama', type: 'textarea' },
+    ],
+    transform: (values) => ({
+      paymentTransactionId: toRequiredNumber(values.paymentTransactionId),
+      operationType: trimOptional(values.operationType) ?? 'REFUND',
+      amount: toRequiredNumber(values.amount),
+      currencyCode: trimOptional(values.currencyCode) ?? 'TRY',
+      idempotencyKey: trimOptional(values.idempotencyKey),
+      reason: trimOptional(values.reason),
+    }),
+    submit: (payload) => b2bApi.createPaymentProviderOperation(payload as unknown as Parameters<typeof b2bApi.createPaymentProviderOperation>[0]),
+  },
 };
 
 function resolveRouteKind(slug?: string): B2bWorkspaceKind {
@@ -678,6 +718,7 @@ function getWorkspaceTableConfig(kind: B2bWorkspaceKind): WorkspaceTableConfig {
     quotes: { primary: 'QuoteNumber', scope: 'CustomerId', status: 'Status', amount: 'EstimatedTotal', date: 'SubmittedDate' },
     orders: { primary: 'OrderNumber', scope: 'CustomerId', status: 'Status', amount: 'GrandTotal', date: 'SubmittedDate' },
     payments: { primary: 'ProviderKey', secondary: 'ExternalTransactionId', scope: 'OrderId', status: 'Status', amount: 'Amount', date: 'CompletedDate' },
+    'payment-operations': { primary: 'OperationType', secondary: 'ExternalOperationId', scope: 'PaymentTransactionId', status: 'Status', amount: 'Amount', date: 'RequestedDate' },
     integrations: { primary: 'EventType', secondary: 'EntityName', scope: 'EntityId', status: 'Status', date: 'ProcessedDate' },
   };
 
@@ -985,6 +1026,18 @@ function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKe
     };
     return values[columnKey];
   }
+  if (kind === 'payment-operations') {
+    const item = row as PaymentProviderOperationDto;
+    const values = {
+      primary: item.operationType,
+      secondary: item.externalOperationId || item.idempotencyKey || '-',
+      scope: `İşlem #${item.paymentTransactionId}`,
+      status: renderStatusBadge(item.status),
+      amount: formatMoney(item.amount, item.currencyCode),
+      date: formatDate(item.processedDate || item.requestedDate),
+    };
+    return values[columnKey];
+  }
   if (kind === 'integrations') {
     const item = row as B2bIntegrationEventDto;
     const values = {
@@ -1048,6 +1101,10 @@ function workspaceExportRow(kind: B2bWorkspaceKind, row: WorkspaceRow): Record<s
   if (kind === 'payments') {
     const item = row as PaymentTransactionDto;
     return { primary: item.providerKey, secondary: item.externalTransactionId, scope: item.orderId, status: item.status, amount: item.amount, date: formatDate(item.completedDate || item.requestedDate) };
+  }
+  if (kind === 'payment-operations') {
+    const item = row as PaymentProviderOperationDto;
+    return { primary: item.operationType, secondary: item.externalOperationId || item.idempotencyKey, scope: item.paymentTransactionId, status: item.status, amount: item.amount, date: formatDate(item.processedDate || item.requestedDate) };
   }
   if (kind === 'integrations') {
     const item = row as B2bIntegrationEventDto;
@@ -2169,6 +2226,24 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
       );
     }
 
+    if (field.lookupKind === 'paymentTransaction') {
+      return (
+        <PagedLookupDialog<PaymentTransactionDto>
+          {...commonProps}
+          title="Ödeme İşlemi Seç"
+          description="Sağlayıcı, işlem numarası veya siparişe göre ödeme hareketi arayın."
+          emptyText="Ödeme işlemi bulunamadı."
+          fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getPayments({ pageNumber, pageSize, search })}
+          getKey={(item) => String(item.id)}
+          getLabel={(item) => `${item.providerKey} - ${item.externalTransactionId || item.id} - ${formatMoney(item.amount, item.currencyCode)}`}
+          onSelect={(item) => setLookupValue(field.name, item.id, `${item.providerKey} - ${item.externalTransactionId || item.id} - ${formatMoney(item.amount, item.currencyCode)}`, {
+            amount: String(item.amount),
+            currencyCode: item.currencyCode,
+          })}
+        />
+      );
+    }
+
     return null;
   }
 
@@ -2833,6 +2908,10 @@ export function B2bOrdersPage(): ReactElement {
 
 export function B2bPaymentsPage(): ReactElement {
   return <B2bWorkspacePage kind="payments" />;
+}
+
+export function B2bPaymentOperationsPage(): ReactElement {
+  return <B2bWorkspacePage kind="payment-operations" />;
 }
 
 export function B2bIntegrationsPage(): ReactElement {

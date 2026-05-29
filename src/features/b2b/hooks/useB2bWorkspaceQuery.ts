@@ -12,6 +12,7 @@ import type {
   CustomerProductAliasDto,
   InventorySnapshotDto,
   OrderDto,
+  PaymentProviderOperationDto,
   PaymentTransactionDto,
   PurchaseApprovalRuleDto,
   QuoteRequestDto,
@@ -31,6 +32,7 @@ type WorkspaceRow =
   | QuoteRequestDto
   | OrderDto
   | PaymentTransactionDto
+  | PaymentProviderOperationDto
   | B2bIntegrationEventDto;
 
 export function useB2bWorkspaceQuery(kind: B2bWorkspaceKind, params: PagedParams = {}) {
@@ -72,6 +74,8 @@ export function useB2bWorkspaceQuery(kind: B2bWorkspaceKind, params: PagedParams
           return b2bApi.getOrders(params) as Promise<PagedResponse<WorkspaceRow>>;
         case 'payments':
           return b2bApi.getPayments(params) as Promise<PagedResponse<WorkspaceRow>>;
+        case 'payment-operations':
+          return b2bApi.getPaymentProviderOperations(params) as Promise<PagedResponse<WorkspaceRow>>;
         case 'integrations':
           return b2bApi.getIntegrationEvents(params) as Promise<PagedResponse<WorkspaceRow>>;
       }

@@ -121,6 +121,7 @@ export const B2B_NAV_ITEMS: NavItem[] = [
           { title: 'sidebar.b2bQuotes', titleFallback: 'Teklif Talepleri', href: '/b2b/quotes' },
           { title: 'sidebar.b2bOrders', titleFallback: 'Siparişler', href: '/b2b/orders' },
           { title: 'sidebar.b2bPayments', titleFallback: 'Ödeme', href: '/b2b/payments' },
+          { title: 'sidebar.b2bPaymentOperations', titleFallback: 'Ödeme Operasyonları', href: '/b2b/payment-operations' },
           { title: 'sidebar.b2bIntegrations', titleFallback: 'ERP Entegrasyon', href: '/b2b/integrations' },
         ],
       },

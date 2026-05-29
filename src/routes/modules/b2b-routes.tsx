@@ -13,6 +13,7 @@ const B2bApprovalRulesPage = lazyNamed(() => import('@/features/b2b'), 'B2bAppro
 const B2bQuotesPage = lazyNamed(() => import('@/features/b2b'), 'B2bQuotesPage');
 const B2bOrdersPage = lazyNamed(() => import('@/features/b2b'), 'B2bOrdersPage');
 const B2bPaymentsPage = lazyNamed(() => import('@/features/b2b'), 'B2bPaymentsPage');
+const B2bPaymentOperationsPage = lazyNamed(() => import('@/features/b2b'), 'B2bPaymentOperationsPage');
 const B2bIntegrationsPage = lazyNamed(() => import('@/features/b2b'), 'B2bIntegrationsPage');
 const B2bInsightsPage = lazyNamed(() => import('@/features/b2b'), 'B2bInsightsPage');
 const B2bRecordDetailPage = lazyNamed(() => import('@/features/b2b'), 'B2bRecordDetailPage');
@@ -36,6 +37,7 @@ export const b2bChildRoutes: RouteObject[] = [
       { path: 'quotes', element: withRoute(B2bQuotesPage, { routeName: 'b2b-quotes' }) },
       { path: 'orders', element: withRoute(B2bOrdersPage, { routeName: 'b2b-orders' }) },
       { path: 'payments', element: withRoute(B2bPaymentsPage, { routeName: 'b2b-payments' }) },
+      { path: 'payment-operations', element: withRoute(B2bPaymentOperationsPage, { routeName: 'b2b-payment-operations' }) },
       { path: 'integrations', element: withRoute(B2bIntegrationsPage, { routeName: 'b2b-integrations' }) },
       { path: ':workspaceKind/create', element: withRoute(B2bRecordCreatePage, { routeName: 'b2b-record-create' }) },
       { path: 'catalog/:id/edit', element: withRoute(B2bRecordEditPage, { routeName: 'b2b-catalog-edit' }) },
