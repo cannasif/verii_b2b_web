@@ -251,12 +251,30 @@ export interface CustomerPortalSummaryDto {
 export interface PaymentTransactionDto {
   id: number;
   orderId: number;
+  paymentOrderId?: number;
+  paymentInstallmentId?: number;
   providerKey: string;
   externalTransactionId?: string;
   status: string;
   amount: number;
+  providerPaymentAmount?: number;
+  providerCollectedAmount?: number;
   currencyCode: string;
   paymentMethod?: string;
+  dueDate?: string;
+  paymentTermDays?: number;
+  installmentCount: number;
+  installmentPlanJson?: string;
+  providerConversationId?: string;
+  binNumber?: string;
+  cardType?: string;
+  cardAssociation?: string;
+  cardFamily?: string;
+  bankName?: string;
+  bankCode?: string;
+  isCommercialCard?: boolean;
+  providerRate?: number;
+  providerCommissionAmount?: number;
   requestedDate?: string;
   completedDate?: string;
 }
@@ -332,6 +350,72 @@ export interface PaymentInstallmentOptionDto {
   providerRate?: number;
   commissionAmount?: number;
   isAvailable: boolean;
+}
+
+export interface PaymentOrderDto {
+  id: number;
+  paymentOrderNumber: string;
+  orderId: number;
+  customerId: number;
+  buyerId?: number;
+  userId?: number;
+  status: string;
+  amount: number;
+  paidAmount: number;
+  remainingAmount: number;
+  currencyCode: string;
+  paymentTermDays?: number;
+  dueDate: string;
+  isDueDateOverridden: boolean;
+  installmentCount: number;
+  paymentMethod?: string;
+  providerKey?: string;
+  providerConversationId?: string;
+  binNumber?: string;
+  cardType?: string;
+  cardAssociation?: string;
+  cardFamily?: string;
+  bankName?: string;
+  bankCode?: string;
+  isCommercialCard?: boolean;
+  providerInstallmentNumber?: number;
+  providerInstallmentPrice?: number;
+  providerTotalPrice?: number;
+  providerRate?: number;
+  providerCommissionAmount?: number;
+  providerInstallmentSnapshotJson?: string;
+  notes?: string;
+  installments: PaymentInstallmentDto[];
+}
+
+export interface PaymentInstallmentDto {
+  id: number;
+  paymentOrderId: number;
+  installmentNumber: number;
+  status: string;
+  dueDate: string;
+  amount: number;
+  paidAmount: number;
+  paidDate?: string;
+  notes?: string;
+}
+
+export interface SelectPaymentProviderInstallmentDto {
+  providerKey: string;
+  providerConversationId?: string;
+  binNumber?: string;
+  cardType?: string;
+  cardAssociation?: string;
+  cardFamily?: string;
+  bankName?: string;
+  bankCode?: string;
+  isCommercialCard?: boolean;
+  installmentNumber: number;
+  installmentPrice: number;
+  totalPrice: number;
+  providerRate?: number;
+  providerCommissionAmount?: number;
+  providerInstallmentSnapshotJson?: string;
 }
 
 export interface CustomerPriceListDto {

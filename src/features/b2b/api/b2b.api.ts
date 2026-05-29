@@ -25,6 +25,8 @@ import type {
   PaymentBinLookupRequestDto,
   PaymentInstallmentOptionsDto,
   PaymentInstallmentOptionsRequestDto,
+  PaymentOrderDto,
+  SelectPaymentProviderInstallmentDto,
   CreatePaytrIframeTokenDto,
   PaytrIframeTokenDto,
   PurchaseApprovalRuleDto,
@@ -373,6 +375,19 @@ export const b2bApi = {
       buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
     );
     return normalizePaged(response);
+  },
+
+  async getPaymentOrders(params: PagedParams = {}): Promise<PagedResponse<PaymentOrderDto>> {
+    const response = await api.post<ApiResponse<PagedResponse<PaymentOrderDto>>>(
+      '/api/b2b/payments/orders/paged',
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
+    );
+    return normalizePaged(response);
+  },
+
+  async selectPaymentProviderInstallment(paymentOrderId: number, payload: SelectPaymentProviderInstallmentDto): Promise<PaymentOrderDto> {
+    const response = await api.put<ApiResponse<PaymentOrderDto>>(`/api/b2b/payments/orders/${paymentOrderId}/provider-installment`, payload);
+    return extractData(response);
   },
 
   async createPayment(payload: Record<string, unknown>): Promise<PaymentTransactionDto> {
