@@ -283,6 +283,57 @@ export interface PaytrIframeTokenDto {
   testMode: boolean;
 }
 
+export interface PaymentBinLookupRequestDto {
+  providerKey: string;
+  binNumber: string;
+  amount?: number;
+  currencyCode?: string;
+  conversationId?: string;
+}
+
+export interface PaymentInstallmentOptionsRequestDto {
+  providerKey: string;
+  binNumber?: string;
+  amount: number;
+  currencyCode?: string;
+  conversationId?: string;
+}
+
+export interface PaymentBinLookupDto {
+  providerKey: string;
+  binNumber: string;
+  cardType?: string;
+  cardAssociation?: string;
+  cardFamily?: string;
+  bankName?: string;
+  bankCode?: string;
+  isCommercial?: boolean;
+  providerStatus?: string;
+  conversationId?: string;
+  rawResponseJson?: string;
+}
+
+export interface PaymentInstallmentOptionsDto {
+  providerKey: string;
+  binNumber?: string;
+  amount: number;
+  currencyCode: string;
+  providerStatus?: string;
+  conversationId?: string;
+  card?: PaymentBinLookupDto;
+  options: PaymentInstallmentOptionDto[];
+  rawResponseJson?: string;
+}
+
+export interface PaymentInstallmentOptionDto {
+  installmentNumber: number;
+  installmentPrice: number;
+  totalPrice: number;
+  providerRate?: number;
+  commissionAmount?: number;
+  isAvailable: boolean;
+}
+
 export interface CustomerPriceListDto {
   id: number;
   code: string;

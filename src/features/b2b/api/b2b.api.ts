@@ -21,6 +21,10 @@ import type {
   InventorySnapshotDto,
   OrderDto,
   PaymentTransactionDto,
+  PaymentBinLookupDto,
+  PaymentBinLookupRequestDto,
+  PaymentInstallmentOptionsDto,
+  PaymentInstallmentOptionsRequestDto,
   CreatePaytrIframeTokenDto,
   PaytrIframeTokenDto,
   PurchaseApprovalRuleDto,
@@ -373,6 +377,16 @@ export const b2bApi = {
 
   async createPayment(payload: Record<string, unknown>): Promise<PaymentTransactionDto> {
     const response = await api.post<ApiResponse<PaymentTransactionDto>>('/api/b2b/payments', payload);
+    return extractData(response);
+  },
+
+  async lookupPaymentBin(payload: PaymentBinLookupRequestDto): Promise<PaymentBinLookupDto> {
+    const response = await api.post<ApiResponse<PaymentBinLookupDto>>('/api/b2b/payments/providers/bin-lookup', payload);
+    return extractData(response);
+  },
+
+  async getPaymentInstallmentOptions(payload: PaymentInstallmentOptionsRequestDto): Promise<PaymentInstallmentOptionsDto> {
+    const response = await api.post<ApiResponse<PaymentInstallmentOptionsDto>>('/api/b2b/payments/providers/installments', payload);
     return extractData(response);
   },
 
