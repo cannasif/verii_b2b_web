@@ -418,6 +418,33 @@ export interface SelectPaymentProviderInstallmentDto {
   providerInstallmentSnapshotJson?: string;
 }
 
+export interface CreatePaymentOrderDto {
+  orderId: number;
+  paymentTermDays?: number;
+  dueDate?: string;
+  installmentCount: number;
+  paymentMethod?: string;
+  providerKey?: string;
+  notes?: string;
+}
+
+export interface PaymentMethodOptionDto {
+  providerKey: string;
+  paymentMethod: string;
+  displayName: string;
+  requiresApproval: boolean;
+  isProviderHosted: boolean;
+  isDeferredPayment: boolean;
+}
+
+export interface ResolvePaymentMethodsDto {
+  customerId: number;
+  companyId?: number;
+  customerGroupCode?: string;
+  amount: number;
+  currencyCode: string;
+}
+
 export interface CustomerPriceListDto {
   id: number;
   code: string;

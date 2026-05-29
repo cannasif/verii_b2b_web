@@ -1,6 +1,6 @@
 import { type ReactElement, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, BarChart3, Building2, CheckCircle2, ClipboardList, FileText, Heart, PackageSearch, Repeat2, ShoppingCart, Sparkles, Upload } from 'lucide-react';
+import { ArrowRight, BarChart3, Building2, CheckCircle2, ClipboardList, CreditCard, FileText, Heart, PackageSearch, Repeat2, ShoppingCart, Sparkles, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PagedLookupDialog } from '@/components/shared';
 import { b2bApi } from '../api/b2b.api';
-import type { B2bCompanyDto, B2bPortalSessionDto, B2bPriceAvailabilityDto, CartDto, CatalogProductDto } from '../types/b2b.types';
+import type { B2bCompanyDto, B2bPortalSessionDto, B2bPriceAvailabilityDto, CartDto, CatalogProductDto, OrderDto, PaymentInstallmentOptionDto, PaymentMethodOptionDto, PaymentOrderDto } from '../types/b2b.types';
 
 const PORTAL_SESSION_STORAGE_KEY = 'v3rii-b2b-portal-session';
 
@@ -55,6 +55,13 @@ export function B2bPortalPage(): ReactElement {
   const [quickOrderText, setQuickOrderText] = useState('');
   const [customerNote, setCustomerNote] = useState('');
   const [message, setMessage] = useState<string | null>(null);
+  const [lastOrder, setLastOrder] = useState<OrderDto | null>(null);
+  const [paymentOrder, setPaymentOrder] = useState<PaymentOrderDto | null>(null);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethodOptionDto[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodOptionDto | null>(null);
+  const [cardBin, setCardBin] = useState('');
+  const [installmentOptions, setInstallmentOptions] = useState<PaymentInstallmentOptionDto[]>([]);
+  const [selectedInstallment, setSelectedInstallment] = useState<PaymentInstallmentOptionDto | null>(null);
 
   const selectedCompany = portalSession?.company ?? null;
   const selectedBuyer = portalSession?.buyer ?? null;
@@ -233,6 +240,83 @@ export function B2bPortalPage(): ReactElement {
     onError: (error) => setMessage((error as Error).message),
   });
 
+  const createPaymentOrderMutation = useMutation({
+    mutationFn: async (order: OrderDto) => {
+      const methods = await b2bApi.resolvePaymentMethods({
+        customerId: order.customerId,
+        companyId: selectedCompany?.id,
+        customerGroupCode: selectedCompany?.customerGroupCode,
+        amount: order.grandTotal,
+        currencyCode: order.currencyCode || 'TRY',
+      }, portalToken);
+      const preferredMethod = methods.find((item) => item.providerKey === 'PAYTR' && item.paymentMethod === 'CARD') ?? methods[0] ?? null;
+      const createdPaymentOrder = await b2bApi.createPaymentOrder({
+        orderId: order.id,
+        installmentCount: 1,
+        providerKey: preferredMethod?.providerKey,
+        paymentMethod: preferredMethod?.paymentMethod,
+        notes: customerNote,
+      }, portalToken);
+      return { methods, preferredMethod, paymentOrder: createdPaymentOrder };
+    },
+    onSuccess: ({ methods, preferredMethod, paymentOrder: createdPaymentOrder }) => {
+      setPaymentMethods(methods);
+      setSelectedPaymentMethod(preferredMethod);
+      setPaymentOrder(createdPaymentOrder);
+      setCardBin('');
+      setInstallmentOptions([]);
+      setSelectedInstallment(null);
+      setMessage(`${createdPaymentOrder.paymentOrderNumber} ödeme emri hazırlandı. Kartın ilk 6/8 hanesiyle taksit seçebilirsiniz.`);
+    },
+    onError: (error) => setMessage((error as Error).message),
+  });
+
+  const installmentMutation = useMutation({
+    mutationFn: async () => {
+      if (!paymentOrder) throw new Error('Önce ödeme emri oluşmalı.');
+      if (!selectedPaymentMethod?.isProviderHosted) throw new Error('Bu ödeme yöntemi kart taksiti gerektirmiyor.');
+      const binNumber = cardBin.replace(/\D/g, '').slice(0, 8);
+      if (binNumber.length < 6) throw new Error('Kartın ilk 6 veya 8 hanesini girin.');
+      return b2bApi.getPaymentInstallmentOptions({
+        providerKey: selectedPaymentMethod.providerKey,
+        binNumber,
+        amount: paymentOrder.remainingAmount || paymentOrder.amount,
+        currencyCode: paymentOrder.currencyCode || 'TRY',
+      }, portalToken);
+    },
+    onSuccess: (data) => {
+      const options = data.options.filter((item) => item.isAvailable);
+      setInstallmentOptions(options);
+      setSelectedInstallment(options[0] ?? null);
+      setMessage(data.card?.bankName ? `${data.card.bankName} için taksit seçenekleri alındı.` : 'Taksit seçenekleri alındı.');
+    },
+    onError: (error) => setMessage((error as Error).message),
+  });
+
+  const selectInstallmentMutation = useMutation({
+    mutationFn: async () => {
+      if (!paymentOrder) throw new Error('Ödeme emri bulunamadı.');
+      if (!selectedPaymentMethod) throw new Error('Ödeme yöntemi seçin.');
+      if (!selectedInstallment) throw new Error('Taksit seçin.');
+      const binNumber = cardBin.replace(/\D/g, '').slice(0, 8);
+      return b2bApi.selectPaymentProviderInstallment(paymentOrder.id, {
+        providerKey: selectedPaymentMethod.providerKey,
+        binNumber,
+        installmentNumber: selectedInstallment.installmentNumber,
+        installmentPrice: selectedInstallment.installmentPrice,
+        totalPrice: selectedInstallment.totalPrice,
+        providerRate: selectedInstallment.providerRate,
+        providerCommissionAmount: selectedInstallment.commissionAmount,
+        providerInstallmentSnapshotJson: JSON.stringify(selectedInstallment),
+      }, portalToken);
+    },
+    onSuccess: (updatedPaymentOrder) => {
+      setPaymentOrder(updatedPaymentOrder);
+      setMessage(`${updatedPaymentOrder.installmentCount} taksitli ödeme planı kaydedildi.`);
+    },
+    onError: (error) => setMessage((error as Error).message),
+  });
+
   const orderMutation = useMutation({
     mutationFn: async () => {
       if (!cart) throw new Error('Sipariş için sepet bulunamadı.');
@@ -244,7 +328,11 @@ export function B2bPortalPage(): ReactElement {
         description: customerNote,
       }, portalToken);
     },
-    onSuccess: (order) => setMessage(`${order.offerNo || order.orderNumber} numaralı sipariş oluşturuldu.`),
+    onSuccess: (order) => {
+      setLastOrder(order);
+      setMessage(`${order.offerNo || order.orderNumber} numaralı sipariş oluşturuldu. Ödeme seçenekleri hazırlanıyor.`);
+      createPaymentOrderMutation.mutate(order);
+    },
     onError: (error) => setMessage((error as Error).message),
   });
 
@@ -397,6 +485,74 @@ export function B2bPortalPage(): ReactElement {
                     Siparişi Onaya Gönder <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
+                {lastOrder && (
+                  <div className="space-y-3 rounded-3xl border border-emerald-900/10 bg-white p-4 shadow-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="flex items-center gap-2 text-sm font-black text-emerald-950"><CreditCard className="h-4 w-4" /> Ödeme planı</p>
+                        <p className="mt-1 text-xs font-semibold text-slate-500">{lastOrder.orderNumber} için {formatMoney(paymentOrder?.remainingAmount ?? lastOrder.grandTotal, lastOrder.currencyCode)}</p>
+                      </div>
+                      {paymentOrder && <Badge className="bg-emerald-100 text-emerald-900 hover:bg-emerald-100">{paymentOrder.status}</Badge>}
+                    </div>
+                    <div className="grid gap-2">
+                      {paymentMethods.map((method) => {
+                        const active = selectedPaymentMethod?.providerKey === method.providerKey && selectedPaymentMethod.paymentMethod === method.paymentMethod;
+                        return (
+                          <button
+                            key={`${method.providerKey}-${method.paymentMethod}`}
+                            type="button"
+                            className={`rounded-2xl border px-3 py-2 text-left text-sm font-black transition ${active ? 'border-emerald-700 bg-emerald-50 text-emerald-950' : 'border-stone-200 bg-white text-slate-600 hover:border-emerald-300'}`}
+                            onClick={() => {
+                              setSelectedPaymentMethod(method);
+                              setInstallmentOptions([]);
+                              setSelectedInstallment(null);
+                            }}
+                          >
+                            {method.displayName}
+                            {method.requiresApproval && <span className="ml-2 text-xs font-bold text-amber-700">Onaylı</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {selectedPaymentMethod?.isProviderHosted && (
+                      <div className="space-y-3 rounded-2xl bg-stone-50 p-3">
+                        <div className="flex gap-2">
+                          <Input
+                            value={cardBin}
+                            onChange={(event) => setCardBin(event.target.value.replace(/\D/g, '').slice(0, 8))}
+                            placeholder="Kart ilk 6/8 hane"
+                            inputMode="numeric"
+                            className="bg-white"
+                          />
+                          <Button type="button" variant="outline" onClick={() => installmentMutation.mutate()} disabled={installmentMutation.isPending || !paymentOrder}>
+                            Taksit Bul
+                          </Button>
+                        </div>
+                        {installmentOptions.length > 0 && (
+                          <div className="grid gap-2">
+                            {installmentOptions.map((option) => {
+                              const active = selectedInstallment?.installmentNumber === option.installmentNumber;
+                              return (
+                                <button
+                                  key={option.installmentNumber}
+                                  type="button"
+                                  className={`flex items-center justify-between rounded-2xl border px-3 py-2 text-sm font-black ${active ? 'border-emerald-700 bg-white text-emerald-950' : 'border-stone-200 bg-white/70 text-slate-600'}`}
+                                  onClick={() => setSelectedInstallment(option)}
+                                >
+                                  <span>{option.installmentNumber === 1 ? 'Tek çekim' : `${option.installmentNumber} taksit`}</span>
+                                  <span>{formatMoney(option.totalPrice, paymentOrder?.currencyCode)}</span>
+                                </button>
+                              );
+                            })}
+                            <Button type="button" className="bg-emerald-800 hover:bg-emerald-700" disabled={!selectedInstallment || selectInstallmentMutation.isPending} onClick={() => selectInstallmentMutation.mutate()}>
+                              Taksit Planını Kaydet
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

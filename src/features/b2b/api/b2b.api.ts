@@ -26,6 +26,9 @@ import type {
   PaymentInstallmentOptionsDto,
   PaymentInstallmentOptionsRequestDto,
   PaymentOrderDto,
+  CreatePaymentOrderDto,
+  PaymentMethodOptionDto,
+  ResolvePaymentMethodsDto,
   SelectPaymentProviderInstallmentDto,
   CreatePaytrIframeTokenDto,
   PaytrIframeTokenDto,
@@ -385,8 +388,30 @@ export const b2bApi = {
     return normalizePaged(response);
   },
 
-  async selectPaymentProviderInstallment(paymentOrderId: number, payload: SelectPaymentProviderInstallmentDto): Promise<PaymentOrderDto> {
-    const response = await api.put<ApiResponse<PaymentOrderDto>>(`/api/b2b/payments/orders/${paymentOrderId}/provider-installment`, payload);
+  async createPaymentOrder(payload: CreatePaymentOrderDto, portalToken?: string): Promise<PaymentOrderDto> {
+    const response = await api.post<ApiResponse<PaymentOrderDto>>(
+      '/api/b2b/payments/orders',
+      payload,
+      portalToken ? portalRequestConfig(portalToken) : undefined,
+    );
+    return extractData(response);
+  },
+
+  async selectPaymentProviderInstallment(paymentOrderId: number, payload: SelectPaymentProviderInstallmentDto, portalToken?: string): Promise<PaymentOrderDto> {
+    const response = await api.put<ApiResponse<PaymentOrderDto>>(
+      `/api/b2b/payments/orders/${paymentOrderId}/provider-installment`,
+      payload,
+      portalToken ? portalRequestConfig(portalToken) : undefined,
+    );
+    return extractData(response);
+  },
+
+  async resolvePaymentMethods(payload: ResolvePaymentMethodsDto, portalToken?: string): Promise<PaymentMethodOptionDto[]> {
+    const response = await api.post<ApiResponse<PaymentMethodOptionDto[]>>(
+      '/api/b2b/payments/methods/resolve',
+      payload,
+      portalToken ? portalRequestConfig(portalToken) : undefined,
+    );
     return extractData(response);
   },
 
@@ -395,13 +420,21 @@ export const b2bApi = {
     return extractData(response);
   },
 
-  async lookupPaymentBin(payload: PaymentBinLookupRequestDto): Promise<PaymentBinLookupDto> {
-    const response = await api.post<ApiResponse<PaymentBinLookupDto>>('/api/b2b/payments/providers/bin-lookup', payload);
+  async lookupPaymentBin(payload: PaymentBinLookupRequestDto, portalToken?: string): Promise<PaymentBinLookupDto> {
+    const response = await api.post<ApiResponse<PaymentBinLookupDto>>(
+      '/api/b2b/payments/providers/bin-lookup',
+      payload,
+      portalToken ? portalRequestConfig(portalToken) : undefined,
+    );
     return extractData(response);
   },
 
-  async getPaymentInstallmentOptions(payload: PaymentInstallmentOptionsRequestDto): Promise<PaymentInstallmentOptionsDto> {
-    const response = await api.post<ApiResponse<PaymentInstallmentOptionsDto>>('/api/b2b/payments/providers/installments', payload);
+  async getPaymentInstallmentOptions(payload: PaymentInstallmentOptionsRequestDto, portalToken?: string): Promise<PaymentInstallmentOptionsDto> {
+    const response = await api.post<ApiResponse<PaymentInstallmentOptionsDto>>(
+      '/api/b2b/payments/providers/installments',
+      payload,
+      portalToken ? portalRequestConfig(portalToken) : undefined,
+    );
     return extractData(response);
   },
 
