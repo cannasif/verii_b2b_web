@@ -47,6 +47,29 @@ export interface MarketplaceChannelDto {
   notes?: string;
 }
 
+export interface MarketplaceCredentialFieldDto {
+  key: string;
+  label: string;
+  type: string;
+  required: boolean;
+  placeholder?: string;
+  helpText?: string;
+}
+
+export interface MarketplaceProviderSettingDto {
+  providerKey: string;
+  name: string;
+  defaultAuthType: string;
+  documentationUrl: string;
+  setupSummary: string;
+  supportsProductCreate: boolean;
+  supportsPriceUpdate: boolean;
+  supportsStockUpdate: boolean;
+  supportsOrderImport: boolean;
+  credentialFields: MarketplaceCredentialFieldDto[];
+  channel?: MarketplaceChannelDto;
+}
+
 export interface MarketplaceListingDto {
   id: number;
   channelId: number;

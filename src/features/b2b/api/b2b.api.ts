@@ -22,6 +22,7 @@ import type {
   MarketplaceCapabilityDto,
   MarketplaceChannelDto,
   MarketplaceListingDto,
+  MarketplaceProviderSettingDto,
   MarketplaceSyncEventDto,
   OrderDto,
   PaymentTransactionDto,
@@ -492,6 +493,11 @@ export const b2bApi = {
 
   async getMarketplaceCapabilities(): Promise<MarketplaceCapabilityDto[]> {
     const response = await api.get<ApiResponse<MarketplaceCapabilityDto[]>>('/api/b2b/marketplaces/capabilities');
+    return extractData(response);
+  },
+
+  async getMarketplaceSettings(): Promise<MarketplaceProviderSettingDto[]> {
+    const response = await api.get<ApiResponse<MarketplaceProviderSettingDto[]>>('/api/b2b/marketplaces/settings');
     return extractData(response);
   },
 
