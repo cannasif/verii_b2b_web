@@ -18,6 +18,7 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   '/b2b/marketplace-channels': 'b2b.marketplace-channels.view',
   '/b2b/marketplace-listings': 'b2b.marketplace-listings.view',
   '/b2b/marketplace-events': 'b2b.marketplace-events.view',
+  '/b2b/marketplace-settings': 'b2b.marketplace-settings.view',
   '/b2b/integrations': 'b2b.integrations.view',
 
   '/erp/customers': 'erp.customers.view',
@@ -55,6 +56,7 @@ export const PATH_TO_PERMISSION_PATTERNS: Array<{ pattern: RegExp; permission: s
   { pattern: /^\/b2b\/marketplace-channels(\/|$)/, permission: 'b2b.marketplace-channels.view' },
   { pattern: /^\/b2b\/marketplace-listings(\/|$)/, permission: 'b2b.marketplace-listings.view' },
   { pattern: /^\/b2b\/marketplace-events(\/|$)/, permission: 'b2b.marketplace-events.view' },
+  { pattern: /^\/b2b\/marketplace-settings(\/|$)/, permission: 'b2b.marketplace-settings.view' },
   { pattern: /^\/b2b\/integrations(\/|$)/, permission: 'b2b.integrations.view' },
 
   { pattern: /^\/erp\/customers(\/|$)/, permission: 'erp.customers.view' },
@@ -130,6 +132,7 @@ export const PERMISSION_SCOPE_DISPLAY: Record<string, PermissionScopeDisplay> = 
   'b2b.marketplace-channels': { key: 'sidebar.b2bMarketplaceChannels', fallback: 'Pazar Yeri Kanalları' },
   'b2b.marketplace-listings': { key: 'sidebar.b2bMarketplaceListings', fallback: 'Pazar Yeri Ürünleri' },
   'b2b.marketplace-events': { key: 'sidebar.b2bMarketplaceEvents', fallback: 'Pazar Yeri Aktarımları' },
+  'b2b.marketplace-settings': { key: 'sidebar.b2bMarketplaceSettings', fallback: 'Pazar Yeri Ayarları' },
   'b2b.integrations': { key: 'sidebar.b2bIntegrations', fallback: 'ERP Entegrasyon' },
 
   'erp.customers': { key: 'sidebar.erpCustomers', fallback: 'Cariler' },

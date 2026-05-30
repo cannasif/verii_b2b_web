@@ -37,6 +37,7 @@ export interface MarketplaceChannelDto {
   sellerId?: string;
   apiBaseUrl?: string;
   authType: string;
+  credentialsMasked?: string;
   supportsProductCreate: boolean;
   supportsPriceUpdate: boolean;
   supportsStockUpdate: boolean;

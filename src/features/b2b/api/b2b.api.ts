@@ -508,6 +508,11 @@ export const b2bApi = {
     return extractData(response);
   },
 
+  async updateMarketplaceChannel(id: number, payload: Record<string, unknown>): Promise<MarketplaceChannelDto> {
+    const response = await api.put<ApiResponse<MarketplaceChannelDto>>(`/api/b2b/marketplaces/channels/${id}`, payload);
+    return extractData(response);
+  },
+
   async getMarketplaceListings(params: PagedParams = {}): Promise<PagedResponse<MarketplaceListingDto>> {
     const response = await api.post<ApiResponse<PagedResponse<MarketplaceListingDto>>>(
       '/api/b2b/marketplaces/listings/paged',

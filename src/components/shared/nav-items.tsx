@@ -125,6 +125,7 @@ export const B2B_NAV_ITEMS: NavItem[] = [
           { title: 'sidebar.b2bMarketplaceChannels', titleFallback: 'Pazar Yeri Kanalları', href: '/b2b/marketplace-channels' },
           { title: 'sidebar.b2bMarketplaceListings', titleFallback: 'Pazar Yeri Ürünleri', href: '/b2b/marketplace-listings' },
           { title: 'sidebar.b2bMarketplaceEvents', titleFallback: 'Pazar Yeri Aktarımları', href: '/b2b/marketplace-events' },
+          { title: 'sidebar.b2bMarketplaceSettings', titleFallback: 'Pazar Yeri Ayarları', href: '/b2b/marketplace-settings' },
           { title: 'sidebar.b2bIntegrations', titleFallback: 'ERP Entegrasyon', href: '/b2b/integrations' },
         ],
       },

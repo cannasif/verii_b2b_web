@@ -3,6 +3,10 @@ export {
 } from './components/B2bPortalPage';
 
 export {
+  B2bMarketplaceSettingsPage,
+} from './components/B2bMarketplaceSettingsPage';
+
+export {
   B2bApprovalRulesPage,
   B2bBuyersPage,
   B2bCatalogPage,
