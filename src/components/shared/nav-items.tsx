@@ -157,6 +157,7 @@ export const B2B_NAV_ITEMS: NavItem[] = [
         title: 'sidebar.accessControlManagementGroup',
         titleFallback: 'Yetki ve Kullanıcı Yönetimi',
         children: [
+          { title: 'sidebar.userManagement', titleFallback: 'Kullanıcı Yönetimi', href: '/access-control/users' },
           { title: 'sidebar.permissionDefinitions', titleFallback: 'Yetki Tanımları', href: '/access-control/permission-definitions' },
           { title: 'sidebar.permissionGroups', titleFallback: 'Yetki Grupları', href: '/access-control/permission-groups' },
           { title: 'sidebar.userGroupAssignments', titleFallback: 'Kullanıcı Grup Atamaları', href: '/access-control/user-group-assignments' },

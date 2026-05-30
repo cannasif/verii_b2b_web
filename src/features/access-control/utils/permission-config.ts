@@ -26,6 +26,7 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   '/erp/warehouses': 'erp.warehouses.view',
   '/erp/yapkodlar': 'erp.yapkodlar.view',
 
+  '/access-control/users': 'access-control.user-management.view',
   '/access-control/permission-definitions': 'access-control.permission-definitions.view',
   '/access-control/permission-groups': 'access-control.permission-groups.view',
   '/access-control/user-group-assignments': 'access-control.user-group-assignments.view',
@@ -64,6 +65,7 @@ export const PATH_TO_PERMISSION_PATTERNS: Array<{ pattern: RegExp; permission: s
   { pattern: /^\/erp\/warehouses(\/|$)/, permission: 'erp.warehouses.view' },
   { pattern: /^\/erp\/yapkodlar(\/|$)/, permission: 'erp.yapkodlar.view' },
 
+  { pattern: /^\/access-control\/users(\/|$)/, permission: 'access-control.user-management.view' },
   { pattern: /^\/access-control\/permission-definitions(\/|$)/, permission: 'access-control.permission-definitions.view' },
   { pattern: /^\/access-control\/permission-groups(\/|$)/, permission: 'access-control.permission-groups.view' },
   { pattern: /^\/access-control\/user-group-assignments(\/|$)/, permission: 'access-control.user-group-assignments.view' },
@@ -88,6 +90,7 @@ export function isLeafPermissionCode(code: string): boolean {
 
 export const ACCESS_CONTROL_ADMIN_PERMISSIONS = [
   'access-control.permission-definitions.view',
+  'access-control.user-management.view',
   'access-control.permission-groups.view',
   'access-control.user-group-assignments.view',
   'access-control.wms-scope-policies.view',
@@ -141,6 +144,7 @@ export const PERMISSION_SCOPE_DISPLAY: Record<string, PermissionScopeDisplay> = 
   'erp.yapkodlar': { key: 'sidebar.erpYapKodlar', fallback: 'YapKodlar' },
 
   'access-control.permission-definitions': { key: 'sidebar.permissionDefinitions', fallback: 'Yetki Tanımları' },
+  'access-control.user-management': { key: 'sidebar.userManagement', fallback: 'Kullanıcı Yönetimi' },
   'access-control.permission-groups': { key: 'sidebar.permissionGroups', fallback: 'Yetki Grupları' },
   'access-control.user-group-assignments': { key: 'sidebar.userGroupAssignments', fallback: 'Kullanıcı Grup Atamaları' },
   'access-control.wms-scope-policies': { key: 'sidebar.b2bScopePolicies', fallback: 'B2B Kapsam Politikaları' },

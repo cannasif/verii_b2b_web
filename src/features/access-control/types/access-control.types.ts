@@ -129,6 +129,70 @@ export interface PermissionGroupDto {
   permissionCodes: string[];
 }
 
+export interface UserAuthorityDto {
+  id: number;
+  title: string;
+}
+
+export interface UserManagementDto {
+  id: number;
+  createdDate?: string | null;
+  updatedDate?: string | null;
+  username: string;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  role: string;
+  roleId: number;
+  isEmailConfirmed: boolean;
+  isActive: boolean;
+  lastLoginDate?: string | null;
+  fullName: string;
+  accountType: string;
+  b2bBuyerId?: number | null;
+  b2bCompanyId?: number | null;
+  b2bCompanyName?: string | null;
+  b2bCompanyCode?: string | null;
+  b2bBuyerRoleCode?: string | null;
+  b2bOrderLimit?: number | null;
+  b2bRequiresApproval: boolean;
+}
+
+export interface CreateUserManagementDto {
+  username: string;
+  email: string;
+  password?: string;
+  newPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  roleId: number;
+  isActive: boolean;
+  permissionGroupIds: number[];
+  accountType?: string;
+  b2bCompanyId?: number | null;
+  b2bBuyerRoleCode?: string;
+  b2bOrderLimit?: number | null;
+  b2bRequiresApproval?: boolean;
+}
+
+export interface UpdateUserManagementDto {
+  email?: string;
+  newPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  roleId?: number;
+  isActive?: boolean;
+  permissionGroupIds?: number[];
+  accountType?: string;
+  b2bCompanyId?: number | null;
+  b2bBuyerRoleCode?: string;
+  b2bOrderLimit?: number | null;
+  b2bRequiresApproval?: boolean;
+}
+
 export interface CreatePermissionGroupDto {
   name: string;
   description?: string;

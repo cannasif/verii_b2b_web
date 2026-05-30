@@ -3,6 +3,7 @@ import { lazyNamed, withRoute } from '../route-utils';
 
 const PermissionDefinitionsPage = lazyNamed(() => import('@/features/access-control'), 'PermissionDefinitionsPage');
 const PermissionGroupsPage = lazyNamed(() => import('@/features/access-control'), 'PermissionGroupsPage');
+const UserManagementPage = lazyNamed(() => import('@/features/access-control'), 'UserManagementPage');
 const UserGroupAssignmentsPage = lazyNamed(() => import('@/features/access-control'), 'UserGroupAssignmentsPage');
 const WmsScopePoliciesPage = lazyNamed(() => import('@/features/access-control'), 'WmsScopePoliciesPage');
 const WmsScopeAssignmentsPage = lazyNamed(() => import('@/features/access-control'), 'WmsScopeAssignmentsPage');
@@ -32,6 +33,13 @@ export const adminChildRoutes: RouteObject[] = [
   {
     path: 'access-control',
     children: [
+      {
+        path: 'users',
+        element: withRoute(UserManagementPage, {
+          routeName: 'access-control-user-management',
+          namespaces: ['access-control'],
+        }),
+      },
       {
         path: 'permission-definitions',
         element: withRoute(PermissionDefinitionsPage, {
