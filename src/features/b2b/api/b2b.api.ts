@@ -22,6 +22,8 @@ import type {
   MarketplaceCapabilityDto,
   MarketplaceChannelDto,
   MarketplaceListingDto,
+  MarketplaceConnectionTestRequestDto,
+  MarketplaceConnectionTestResultDto,
   MarketplaceProviderSettingDto,
   MarketplaceSyncEventDto,
   OrderDto,
@@ -541,7 +543,33 @@ export const b2bApi = {
   },
 
   async queueMarketplaceProviderOperation(provider: string, operation: 'product-create' | 'price-update' | 'stock-update' | 'order-import', payload: Record<string, unknown>): Promise<MarketplaceSyncEventDto> {
-    const response = await api.post<ApiResponse<MarketplaceSyncEventDto>>(`/api/b2b/marketplaces/${provider}/${operation}`, payload);
+    const route = normalizeProviderRoute(provider);
+    const response = await api.post<ApiResponse<MarketplaceSyncEventDto>>(`/api/b2b/marketplaces/${route}/${operation}`, payload);
+    return extractData(response);
+  },
+
+  async testMarketplaceConnection(payload: MarketplaceConnectionTestRequestDto): Promise<MarketplaceConnectionTestResultDto> {
+    const response = await api.post<ApiResponse<MarketplaceConnectionTestResultDto>>('/api/b2b/marketplaces/connection-test', payload);
     return extractData(response);
   },
 };
+
+function normalizeProviderRoute(providerKey: string): string {
+  const routeMap: Record<string, string> = {
+    AdobeCommerce: 'adobe-commerce',
+    Ciceksepeti: 'ciceksepeti',
+    PttAvm: 'pttavm',
+    WooCommerce: 'woocommerce',
+  };
+
+  if (routeMap[providerKey]) {
+    return routeMap[providerKey];
+  }
+
+  return providerKey
+    .normalize('NFD')
+    .replace(/[\\u0300-\\u036f]/g, '')
+    .replace(/([A-Z])/g, '-$1')
+    .replace(/^-/, '')
+    .toLowerCase();
+}

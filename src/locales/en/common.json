@@ -4851,7 +4851,21 @@
     },
     "advancedJson": {
       "title": "Advanced JSON mode",
-      "description": "Use this to paste the provider credential JSON exactly as documented."
+      "description": "Use this to paste the provider credential JSON exactly as documented.",
+      "placeholder": "{\"apiKey\":\"...\",\"apiSecret\":\"...\"}"
+    },
+    "requiredField": "Field {{index}}",
+    "defaultStep": "Step {{index}}",
+    "defaultWarning": "Production integration should be carefully validated because extra configuration requirements can be provider-specific.",
+    "actions": {
+      "testConnection": "Test connection"
+    },
+    "connectionStatus": {
+      "unknown": "Status unknown",
+      "not-tested": "Not tested yet",
+      "testing": "Testing",
+      "success": "Connection successful",
+      "failed": "Connection failed"
     },
     "operations": {
       "product": {
@@ -4873,7 +4887,9 @@
     },
     "toasts": {
       "saved": "Integration settings saved.",
-      "saveFailed": "Integration settings could not be saved."
+      "saveFailed": "Integration settings could not be saved.",
+      "connectionTestSuccess": "Connection test succeeded.",
+      "connectionTestFailed": "Connection test failed."
     },
     "errors": {
       "providerNotFound": "Provider settings could not be found."
@@ -5366,10 +5382,15 @@
       "queued": "Operation queued.",
       "queueFailed": "Operation could not be queued."
     },
+    "messages": {
+      "connectionBlocked": "Connection test failed for this channel. Run Test Connection first, then retry the operation."
+    },
     "errors": {
       "noAction": "No action selected.",
       "providerMissing": "Marketplace provider could not be resolved.",
-      "targetChannelRequired": "Please select a target channel."
+      "targetChannelRequired": "Please select a target channel.",
+      "channelRequired": "A channel must be selected before queueing this operation.",
+      "connectionTestFailed": "Marketplace connection test failed. Please verify integration settings first."
     }
   }
 }

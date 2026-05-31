@@ -33,6 +33,14 @@ type MarketplaceAction = 'product-create' | 'price-update' | 'stock-update' | 'c
 type QuickOperation = 'price-update' | 'stock-update';
 type ListingFilter = 'all' | 'published' | 'pending' | 'failed' | 'needs-action';
 
+type ConnectionCheckStatus = 'unknown' | 'testing' | 'success' | 'failed';
+
+type ChannelConnectionState = {
+  status: ConnectionCheckStatus;
+  message?: string;
+  testedAt?: number;
+};
+
 type ActionState = {
   type: MarketplaceAction;
   listing: MarketplaceListingDto;
@@ -82,6 +90,7 @@ export function B2bMarketplaceListingsPage(): ReactElement {
   const [targetChannelId, setTargetChannelId] = useState('');
   const [listingFilter, setListingFilter] = useState<ListingFilter>('all');
   const [quickValues, setQuickValues] = useState<Record<number, { price: string; quantity: string; currencyCode: string }>>({});
+  const [channelConnectionStates, setChannelConnectionStates] = useState<Record<number, ChannelConnectionState>>({});
 
   const channelsQuery = useQuery({
     queryKey: ['b2b-marketplace-workbench', 'channels'],
@@ -123,6 +132,7 @@ export function B2bMarketplaceListingsPage(): ReactElement {
   const pendingEventCount = (eventsQuery.data?.data ?? []).filter((event) => normalize(event.status).includes('pending')).length;
   const failedListingCount = listings.filter((item) => normalize(item.status).includes('fail')).length;
   const missingPriceCount = listings.filter((item) => item.lastPushedPrice == null).length;
+  const isChannelBlockedByConnection = (channelId: number): boolean => channelConnectionStates[channelId]?.status === 'failed';
   const latestEvents = eventsQuery.data?.data ?? [];
   const listingFilterOptions: Array<{ key: ListingFilter; label: string; count: number; icon: ReactElement }> = [
     { key: 'all', label: t('marketplaceWorkbench.filters.all'), count: listings.length, icon: <ShoppingBag className="size-4" /> },
@@ -142,6 +152,7 @@ export function B2bMarketplaceListingsPage(): ReactElement {
       if (action.type === 'clone-to-channel') {
         const target = channels.find((channel) => String(channel.id) === targetChannelId);
         if (!target) throw new Error(t('marketplaceWorkbench.errors.targetChannelRequired'));
+        await ensureChannelConnection(target.id, target.providerKey);
         const created = await b2bApi.upsertMarketplaceListing({
           channelId: target.id,
           catalogProductId: listing.catalogProductId,
@@ -163,6 +174,8 @@ export function B2bMarketplaceListingsPage(): ReactElement {
           currencyCode: listing.currencyCode || currencyCode,
         });
       }
+
+      await ensureChannelConnection(listing.channelId, provider);
 
       const payload: Record<string, unknown> = {
         listingId: listing.id,
@@ -189,6 +202,7 @@ export function B2bMarketplaceListingsPage(): ReactElement {
     mutationFn: async ({ listing, type, override }: { listing: MarketplaceListingDto; type: QuickOperation; override?: Partial<{ price: string; quantity: string; currencyCode: string }> }) => {
       const provider = listing.providerKey || channels.find((channel) => channel.id === listing.channelId)?.providerKey;
       if (!provider) throw new Error(t('marketplaceWorkbench.errors.providerMissing'));
+      await ensureChannelConnection(listing.channelId, provider);
       const defaults = {
         price: listing.lastPushedPrice != null ? String(listing.lastPushedPrice) : '',
         quantity: listing.lastPushedQuantity != null ? String(listing.lastPushedQuantity) : '',
@@ -235,6 +249,62 @@ export function B2bMarketplaceListingsPage(): ReactElement {
       quantity: listing.lastPushedQuantity != null ? String(listing.lastPushedQuantity) : '',
       currencyCode: listing.currencyCode || 'TRY',
     };
+  }
+
+  async function ensureChannelConnection(channelId: number, providerKey: string): Promise<void> {
+    const cached = channelConnectionStates[channelId];
+    if (cached?.status === 'success' && cached.testedAt && Date.now() - cached.testedAt < 120000) {
+      return;
+    }
+
+    setChannelConnectionStates((current) => ({
+      ...current,
+      [channelId]: {
+        status: 'testing',
+        message: current[channelId]?.message,
+        testedAt: current[channelId]?.testedAt,
+      },
+    }));
+
+    try {
+      const result = await b2bApi.testMarketplaceConnection({
+        providerKey,
+        channelId,
+      });
+
+      if (!result.isSuccessful) {
+        setChannelConnectionStates((current) => ({
+          ...current,
+          [channelId]: {
+            status: 'failed',
+            message: result.message,
+            testedAt: Date.now(),
+          },
+        }));
+        throw new Error(result.message || t('marketplaceWorkbench.errors.connectionTestFailed'));
+      }
+
+      setChannelConnectionStates((current) => ({
+        ...current,
+        [channelId]: {
+          status: 'success',
+          message: result.message,
+          testedAt: Date.now(),
+        },
+      }));
+    }
+    catch (error) {
+      const message = error instanceof Error ? error.message : t('marketplaceWorkbench.errors.connectionTestFailed');
+      setChannelConnectionStates((current) => ({
+        ...current,
+        [channelId]: {
+          status: 'failed',
+          message,
+          testedAt: Date.now(),
+        },
+      }));
+      throw new Error(message);
+    }
   }
 
   function updateQuickValue(listing: MarketplaceListingDto, key: 'price' | 'quantity' | 'currencyCode', value: string): void {
@@ -413,7 +483,7 @@ export function B2bMarketplaceListingsPage(): ReactElement {
                       <Button
                         variant="outline"
                         onClick={() => quickMutation.mutate({ listing, type: 'price-update' })}
-                        disabled={quickMutation.isPending}
+                        disabled={quickMutation.isPending || isChannelBlockedByConnection(listing.channelId)}
                       >
                         <Tag className="mr-2 size-4" />
                         {t('marketplaceWorkbench.quick.queuePrice')}
@@ -421,11 +491,16 @@ export function B2bMarketplaceListingsPage(): ReactElement {
                       <Button
                         variant="outline"
                         onClick={() => quickMutation.mutate({ listing, type: 'stock-update' })}
-                        disabled={quickMutation.isPending}
+                        disabled={quickMutation.isPending || isChannelBlockedByConnection(listing.channelId)}
                       >
                         <Warehouse className="mr-2 size-4" />
                         {t('marketplaceWorkbench.quick.queueStock')}
                       </Button>
+                      {isChannelBlockedByConnection(listing.channelId) ? (
+                        <p className="md:col-span-3 text-xs font-semibold text-red-600 dark:text-red-300">
+                          {t('marketplaceWorkbench.messages.connectionBlocked')}
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                   {listing.errorMessage ? (
@@ -438,26 +513,50 @@ export function B2bMarketplaceListingsPage(): ReactElement {
                 <div className="border-t border-slate-200 bg-slate-50 p-5 dark:border-white/10 dark:bg-white/[0.03] xl:border-l xl:border-t-0">
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{t('marketplaceWorkbench.actions.title')}</p>
                   <div className="mt-3 grid gap-2">
-                    <Button variant="outline" className="justify-between" onClick={() => openAction('price-update', listing)}>
+                    <Button
+                      variant="outline"
+                      className="justify-between"
+                      onClick={() => openAction('price-update', listing)}
+                      disabled={isChannelBlockedByConnection(listing.channelId)}
+                    >
                       {t('marketplaceWorkbench.actions.updatePrice')}
                       <ArrowRight className="size-4" />
                     </Button>
-                    <Button variant="outline" className="justify-between" onClick={() => openAction('stock-update', listing)}>
+                    <Button
+                      variant="outline"
+                      className="justify-between"
+                      onClick={() => openAction('stock-update', listing)}
+                      disabled={isChannelBlockedByConnection(listing.channelId)}
+                    >
                       {t('marketplaceWorkbench.actions.updateStock')}
                       <ArrowRight className="size-4" />
                     </Button>
-                    <Button variant="outline" className="justify-between" onClick={() => openAction('product-create', listing)}>
+                    <Button
+                      variant="outline"
+                      className="justify-between"
+                      onClick={() => openAction('product-create', listing)}
+                      disabled={isChannelBlockedByConnection(listing.channelId)}
+                    >
                       <span className="flex items-center gap-2"><PlusCircle className="size-4" />{t('marketplaceWorkbench.actions.publishSameChannel')}</span>
                       <ArrowRight className="size-4" />
                     </Button>
-                    <Button className="justify-between" onClick={() => openAction('clone-to-channel', listing)}>
+                    <Button
+                      className="justify-between"
+                      onClick={() => openAction('clone-to-channel', listing)}
+                      disabled={isChannelBlockedByConnection(listing.channelId)}
+                    >
                       <span className="flex items-center gap-2"><Send className="size-4" />{t('marketplaceWorkbench.actions.publishAnotherChannel')}</span>
                       <ArrowRight className="size-4" />
                     </Button>
-                    <Button variant="secondary" className="justify-between" onClick={() => {
+                    <Button
+                      variant="secondary"
+                      className="justify-between"
+                      onClick={() => {
                       updateQuickValue(listing, 'quantity', '0');
                       quickMutation.mutate({ listing, type: 'stock-update', override: { quantity: '0' } });
-                    }}>
+                      }}
+                      disabled={quickMutation.isPending || isChannelBlockedByConnection(listing.channelId)}
+                    >
                       {t('marketplaceWorkbench.actions.removeFromSale')}
                       <ArrowRight className="size-4" />
                     </Button>
@@ -522,7 +621,10 @@ export function B2bMarketplaceListingsPage(): ReactElement {
           ) : null}
           <DialogFooter>
             <Button variant="outline" onClick={closeAction}>{t('common.cancel')}</Button>
-            <Button onClick={() => operationMutation.mutate()} disabled={operationMutation.isPending}>
+            <Button
+              onClick={() => operationMutation.mutate()}
+              disabled={operationMutation.isPending || !action || isChannelBlockedByConnection(action.listing.channelId)}
+            >
               {operationMutation.isPending ? t('common.processing') : t('marketplaceWorkbench.dialog.queue')}
             </Button>
           </DialogFooter>

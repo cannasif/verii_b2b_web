@@ -71,6 +71,27 @@ export interface MarketplaceProviderSettingDto {
   channel?: MarketplaceChannelDto;
 }
 
+export interface MarketplaceConnectionTestRequestDto {
+  providerKey: string;
+  channelId?: number;
+  sellerId?: string;
+  apiBaseUrl?: string;
+  authType?: string;
+  credentialsJson?: string;
+}
+
+export interface MarketplaceConnectionTestResultDto {
+  providerKey: string;
+  status: string;
+  isSuccessful: boolean;
+  message?: string;
+  details?: string;
+  httpStatusCode?: number;
+  endpoint?: string;
+  errorCode?: string;
+  testedAt?: string;
+}
+
 export interface MarketplaceListingDto {
   id: number;
   channelId: number;

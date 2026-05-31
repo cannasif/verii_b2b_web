@@ -4851,7 +4851,21 @@
     },
     "advancedJson": {
       "title": "Gelişmiş JSON modu",
-      "description": "Provider dokümanındaki credential JSON’unu birebir yapıştırmak için kullanın."
+      "description": "Provider dokümanındaki credential JSON’unu birebir yapıştırmak için kullanın.",
+      "placeholder": "{\"apiKey\":\"...\",\"apiSecret\":\"...\"}"
+    },
+    "requiredField": "Alan {{index}}",
+    "defaultStep": "Adım {{index}}",
+    "defaultWarning": "Ek ayar gereksinimleri nedeniyle üretim bağlantısı dikkatle doğrulanmalıdır.",
+    "actions": {
+      "testConnection": "Bağlantıyı Test Et"
+    },
+    "connectionStatus": {
+      "unknown": "Durum bilinmiyor",
+      "not-tested": "Henüz test edilmedi",
+      "testing": "Test yapılıyor",
+      "success": "Bağlantı başarılı",
+      "failed": "Bağlantı başarısız"
     },
     "operations": {
       "product": {
@@ -4873,7 +4887,9 @@
     },
     "toasts": {
       "saved": "Entegrasyon ayarları kaydedildi.",
-      "saveFailed": "Entegrasyon ayarları kaydedilemedi."
+      "saveFailed": "Entegrasyon ayarları kaydedilemedi.",
+      "connectionTestSuccess": "Bağlantı testi başarılı.",
+      "connectionTestFailed": "Bağlantı testi başarısız oldu."
     },
     "errors": {
       "providerNotFound": "Provider ayarı bulunamadı."
@@ -5366,10 +5382,15 @@
       "queued": "İşlem kuyruğa alındı.",
       "queueFailed": "İşlem kuyruğa alınamadı."
     },
+    "messages": {
+      "connectionBlocked": "Bu kanal için son bağlantı testi başarısız. İşleme geçmek için önce 'Bağlantıyı Test Et' ile doğrulayın."
+    },
     "errors": {
       "noAction": "İşlem seçilmedi.",
       "providerMissing": "Pazaryeri sağlayıcısı bulunamadı.",
-      "targetChannelRequired": "Hedef kanal seçmelisiniz."
+      "targetChannelRequired": "Hedef kanal seçmelisiniz.",
+      "channelRequired": "Önce kanal seçimi yapılmalı.",
+      "connectionTestFailed": "Pazaryeri bağlantı testi başarısız oldu. Lütfen önce ayarları gözden geçirin."
     }
   }
 }

@@ -1,7 +1,7 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { BookOpenCheck, CheckCircle2, ExternalLink, KeyRound, Settings2, Store, TriangleAlert } from 'lucide-react';
+import { BookOpenCheck, CheckCircle2, ExternalLink, KeyRound, RefreshCcw, Settings2, Store, TriangleAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,10 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { b2bApi } from '../api/b2b.api';
-import type { MarketplaceProviderSettingDto } from '../types/b2b.types';
+import type {
+  MarketplaceConnectionTestResultDto,
+  MarketplaceProviderSettingDto,
+} from '../types/b2b.types';
 
 type ProviderFormState = {
   channelId?: number;
@@ -36,11 +39,11 @@ type ProviderGuideDefinition = {
   requiredCount: number;
   stepCount: number;
   requiredLabels?: string[];
-  defaultSteps?: string[];
   links: Array<{ label: string; href: string }>;
   hasWarning?: boolean;
   connectionModeHelp?: string;
-  connectionChecklist?: string[];
+  defaultSteps?: string[];
+  warning?: string;
 };
 
 type ProviderDefinitionMap = Record<string, ProviderGuideDefinition>;
@@ -49,12 +52,6 @@ const providerGuides: ProviderDefinitionMap = {
   Trendyol: {
     requiredCount: 5,
     stepCount: 4,
-    connectionChecklist: [
-      'Satıcı panelindeki “Entegrasyon Bilgileri” ekranından Supplier ID ve API Key/Secret alın.',
-      'API çağrılarında Seller ve ürün senkronu için doğru ortam URL (prod/sandbox) seçin.',
-      'Katalog eşleşmesi olmadan yayına alınmış satış kalemi göndermeyin.',
-      'Canlıya geçmeden önce test ürünleriyle ürün, fiyat ve stok akışını birer kez koşun.',
-    ],
     links: [
       { label: 'authorization', href: 'https://developers.trendyol.com/tr/docs/2-authorization' },
       { label: 'developer', href: 'https://developers.trendyol.com/' },
@@ -63,12 +60,6 @@ const providerGuides: ProviderDefinitionMap = {
   Hepsiburada: {
     requiredCount: 5,
     stepCount: 4,
-    connectionChecklist: [
-      'Developer/mağaza panelinde uygulama kaydını ve API erişim tipini doğrulayın.',
-      'Merchant ID, API Key ve secret bilgilerini doğrulayın; test ortamını ayrı saklayın.',
-      'Entegrasyon yetkisi verilen hesapla sipariş ve ürün API’lerine erişim test edin.',
-      'Gerekliyse webhook/push callback URL yapılandırmasını tamamlayın.',
-    ],
     links: [
       { label: 'gettingStarted', href: 'https://developers.hepsiburada.com/hepsiburada/docs/getting-started' },
       { label: 'developer', href: 'https://developers.hepsiburada.com/' },
@@ -119,12 +110,6 @@ const providerGuides: ProviderDefinitionMap = {
   Ebay: {
     requiredCount: 3,
     stepCount: 5,
-    connectionChecklist: [
-      'Üretimden önce eBay Developer account ile OAuth token akışını tamamlayın.',
-      'Kullanacağınız Marketplace ID ve seller context değerini doğrulayın (örn. EBAY_US).',
-      'Inventory item + offer + publish akışını sırasıyla tamamlayın.',
-      'Kategori ve policy eksikliği ürün yayınını reddeder; öncelikle katalog atamalarını kontrol edin.',
-    ],
     links: [
       { label: 'inventoryApi', href: 'https://developer.ebay.com/api-docs/sell/inventory/overview.html' },
       { label: 'bulkPriceQuantity', href: 'https://developer.ebay.com/api-docs/sell/inventory/resources/methods' },
@@ -161,13 +146,6 @@ const providerGuides: ProviderDefinitionMap = {
   Amazon: {
     requiredCount: 7,
     stepCount: 5,
-    connectionChecklist: [
-      'Seller Central’da SP-API uygulamasını kaydedin ve LWA client id/secret oluşturun.',
-      'Satıcınız için authorization akışını tamamlayıp refresh token alın.',
-      'AWS IAM erişimi ve Signature V4 için erişim anahtarlarını ekleyin.',
-      'Marketplace ID + region eşleşmesini seçin (ör. EU için bölge uygunluğu).',
-      'Ürünü açmadan önce Listing SKU ve ürün-ürün varyant eşlemesini kontrol edin.',
-    ],
     links: [
       { label: 'registration', href: 'https://developer-docs.amazon.com/sp-api/docs/sp-api-registration-overview' },
       { label: 'marketplaceIds', href: 'https://developer-docs.amazon.com/sp-api/docs/marketplace-ids' },
@@ -185,14 +163,18 @@ const providerGuides: ProviderDefinitionMap = {
   },
 };
 
-const fallbackStepLabels = [
-  'Sağlayıcı hesabınızın API erişim ve yetki ayarlarını tamamlayın.',
-  'API bilgilerini ve kanal kodlarını kimlik bilgileri alanına girin.',
-  'Operasyon izinlerini (ürün, fiyat, stok, sipariş) gerekiyorsa aktif edin.',
-  'Kanalı kaydedip test akışıyla bağlantıyı doğrulayın.',
-];
+type ConnectionStatus = 'unknown' | 'not-tested' | 'testing' | 'success' | 'failed';
 
-const fallbackRequiredLabel = 'Zorunlu alan';
+type ProviderConnectionState = {
+  status: ConnectionStatus;
+  result?: MarketplaceConnectionTestResultDto;
+};
+
+type ProviderConnectionStateMap = Record<string, ProviderConnectionState>;
+
+function toConnectionStateKey(providerKey: string, channelId?: number | null): string {
+  return `${providerKey.toLowerCase()}:${channelId ?? 'new'}`;
+}
 
 const authTypeLabels = {
   Basic: 'Basic Auth',
@@ -215,9 +197,7 @@ function createFallbackGuide(setting: MarketplaceProviderSettingDto): ProviderGu
     requiredCount: requiredLabels.length > 0 ? requiredLabels.length : 1,
     stepCount: 4,
     requiredLabels,
-    defaultSteps: fallbackStepLabels,
     links: [{ label: 'documentation', href: setting.documentationUrl }],
-    connectionChecklist: setting.credentialFields.length > 0 ? setting.credentialFields.map((field) => field.label) : undefined,
   };
 }
 
@@ -228,7 +208,7 @@ function createFallbackProviderSetting(providerKey: string): MarketplaceProvider
     defaultAuthType: 'ApiKey',
     supportedAuthTypes: ['ApiKey', 'OAuth', 'Basic'],
     documentationUrl: providerGuides[providerKey]?.links?.[0]?.href || '',
-    setupSummary: 'Sağlayıcı API alanları backend’de tanımlı olduğunda otomatik gelir.',
+    setupSummary: '',
     supportsProductCreate: true,
     supportsPriceUpdate: true,
     supportsStockUpdate: true,
@@ -240,7 +220,6 @@ function createFallbackProviderSetting(providerKey: string): MarketplaceProvider
         type: 'password',
         required: true,
         placeholder: 'API_KEY',
-        helpText: 'Sağlayıcı hesabınızdan aldığınız API anahtarını girin.',
       },
     ],
   };
@@ -267,22 +246,13 @@ function resolveChecklistItems(
   selectedProviderKey: string,
   guide: ProviderGuideDefinition,
   t: (key: string, options?: Record<string, unknown>) => string,
-  fallback: string[],
 ): string[] {
   const localized = getGuideList(
     t,
     `marketplaceSettings.guides.${selectedProviderKey}.connectionChecklist`,
-    [],
+    guide.requiredLabels ?? [],
   );
-  if (localized.length > 0) {
-    return localized;
-  }
-
-  if (guide.connectionChecklist?.length) {
-    return guide.connectionChecklist;
-  }
-
-  return fallback;
+  return localized;
 }
 
 function humanizeLinkLabel(label: string): string {
@@ -296,7 +266,7 @@ function createDefaultState(setting?: MarketplaceProviderSettingDto): ProviderFo
 
   return {
     channelId: channel?.id,
-    code: channel?.code || `${provider}-ANA-MAGAZA`.toUpperCase(),
+    code: channel?.code || `${provider}-MAIN-STORE`.toUpperCase(),
     name: channel?.name || `${setting?.name || provider} Main Store`,
     sellerId: channel?.sellerId || '',
     apiBaseUrl: channel?.apiBaseUrl || '',
@@ -349,11 +319,28 @@ function buildDisplaySettings(settings: MarketplaceProviderSettingDto[]): Market
   return [...merged, ...unknownProviders];
 }
 
+function createRequestPayload(selectedSetting?: MarketplaceProviderSettingDto | null, form?: ProviderFormState) {
+  if (!selectedSetting || !form) return null;
+  return {
+    providerKey: selectedSetting.providerKey,
+    channelId: selectedSetting.channel?.id,
+    sellerId: form.sellerId || undefined,
+    apiBaseUrl: form.apiBaseUrl || undefined,
+    authType: form.authType,
+    credentialsJson: buildCredentialJson(form),
+  };
+}
+
+function getConnectionStatusText(t: (key: string, options?: Record<string, unknown>) => string, status: ConnectionStatus): string {
+  return t(`marketplaceSettings.connectionStatus.${status}`);
+}
+
 export function B2bMarketplaceSettingsPage(): ReactElement {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedProvider, setSelectedProvider] = useState('Trendyol');
   const [form, setForm] = useState<ProviderFormState>(() => createDefaultState());
+  const [providerConnections, setProviderConnections] = useState<ProviderConnectionStateMap>({});
 
   const settingsQuery = useQuery({
     queryKey: ['b2b-marketplaces', 'settings'],
@@ -373,6 +360,11 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
   }, [selectedSetting]);
   const selectedProviderKey = selectedSetting?.providerKey ?? selectedProvider;
   const selectedAuthTypes = useMemo(() => resolveAuthTypes(selectedSetting), [selectedSetting]);
+  const selectedConnectionStateKey = useMemo(
+    () => toConnectionStateKey(selectedProviderKey, selectedSetting?.channel?.id),
+    [selectedProviderKey, selectedSetting?.channel?.id],
+  );
+  const selectedConnectionState = providerConnections[selectedConnectionStateKey] ?? { status: 'not-tested' as ConnectionStatus };
 
   useEffect(() => {
     if (!selectedSetting) return;
@@ -416,6 +408,49 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
     onError: (error: Error) => toast.error(error.message || t('marketplaceSettings.toasts.saveFailed')),
   });
 
+  const testConnectionMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedSetting) throw new Error(t('marketplaceSettings.errors.providerNotFound'));
+      const payload = createRequestPayload(selectedSetting, form);
+      if (!payload) throw new Error(t('marketplaceSettings.errors.providerNotFound'));
+      const response = await b2bApi.testMarketplaceConnection(payload);
+      return response;
+    },
+    onMutate: () => {
+      setProviderConnections((current) => ({
+        ...current,
+        [selectedConnectionStateKey]: { status: 'testing' },
+      }));
+    },
+    onSuccess: (result) => {
+      setProviderConnections((current) => ({
+        ...current,
+        [selectedConnectionStateKey]: { status: result.isSuccessful ? 'success' : 'failed', result },
+      }));
+      if (result.isSuccessful) {
+        toast.success(t('marketplaceSettings.toasts.connectionTestSuccess'));
+      } else {
+        toast.error(result.message || t('marketplaceSettings.toasts.connectionTestFailed'));
+      }
+    },
+    onError: (error: Error) => {
+      setProviderConnections((current) => ({
+        ...current,
+        [selectedConnectionStateKey]: {
+          status: 'failed',
+          result: {
+            providerKey: selectedProviderKey,
+            status: 'failed',
+            isSuccessful: false,
+            message: error.message,
+            testedAt: new Date().toISOString(),
+          },
+        },
+      }));
+      toast.error(error.message || t('marketplaceSettings.toasts.connectionTestFailed'));
+    },
+  });
+
   function update<K extends keyof ProviderFormState>(key: K, value: ProviderFormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
   }
@@ -441,9 +476,22 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
             {t('marketplaceSettings.subtitle')}
           </p>
         </div>
-        <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending || !selectedSetting}>
-          {saveMutation.isPending ? t('common.saving') : t('marketplaceSettings.saveButton')}
-        </Button>
+        <div className="flex flex-wrap justify-end gap-2">
+          <Badge variant="outline" className="rounded-full">
+            {getConnectionStatusText(t, selectedConnectionState.status)}
+          </Badge>
+          <Button
+            variant="outline"
+            onClick={() => testConnectionMutation.mutate()}
+            disabled={testConnectionMutation.isPending || !selectedSetting}
+          >
+            <RefreshCcw className={`mr-2 size-4 ${testConnectionMutation.isPending ? 'animate-spin' : ''}`} />
+            {t('marketplaceSettings.actions.testConnection')}
+          </Button>
+          <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending || !selectedSetting}>
+            {saveMutation.isPending ? t('common.saving') : t('marketplaceSettings.saveButton')}
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[380px_minmax(0,1fr)]">
@@ -518,17 +566,17 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                             {getGuideText(
                               t,
                               `marketplaceSettings.guides.${selectedProviderKey}.steps.${index}`,
-                              selectedGuide?.defaultSteps?.[index] ?? `Adım ${index + 1}`,
+                              selectedGuide?.defaultSteps?.[index] ?? t('marketplaceSettings.defaultStep', { index: index + 1 }),
                             )}
                           </span>
                         </li>
                       ))}
                     </ol>
-                    {resolveChecklistItems(selectedProviderKey, selectedGuide, t, []).length > 0 ? (
+                    {resolveChecklistItems(selectedProviderKey, selectedGuide, t).length > 0 ? (
                       <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-950/30 dark:text-emerald-100">
                         <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">{t('marketplaceSettings.connectionChecklist')}</p>
                         <ul className="mt-3 space-y-2">
-                          {resolveChecklistItems(selectedProviderKey, selectedGuide, t, []).map((item) => (
+                          {resolveChecklistItems(selectedProviderKey, selectedGuide, t).map((item) => (
                             <li key={`${selectedProviderKey}-check-${item}`} className="ml-4 list-disc">
                               {item}
                             </li>
@@ -550,7 +598,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                         {getGuideText(
                           t,
                           `marketplaceSettings.guides.${selectedProviderKey}.warning`,
-                          'Ek ayar gereksinimleri nedeniyle üretim bağlantısı dikkatle doğrulanmalıdır.',
+                          t('marketplaceSettings.defaultWarning'),
                         )}
                       </div>
                     ) : null}
@@ -560,7 +608,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                       <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('marketplaceSettings.requiredInfo')}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {Array.from({ length: selectedGuide.requiredCount }, (_, index) => {
-                          const fallback = selectedSetting?.credentialFields[index]?.label ?? `${fallbackRequiredLabel} ${index + 1}`;
+                          const fallback = selectedSetting?.credentialFields[index]?.label ?? t('marketplaceSettings.requiredField', { index: index + 1 });
                           const label = getGuideText(
                             t,
                             `marketplaceSettings.guides.${selectedProviderKey}.required.${index}`,
@@ -667,7 +715,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                     <Textarea
                       value={form.credentialsJson}
                       onChange={(event) => update('credentialsJson', event.target.value)}
-                      placeholder='{"apiKey":"...","apiSecret":"..."}'
+                      placeholder={t('marketplaceSettings.advancedJson.placeholder')}
                       className="min-h-40 font-mono text-xs"
                     />
                   ) : (
