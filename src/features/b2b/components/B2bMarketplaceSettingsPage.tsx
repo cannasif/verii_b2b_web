@@ -35,11 +35,15 @@ type ProviderFormState = {
 type ProviderGuideDefinition = {
   requiredCount: number;
   stepCount: number;
+  requiredLabels?: string[];
+  defaultSteps?: string[];
   links: Array<{ label: string; href: string }>;
   hasWarning?: boolean;
 };
 
-const providerGuides: Record<string, ProviderGuideDefinition> = {
+type ProviderDefinitionMap = Record<string, ProviderGuideDefinition>;
+
+const providerGuides: ProviderDefinitionMap = {
   Trendyol: {
     requiredCount: 5,
     stepCount: 4,
@@ -154,6 +158,59 @@ const providerGuides: Record<string, ProviderGuideDefinition> = {
   },
 };
 
+const fallbackStepLabels = [
+  'Sağlayıcı hesabınızın API erişim ve yetki ayarlarını tamamlayın.',
+  'API bilgilerini ve kanal kodlarını kimlik bilgileri alanına girin.',
+  'Operasyon izinlerini (ürün, fiyat, stok, sipariş) gerekiyorsa aktif edin.',
+  'Kanalı kaydedip test akışıyla bağlantıyı doğrulayın.',
+];
+
+const fallbackRequiredLabel = 'Zorunlu alan';
+
+function createFallbackGuide(setting: MarketplaceProviderSettingDto): ProviderGuideDefinition {
+  const requiredLabels = setting.credentialFields.filter((field) => field.required).map((field) => field.label);
+
+  return {
+    requiredCount: requiredLabels.length > 0 ? requiredLabels.length : 1,
+    stepCount: 4,
+    requiredLabels,
+    defaultSteps: fallbackStepLabels,
+    links: [{ label: 'documentation', href: setting.documentationUrl }],
+  };
+}
+
+function createFallbackProviderSetting(providerKey: string): MarketplaceProviderSettingDto {
+  return {
+    providerKey,
+    name: providerKey,
+    defaultAuthType: 'ApiKey',
+    documentationUrl: providerGuides[providerKey]?.links?.[0]?.href || '',
+    setupSummary: 'Sağlayıcı API alanları backend’de tanımlı olduğunda otomatik gelir.',
+    supportsProductCreate: true,
+    supportsPriceUpdate: true,
+    supportsStockUpdate: true,
+    supportsOrderImport: true,
+    credentialFields: [
+      {
+        key: 'apiKey',
+        label: 'API Key',
+        type: 'password',
+        required: true,
+        placeholder: 'API_KEY',
+        helpText: 'Sağlayıcı hesabınızdan aldığınız API anahtarını girin.',
+      },
+    ],
+  };
+}
+
+function getGuideText(t: (key: string, options?: Record<string, unknown>) => string, key: string, fallback: string): string {
+  return t(key, { defaultValue: fallback });
+}
+
+function humanizeLinkLabel(label: string): string {
+  return label.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+}
+
 function createDefaultState(setting?: MarketplaceProviderSettingDto): ProviderFormState {
   const provider = setting?.providerKey || 'Trendyol';
   const channel = setting?.channel;
@@ -192,6 +249,14 @@ function buildCredentialJson(form: ProviderFormState): string | undefined {
   return Object.keys(payload).length > 0 ? JSON.stringify(payload) : undefined;
 }
 
+function buildDisplaySettings(settings: MarketplaceProviderSettingDto[]): MarketplaceProviderSettingDto[] {
+  const settingMap = new Map(settings.map((item) => [item.providerKey.toLowerCase(), item] as const));
+  const orderedProviders = Object.keys(providerGuides);
+  const merged = orderedProviders.map((providerKey) => settingMap.get(providerKey.toLowerCase()) ?? createFallbackProviderSetting(providerKey));
+  const unknownProviders = settings.filter((item) => !Object.prototype.hasOwnProperty.call(providerGuides, item.providerKey));
+  return [...merged, ...unknownProviders];
+}
+
 export function B2bMarketplaceSettingsPage(): ReactElement {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -204,11 +269,16 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
   });
 
   const settings = settingsQuery.data ?? [];
+  const displaySettings = useMemo(() => buildDisplaySettings(settings), [settings]);
+
   const selectedSetting = useMemo(
-    () => settings.find((item) => item.providerKey === selectedProvider) ?? settings[0],
-    [selectedProvider, settings],
+    () => displaySettings.find((item) => item.providerKey === selectedProvider) ?? displaySettings[0],
+    [selectedProvider, displaySettings],
   );
-  const selectedGuide = selectedSetting ? providerGuides[selectedSetting.providerKey] : undefined;
+  const selectedGuide = useMemo(() => {
+    if (!selectedSetting) return undefined;
+    return providerGuides[selectedSetting.providerKey] ?? createFallbackGuide(selectedSetting);
+  }, [selectedSetting]);
   const selectedProviderKey = selectedSetting?.providerKey ?? selectedProvider;
 
   useEffect(() => {
@@ -248,7 +318,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
         credentialValues: Object.fromEntries(Object.keys(current.credentialValues).map((key) => [key, ''])),
         credentialsJson: '',
       }));
-      await queryClient.invalidateQueries({ queryKey: ['b2b-marketplaces'] });
+      await queryClient.invalidateQueries({ queryKey: ['b2b-marketplaces', 'settings'] });
     },
     onError: (error: Error) => toast.error(error.message || t('marketplaceSettings.toasts.saveFailed')),
   });
@@ -285,7 +355,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
 
       <div className="grid gap-4 xl:grid-cols-[380px_minmax(0,1fr)]">
         <div className="space-y-3">
-          {settings.map((setting) => {
+          {displaySettings.map((setting) => {
             const selected = setting.providerKey === selectedProvider;
             return (
               <button
@@ -351,13 +421,23 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                       {Array.from({ length: selectedGuide.stepCount }, (_, index) => (
                         <li key={`${selectedProviderKey}-step-${index + 1}`} className="flex gap-3">
                           <span className="grid size-6 shrink-0 place-items-center rounded-full bg-cyan-100 text-xs font-black text-cyan-800 dark:bg-cyan-500/15 dark:text-cyan-200">{index + 1}</span>
-                          <span>{t(`marketplaceSettings.guides.${selectedProviderKey}.steps.${index}`)}</span>
+                          <span>
+                            {getGuideText(
+                              t,
+                              `marketplaceSettings.guides.${selectedProviderKey}.steps.${index}`,
+                              selectedGuide?.defaultSteps?.[index] ?? `Adım ${index + 1}`,
+                            )}
+                          </span>
                         </li>
                       ))}
                     </ol>
                     {selectedGuide.hasWarning ? (
                       <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
-                        {t(`marketplaceSettings.guides.${selectedProviderKey}.warning`)}
+                        {getGuideText(
+                          t,
+                          `marketplaceSettings.guides.${selectedProviderKey}.warning`,
+                          'Ek ayar gereksinimleri nedeniyle üretim bağlantısı dikkatle doğrulanmalıdır.',
+                        )}
                       </div>
                     ) : null}
                   </div>
@@ -365,19 +445,41 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                     <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
                       <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('marketplaceSettings.requiredInfo')}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {Array.from({ length: selectedGuide.requiredCount }, (_, index) => (
-                          <Badge key={`${selectedProviderKey}-required-${index + 1}`} variant="secondary" className="rounded-full">
-                            {t(`marketplaceSettings.guides.${selectedProviderKey}.required.${index}`)}
-                          </Badge>
-                        ))}
+                        {Array.from({ length: selectedGuide.requiredCount }, (_, index) => {
+                          const fallback = selectedSetting?.credentialFields[index]?.label ?? `${fallbackRequiredLabel} ${index + 1}`;
+                          const label = getGuideText(
+                            t,
+                            `marketplaceSettings.guides.${selectedProviderKey}.required.${index}`,
+                            selectedGuide.requiredLabels?.[index] ?? fallback,
+                          );
+
+                          return (
+                            <Badge key={`${selectedProviderKey}-required-${index + 1}`} variant="secondary" className="rounded-full">
+                              {label}
+                            </Badge>
+                          );
+                        })}
                       </div>
+                      {selectedGuide.requiredLabels && selectedGuide.requiredLabels.length > selectedGuide.requiredCount ? (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {selectedGuide.requiredLabels.slice(selectedGuide.requiredCount).map((requiredLabel) => (
+                            <Badge key={`${selectedProviderKey}-required-extra-${requiredLabel}`} variant="outline" className="rounded-full">
+                              {requiredLabel}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
                     <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
                       <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('marketplaceSettings.officialLinks')}</p>
                       <div className="mt-3 grid gap-2">
                         {selectedGuide.links.map((link) => (
                           <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="inline-flex items-center justify-between rounded-2xl border px-3 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-50 dark:border-white/10 dark:text-cyan-300 dark:hover:bg-cyan-500/10">
-                            {t(`marketplaceSettings.guides.${selectedProviderKey}.links.${link.label}`)}
+                            {getGuideText(
+                              t,
+                              `marketplaceSettings.guides.${selectedProviderKey}.links.${link.label}`,
+                              humanizeLinkLabel(link.label),
+                            )}
                             <ExternalLink size={14} />
                           </a>
                         ))}
@@ -448,7 +550,11 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                           onChange={(value) => updateCredential(field.key, value)}
                           placeholder={field.placeholder}
                           type={field.type === 'password' ? 'password' : 'text'}
-                          helpText={t(`marketplaceSettings.guides.${selectedProviderKey}.credentialHelp.${field.key}`, { defaultValue: field.helpText ?? '' })}
+                          helpText={getGuideText(
+                            t,
+                            `marketplaceSettings.guides.${selectedProviderKey}.credentialHelp.${field.key}`,
+                            field.helpText ?? '',
+                          )}
                         />
                       ))}
                     </div>
@@ -476,7 +582,23 @@ function MiniFlag({ active, label }: { active: boolean; label: string }) {
   return <span className={`rounded-full px-2 py-1 text-center ${active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'}`}>{label}</span>;
 }
 
-function LabeledInput({ label, value, onChange, placeholder, disabled, type = 'text', helpText }: { label: string; value: string; onChange: (value: string) => void; placeholder?: string; disabled?: boolean; type?: string; helpText?: string }) {
+function LabeledInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  disabled,
+  type = 'text',
+  helpText,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  type?: string;
+  helpText?: string;
+}) {
   return (
     <div className="space-y-2">
       <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">{label}</label>
@@ -486,7 +608,19 @@ function LabeledInput({ label, value, onChange, placeholder, disabled, type = 't
   );
 }
 
-function SwitchPanel({ label, value, onChange, activeLabel, inactiveLabel }: { label: string; value: boolean; onChange: (value: boolean) => void; activeLabel: string; inactiveLabel: string }) {
+function SwitchPanel({
+  label,
+  value,
+  onChange,
+  activeLabel,
+  inactiveLabel,
+}: {
+  label: string;
+  value: boolean;
+  onChange: (value: boolean) => void;
+  activeLabel: string;
+  inactiveLabel: string;
+}) {
   return (
     <div className="space-y-2">
       <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">{label}</label>
@@ -498,7 +632,17 @@ function SwitchPanel({ label, value, onChange, activeLabel, inactiveLabel }: { l
   );
 }
 
-function OperationCard({ title, description, value, onChange }: { title: string; description: string; value: boolean; onChange: (value: boolean) => void }) {
+function OperationCard({
+  title,
+  description,
+  value,
+  onChange,
+}: {
+  title: string;
+  description: string;
+  value: boolean;
+  onChange: (value: boolean) => void;
+}) {
   return (
     <div className="rounded-3xl border p-4 dark:border-white/10">
       <div className="flex items-start justify-between gap-3">
