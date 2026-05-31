@@ -4956,6 +4956,31 @@
           "appSecret": "n11 REST API erişimi için appKey ile birlikte kullanılan gizli anahtar."
         }
       },
+      "Pazarama": {
+        "title": "Pazarama bilgileri nereden alınır?",
+        "summary": "Pazarama entegrasyonu clientId/clientSecret ile token alır. Ürün, fiyat-stok ve sipariş servisleri satıcı kanalına göre yürütülür.",
+        "required": [
+          "Seller ID",
+          "Client ID",
+          "Client Secret"
+        ],
+        "steps": [
+          "Pazarama satıcı başvurusu ve entegrasyon yetkisini tamamlayın.",
+          "Satıcı paneli veya entegrasyon ekibinden Client ID ve Client Secret bilgisini alın.",
+          "Bu ekranda Satıcı / Mağaza No alanına Seller ID bilgisini, credential alanlarına Client ID ve Client Secret bilgisini girin.",
+          "Ürün/fiyat/stok operasyonlarını kuyruğa alıp job takip ekranından sonucu izleyin."
+        ],
+        "links": {
+          "apiPdf": "API entegrasyon dokümanı",
+          "sellerPanel": "Satıcı başvuru"
+        },
+        "setupSummary": "Pazarama entegrasyonu clientId/clientSecret ile token alır; ürün, fiyat-stok ve sipariş işlemleri satıcı kanalına göre yürütülür.",
+        "credentialHelp": {
+          "sellerId": "Pazarama satıcı/mağaza kimliği. Kanal ve token isteklerinde mağaza bağlamı için kullanılır.",
+          "clientId": "Pazarama entegrasyon başvurusu sonrası verilen client id.",
+          "clientSecret": "Pazarama token alma akışında kullanılan gizli anahtar."
+        }
+      },
       "Amazon": {
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",

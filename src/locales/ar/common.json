@@ -3787,6 +3787,31 @@
           "appSecret": "Secret key used together with appKey for n11 REST API access."
         }
       },
+      "Pazarama": {
+        "title": "Where do I get Pazarama credentials?",
+        "summary": "Pazarama integration obtains a token with clientId/clientSecret. Product, price-stock and order services run in the seller channel context.",
+        "required": [
+          "Seller ID",
+          "Client ID",
+          "Client Secret"
+        ],
+        "steps": [
+          "Complete Pazarama seller application and integration authorization.",
+          "Get Client ID and Client Secret from the seller panel or integration team.",
+          "Enter Seller ID in Seller / Store No and Client ID/Client Secret in credential fields.",
+          "Queue product, price and stock operations and track results from the job screen."
+        ],
+        "links": {
+          "apiPdf": "API integration documentation",
+          "sellerPanel": "Seller application"
+        },
+        "setupSummary": "Pazarama integration obtains a token with clientId/clientSecret; product, price-stock and order operations run by seller channel.",
+        "credentialHelp": {
+          "sellerId": "Pazarama seller/store id. Used as store context in channel and token requests.",
+          "clientId": "Client id provided after Pazarama integration application.",
+          "clientSecret": "Secret key used in the Pazarama token flow."
+        }
+      },
       "Amazon": {
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",

@@ -64,6 +64,14 @@ const providerGuides: Record<string, ProviderGuideDefinition> = {
       { label: 'sellerSupport', href: 'https://magazadestek.n11.com/' },
     ],
   },
+  Pazarama: {
+    requiredCount: 3,
+    stepCount: 4,
+    links: [
+      { label: 'apiPdf', href: 'https://cdn.pazarama.com/asset/entegrasyondokumani/APIEntegrasyonDokumani18.09.2023.pdf' },
+      { label: 'sellerPanel', href: 'https://www.pazarama.com/satici-basvuru' },
+    ],
+  },
   Amazon: {
     requiredCount: 7,
     stepCount: 5,
