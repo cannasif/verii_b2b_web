@@ -4821,6 +4821,7 @@
     "providerSettingsTitle": "{{provider}} settings",
     "officialDocument": "Official documentation",
     "requiredInfo": "Required information",
+    "connectionModes": "Supported connection methods",
     "officialLinks": "Official links",
     "currentSecret": "Current secret: {{secret}}. Existing credentials are preserved if you do not enter a new value.",
     "tabs": {
@@ -4880,6 +4881,7 @@
       "Trendyol": {
         "title": "Where do I get Trendyol credentials?",
         "summary": "Trendyol uses Basic Auth. Supplier ID, API Key and API Secret are used for product, price, stock and order services.",
+        "connectionModeHelp": "Trendyol uses Basic Auth in this integration; Supplier ID and API Key/API Secret must be filled together or authentication fails.",
         "required": [
           "Supplier ID",
           "API Key",
@@ -5061,6 +5063,7 @@
       "Ebay": {
         "title": "Where do I get eBay credentials?",
         "summary": "eBay Sell Inventory API publishes products through inventory item, offer and publish steps. Price and stock use the bulk update price quantity endpoint.",
+        "connectionModeHelp": "Most eBay flows require an OAuth access token with Inventory scope; seller and marketplace context should be sent if the listing uses country-specific marketplaces.",
         "required": [
           "Seller ID",
           "Marketplace ID",
@@ -5174,6 +5177,7 @@
       "Amazon": {
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",
+        "connectionModeHelp": "Amazon SP-API requires LWA OAuth + AWS Signature Version 4 together. Seller ID and region must match the target marketplace before sending requests.",
         "required": [
           "Seller ID",
           "Marketplace ID",

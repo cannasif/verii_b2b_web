@@ -39,6 +39,7 @@ type ProviderGuideDefinition = {
   defaultSteps?: string[];
   links: Array<{ label: string; href: string }>;
   hasWarning?: boolean;
+  connectionModeHelp?: string;
 };
 
 type ProviderDefinitionMap = Record<string, ProviderGuideDefinition>;
@@ -167,6 +168,20 @@ const fallbackStepLabels = [
 
 const fallbackRequiredLabel = 'Zorunlu alan';
 
+const authTypeLabels = {
+  Basic: 'Basic Auth',
+  AppKey: 'App Key',
+  ApiKey: 'API Key',
+  OAuth: 'OAuth 2.0',
+  AccessToken: 'Access Token',
+  Bearer: 'Bearer Token',
+  LWA: 'LWA OAuth',
+  SignatureV4: 'AWS Signature V4',
+  ClientCredentials: 'Client Credentials',
+} as const;
+
+const defaultAuthTypes = ['API Key', 'OAuth 2.0', 'Basic Auth', 'Bearer Token', 'Access Token'];
+
 function createFallbackGuide(setting: MarketplaceProviderSettingDto): ProviderGuideDefinition {
   const requiredLabels = setting.credentialFields.filter((field) => field.required).map((field) => field.label);
 
@@ -184,6 +199,7 @@ function createFallbackProviderSetting(providerKey: string): MarketplaceProvider
     providerKey,
     name: providerKey,
     defaultAuthType: 'ApiKey',
+    supportedAuthTypes: ['ApiKey', 'OAuth', 'Basic'],
     documentationUrl: providerGuides[providerKey]?.links?.[0]?.href || '',
     setupSummary: 'Sağlayıcı API alanları backend’de tanımlı olduğunda otomatik gelir.',
     supportsProductCreate: true,
@@ -235,6 +251,20 @@ function createDefaultState(setting?: MarketplaceProviderSettingDto): ProviderFo
   };
 }
 
+function resolveAuthTypes(setting?: MarketplaceProviderSettingDto): string[] {
+  const supported = setting?.supportedAuthTypes?.length ? setting.supportedAuthTypes : [];
+  if (setting?.defaultAuthType) {
+    const merged = [setting.defaultAuthType, ...supported];
+    return [...new Set(merged)];
+  }
+
+  return [...new Set(supported)];
+}
+
+function formatAuthType(authType: string): string {
+  return authTypeLabels[authType as keyof typeof authTypeLabels] ?? authType;
+}
+
 function buildCredentialJson(form: ProviderFormState): string | undefined {
   if (form.useAdvancedJson) {
     return form.credentialsJson.trim() || undefined;
@@ -280,6 +310,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
     return providerGuides[selectedSetting.providerKey] ?? createFallbackGuide(selectedSetting);
   }, [selectedSetting]);
   const selectedProviderKey = selectedSetting?.providerKey ?? selectedProvider;
+  const selectedAuthTypes = useMemo(() => resolveAuthTypes(selectedSetting), [selectedSetting]);
 
   useEffect(() => {
     if (!selectedSetting) return;
@@ -431,6 +462,15 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                         </li>
                       ))}
                     </ol>
+                    {selectedGuide.connectionModeHelp ? (
+                      <p className="mt-4 rounded-2xl border border-cyan-500/20 bg-cyan-50 p-3 text-sm text-cyan-900 dark:border-cyan-500/40 dark:bg-cyan-950/30 dark:text-cyan-100">
+                        {getGuideText(
+                          t,
+                          `marketplaceSettings.guides.${selectedProviderKey}.connectionModeHelp`,
+                          selectedGuide.connectionModeHelp,
+                        )}
+                      </p>
+                    ) : null}
                     {selectedGuide.hasWarning ? (
                       <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
                         {getGuideText(
@@ -471,6 +511,20 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                       ) : null}
                     </div>
                     <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
+                      <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('marketplaceSettings.connectionModes')}</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {selectedAuthTypes.length > 0 ? (
+                          selectedAuthTypes.map((type) => (
+                            <Badge key={`${selectedProviderKey}-auth-${type}`} variant="outline" className="rounded-full">
+                              {formatAuthType(type)}
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="rounded-full border border-slate-200 px-3 py-1 text-xs dark:border-white/10">{defaultAuthTypes.join(' / ')}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
                       <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('marketplaceSettings.officialLinks')}</p>
                       <div className="mt-3 grid gap-2">
                         {selectedGuide.links.map((link) => (
@@ -507,9 +561,11 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                       <Select value={form.authType} onValueChange={(value) => update('authType', value)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Basic">Basic Auth</SelectItem>
-                          <SelectItem value="ApiKey">API Key</SelectItem>
-                          <SelectItem value="OAuth">OAuth</SelectItem>
+                          {(selectedAuthTypes.length ? selectedAuthTypes : [form.authType]).map((type) => (
+                            <SelectItem key={`${selectedProviderKey}-auth-option-${type}`} value={type}>
+                              {formatAuthType(type)}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>

@@ -4821,6 +4821,7 @@
     "providerSettingsTitle": "{{provider}} ayarları",
     "officialDocument": "Resmi doküman",
     "requiredInfo": "Gerekli bilgiler",
+    "connectionModes": "Desteklenen bağlantı metodları",
     "officialLinks": "Resmi bağlantılar",
     "currentSecret": "Mevcut secret: {{secret}}. Yeni değer girmezseniz mevcut credential korunur.",
     "tabs": {
@@ -4880,6 +4881,7 @@
       "Trendyol": {
         "title": "Trendyol bilgileri nereden alınır?",
         "summary": "Trendyol entegrasyonu Basic Auth ile çalışır. Ürün, fiyat, stok ve sipariş servislerinde Supplier ID ile API Key/API Secret birlikte kullanılır.",
+        "connectionModeHelp": "Trendyol için bu alanda Basic Auth kullanılır; Supplier ID ve API Key/API Secret birlikte girilmezse kimlik doğrulama tamamlanmaz.",
         "required": [
           "Supplier ID",
           "API Key",
@@ -5061,6 +5063,7 @@
       "Ebay": {
         "title": "eBay bilgileri nereden alınır?",
         "summary": "eBay Sell Inventory API ürünleri inventory item, offer ve publish adımlarıyla yayınlar. Fiyat ve stok için bulk update price quantity endpointi kullanılır.",
+        "connectionModeHelp": "eBay çoğu işlemde OAuth scope token’ı ile çalışır, gerekirse provider tarafına seller/marketplace bağlamı ayrı gönderilir.",
         "required": [
           "Seller ID",
           "Marketplace ID",
@@ -5174,6 +5177,7 @@
       "Amazon": {
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",
+        "connectionModeHelp": "Amazon’da OAuth akışı (LWA) + AWS Signature v4 birlikte çalışır; Seller ID ve Region bilgisi olmadan istek reddedilir.",
         "required": [
           "Seller ID",
           "Marketplace ID",

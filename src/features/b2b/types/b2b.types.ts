@@ -60,6 +60,7 @@ export interface MarketplaceProviderSettingDto {
   providerKey: string;
   name: string;
   defaultAuthType: string;
+  supportedAuthTypes: string[];
   documentationUrl: string;
   setupSummary: string;
   supportsProductCreate: boolean;
