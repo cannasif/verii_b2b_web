@@ -4588,7 +4588,10 @@
       "testing": "Testing",
       "success": "Connection successful",
       "failed": "Connection failed"
-    }
+    },
+    "channels": "Canales",
+    "searchProviders": "Buscar integración...",
+    "noProvidersFound": "No se encontró ninguna integración que coincida con la búsqueda."
   },
   "marketplaceWorkbench": {
     "badge": "Marketplace Operations",

@@ -5288,7 +5288,10 @@
     "status": {
       "active": "Active",
       "passive": "Passive"
-    }
+    },
+    "channels": "Channels",
+    "searchProviders": "Search integrations...",
+    "noProvidersFound": "No integrations match your search."
   },
   "marketplaceWorkbench": {
     "badge": "Marketplace Operations",

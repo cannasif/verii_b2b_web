@@ -4112,362 +4112,362 @@
     }
   },
   "marketplaceSettings": {
-    "badge": "Settings",
-    "title": "Marketplace integration settings",
-    "subtitle": "Manage each marketplace with the fields it requires. Trendyol and Hepsiburada are simpler, while Amazon SP-API needs OAuth and AWS credentials.",
-    "loading": "Loading settings...",
-    "saveButton": "Save Settings",
-    "channelNotCreated": "Channel not created",
-    "providerSettingsTitle": "{{provider}} settings",
-    "officialDocument": "Official documentation",
-    "requiredInfo": "Required information",
-    "officialLinks": "Official links",
-    "currentSecret": "Current secret: {{secret}}. Existing credentials are preserved if you do not enter a new value.",
+    "badge": "Einstellungen",
+    "title": "Marktplatz-Integrationen",
+    "subtitle": "Verwalten Sie jeden Marktplatz mit den jeweils erforderlichen Feldern. Trendyol und Hepsiburada sind einfacher, Amazon SP-API benötigt OAuth- und AWS-Zugangsdaten.",
+    "loading": "Einstellungen werden geladen...",
+    "saveButton": "Einstellungen speichern",
+    "channelNotCreated": "Kanal nicht erstellt",
+    "providerSettingsTitle": "{{provider}} Einstellungen",
+    "officialDocument": "Offizielle Dokumentation",
+    "requiredInfo": "Erforderliche Informationen",
+    "officialLinks": "Offizielle Links",
+    "currentSecret": "Aktuelles Secret: {{secret}}. Bestehende Zugangsdaten bleiben erhalten, wenn Sie keinen neuen Wert eingeben.",
     "tabs": {
-      "connection": "Connection",
-      "credentials": "Credentials",
-      "operations": "Operations"
+      "connection": "Verbindung",
+      "credentials": "Zugangsdaten",
+      "operations": "Operationen"
     },
     "flags": {
-      "product": "Product",
-      "price": "Price",
-      "stock": "Stock",
-      "order": "Order"
+      "product": "Produkt",
+      "price": "Preis",
+      "stock": "Bestand",
+      "order": "Bestellung"
     },
     "fields": {
-      "channelCode": "Channel Code",
-      "channelName": "Channel Name",
-      "sellerNo": "Seller / Store No",
-      "apiBaseUrl": "API Base URL",
-      "authType": "Authentication",
-      "channelStatus": "Channel Status",
-      "notes": "Notes"
+      "channelCode": "Kanalcode",
+      "channelName": "Kanalname",
+      "sellerNo": "Verkäufer- / Shop-Nr.",
+      "apiBaseUrl": "API-Basis-URL",
+      "authType": "Authentifizierung",
+      "channelStatus": "Kanalstatus",
+      "notes": "Notizen"
     },
     "placeholders": {
-      "defaultApiBaseUrl": "Default is used if empty",
-      "notes": "Store, category or operation notes"
+      "defaultApiBaseUrl": "Standardwert wird verwendet, wenn leer",
+      "notes": "Notizen zu Shop, Kategorie oder Operation"
     },
     "advancedJson": {
-      "title": "Advanced JSON mode",
-      "description": "Use this to paste the provider credential JSON exactly as documented.",
+      "title": "Erweiterter JSON-Modus",
+      "description": "Nutzen Sie dies, um die Zugangsdaten-JSON des Anbieters exakt wie dokumentiert einzufügen.",
       "placeholder": "{\"apiKey\":\"...\",\"apiSecret\":\"...\"}"
     },
     "operations": {
       "product": {
-        "title": "Product create",
-        "description": "Publishes catalog products to the marketplace."
+        "title": "Produkt anlegen",
+        "description": "Veröffentlicht Katalogprodukte auf dem Marktplatz."
       },
       "price": {
-        "title": "Price update",
-        "description": "Sends the ERP/B2B price snapshot."
+        "title": "Preis aktualisieren",
+        "description": "Sendet den ERP/B2B-Preissnapshot."
       },
       "stock": {
-        "title": "Stock update",
-        "description": "Sends sellable stock availability."
+        "title": "Bestand aktualisieren",
+        "description": "Sendet den verkaufbaren Bestand."
       },
       "order": {
-        "title": "Order import",
-        "description": "Imports marketplace orders."
+        "title": "Bestellungen importieren",
+        "description": "Importiert Marktplatzbestellungen."
       }
     },
     "toasts": {
-      "saved": "Integration settings saved.",
-      "saveFailed": "Integration settings could not be saved.",
-      "connectionTestSuccess": "Connection test succeeded.",
-      "connectionTestFailed": "Connection test failed."
+      "saved": "Integrationseinstellungen gespeichert.",
+      "saveFailed": "Integrationseinstellungen konnten nicht gespeichert werden.",
+      "connectionTestSuccess": "Verbindungstest erfolgreich.",
+      "connectionTestFailed": "Verbindungstest fehlgeschlagen."
     },
     "errors": {
-      "providerNotFound": "Provider settings could not be found."
+      "providerNotFound": "Anbietereinstellungen konnten nicht gefunden werden."
     },
     "guides": {
       "Trendyol": {
-        "title": "Where do I get Trendyol credentials?",
-        "summary": "Trendyol uses Basic Auth. Supplier ID, API Key and API Secret are used for product, price, stock and order services.",
+        "title": "Wo finde ich Trendyol-Zugangsdaten?",
+        "summary": "Trendyol verwendet Basic Auth. Supplier ID, API Key und API Secret werden für Produkt-, Preis-, Bestands- und Bestellservices genutzt.",
         "required": [
           "Supplier ID",
           "API Key",
           "API Secret",
-          "Optional test/stage credentials",
-          "Store operation permission"
+          "Optionale Test-/Stage-Zugangsdaten",
+          "Shop-Betriebsberechtigung"
         ],
         "steps": [
-          "Sign in to Seller Panel with a master or authorized user.",
-          "Open Account Information > Integration Information and copy Supplier ID, API Key and API Secret.",
-          "Enter Supplier ID in Seller / Store No and enter API Key/API Secret in the credential fields.",
-          "Keep the product, price, stock and order operations enabled as needed."
+          "Mit einem Haupt- oder berechtigten Benutzer im Seller Panel anmelden.",
+          "Kontoinformationen > Integrationsinformationen öffnen und Supplier ID, API Key und API Secret kopieren.",
+          "Supplier ID in Verkäufer- / Shop-Nr. eintragen und API Key/API Secret in den Zugangsdaten pflegen.",
+          "Produkt-, Preis-, Bestands- und Bestelloperationen nach Bedarf aktiviert lassen."
         ],
         "links": {
-          "authorization": "Authorization documentation",
+          "authorization": "Autorisierungsdokumentation",
           "developer": "Trendyol Developer"
         },
-        "setupSummary": "Supplier ID, API Key and API Secret are available in the Trendyol seller panel under Account Information > Integration Information. PROD/STAGE credentials may differ.",
+        "setupSummary": "Supplier ID, API Key und API Secret stehen im Trendyol Seller Panel unter Kontoinformationen > Integrationsinformationen. PROD/STAGE-Zugangsdaten können abweichen.",
         "credentialHelp": {
-          "supplierId": "The supplier/seller number shown in Trendyol Integration Information.",
-          "apiKey": "Trendyol API key visible to the master/authorized user.",
-          "apiSecret": "Secret key used together with API Key for Basic Auth."
+          "supplierId": "Die im Bereich Trendyol-Integrationsinformationen angezeigte Lieferanten-/Verkäufernummer.",
+          "apiKey": "Trendyol API Key, sichtbar für Haupt- oder berechtigte Benutzer.",
+          "apiSecret": "Secret Key, der zusammen mit dem API Key für Basic Auth verwendet wird."
         },
-        "connectionModeHelp": "Trendyol uses Basic Auth in this integration; Supplier ID and API Key/API Secret must be filled together or authentication fails.",
+        "connectionModeHelp": "Trendyol nutzt in dieser Integration Basic Auth; Supplier ID und API Key/API Secret müssen gemeinsam ausgefüllt sein, sonst schlägt die Authentifizierung fehl.",
         "connectionChecklist": [
-          "Get Supplier ID, API Key and API Secret from Trendyol seller integration settings.",
-          "Separate production and sandbox environments to avoid URL and token confusion.",
-          "Validate catalog, stock and price mappings before publishing products.",
-          "Run one small test SKU end-to-end before production release."
+          "Supplier ID, API Key und API Secret aus den Trendyol-Verkäufer-Integrationseinstellungen übernehmen.",
+          "Produktions- und Sandbox-Umgebungen getrennt halten, damit URL und Token nicht verwechselt werden.",
+          "Katalog-, Bestands- und Preiszuordnungen prüfen, bevor Produkte veröffentlicht werden.",
+          "Vor dem Produktivstart eine kleine Test-SKU vollständig durchlaufen lassen."
         ]
       },
       "Hepsiburada": {
-        "title": "Where do I get Hepsiburada credentials?",
-        "summary": "Hepsiburada requires merchant/store information and API keys. Operations usually run with batch or transaction tracking.",
+        "title": "Wo finde ich Hepsiburada-Zugangsdaten?",
+        "summary": "Hepsiburada benötigt Händler-/Shop-Informationen und API-Schlüssel. Operationen laufen meist mit Batch- oder Transaktionsverfolgung.",
         "required": [
           "Merchant ID",
-          "API Key or Client ID",
+          "API Key oder Client ID",
           "API Secret",
-          "Developer/merchant panel access",
-          "Authorized integrator permission"
+          "Developer-/Merchant-Panel-Zugriff",
+          "Berechtigung für autorisierten Integrator"
         ],
         "steps": [
-          "Prepare Hepsiburada developer account and merchant panel access.",
-          "Confirm the merchant/store ID in merchant panel.",
-          "Create API Key/API Secret from the developer portal or integrator authorization screen.",
-          "Enter Merchant ID in Seller / Store No and keys in the Credentials tab."
+          "Hepsiburada Developer-Konto und Merchant-Panel-Zugriff vorbereiten.",
+          "Merchant-/Shop-ID im Merchant Panel prüfen.",
+          "API Key/API Secret im Developer Portal oder über den Integrator-Freigabebereich erstellen.",
+          "Merchant ID in Verkäufer- / Shop-Nr. und Schlüssel im Tab Zugangsdaten eintragen."
         ],
         "links": {
-          "gettingStarted": "Getting started",
+          "gettingStarted": "Erste Schritte",
           "developer": "Hepsiburada Developer"
         },
-        "setupSummary": "Developer account, API keys and merchant/store information are prepared from the Hepsiburada developer/merchant panel. Integrator authorization is managed in the merchant panel.",
+        "setupSummary": "Developer-Konto, API-Schlüssel und Merchant-/Shop-Informationen werden im Hepsiburada Developer-/Merchant-Panel vorbereitet. Die Integrator-Freigabe wird im Merchant Panel verwaltet.",
         "credentialHelp": {
-          "merchantId": "Unique merchant/store id from Hepsiburada merchant panel.",
-          "apiKey": "Client/API key from developer portal or authorized integrator account.",
-          "apiSecret": "Secret used for token generation or Basic/Auth flow."
+          "merchantId": "Eindeutige Händler-/Shop-ID aus dem Hepsiburada Merchant Panel.",
+          "apiKey": "Client-/API-Schlüssel aus dem Developer Portal oder autorisierten Integrator-Konto.",
+          "apiSecret": "Secret für Token-Erzeugung oder Basic/Auth-Ablauf."
         },
         "connectionChecklist": [
-          "Verify developer account and merchant panel access with required API scopes.",
-          "Confirm Merchant ID and API key/secret pair belong to the same seller context.",
-          "Activate order and catalog permissions for the integration.",
-          "If callbacks are enabled, validate HTTPS callback URL and headers."
+          "Developer-Konto und Merchant-Panel-Zugriff mit den nötigen API-Berechtigungen prüfen.",
+          "Sicherstellen, dass Merchant ID und API Key/Secret zum selben Verkäuferkontext gehören.",
+          "Bestell- und Katalogberechtigungen für die Integration aktivieren.",
+          "Bei Callback-Nutzung HTTPS-Callback-URL und Header prüfen."
         ]
       },
       "N11": {
-        "title": "Where do I get n11 credentials?",
-        "summary": "n11 REST API works with appKey/appSecret. Price and stock updates create a taskId; results are tracked by the sync job.",
+        "title": "Wo finde ich n11-Zugangsdaten?",
+        "summary": "Die n11 REST API arbeitet mit appKey/appSecret. Preis- und Bestandsupdates erzeugen eine taskId; Ergebnisse werden vom Sync-Job verfolgt.",
         "required": [
           "Seller ID",
           "App Key",
           "App Secret"
         ],
         "steps": [
-          "Log in to the n11 seller panel with an authorized user.",
-          "Get App Key and App Secret from the API/integration information area.",
-          "Enter Seller ID in Seller / Store No and App Key/App Secret in credential fields.",
-          "Track task results after price or stock updates."
+          "Mit einem berechtigten Benutzer im n11 Seller Panel anmelden.",
+          "App Key und App Secret im API-/Integrationsbereich übernehmen.",
+          "Seller ID in Verkäufer- / Shop-Nr. und App Key/App Secret in die Zugangsdaten eintragen.",
+          "Task-Ergebnisse nach Preis- oder Bestandsupdates verfolgen."
         ],
         "links": {
-          "priceStock": "Price-stock update documentation",
-          "sellerSupport": "n11 seller support"
+          "priceStock": "Dokumentation zu Preis-/Bestandsupdate",
+          "sellerSupport": "n11 Verkäufersupport"
         },
-        "setupSummary": "AppKey/appSecret values are obtained from the n11 seller panel. Price-stock updates create a taskId and the result is tracked by the Hangfire job.",
+        "setupSummary": "AppKey/appSecret werden aus dem n11 Seller Panel übernommen. Preis-/Bestandsupdates erzeugen eine taskId und werden über den Hangfire-Job verfolgt.",
         "credentialHelp": {
-          "sellerId": "n11 store/seller id. Used as the store identifier in channel mapping.",
-          "appKey": "Application key obtained from n11 seller panel for REST API access.",
-          "appSecret": "Secret key used together with appKey for n11 REST API access."
+          "sellerId": "n11 Shop-/Verkäufer-ID. Wird als Shop-Kennung in der Kanalzuordnung genutzt.",
+          "appKey": "Anwendungsschlüssel aus dem n11 Seller Panel für REST-API-Zugriff.",
+          "appSecret": "Secret Key, der zusammen mit appKey für n11 REST API verwendet wird."
         }
       },
       "Pazarama": {
-        "title": "Where do I get Pazarama credentials?",
-        "summary": "Pazarama integration obtains a token with clientId/clientSecret. Product, price-stock and order services run in the seller channel context.",
+        "title": "Wo finde ich Pazarama-Zugangsdaten?",
+        "summary": "Die Pazarama-Integration erzeugt ein Token mit clientId/clientSecret. Produkt-, Preis-/Bestands- und Bestellservices laufen im Verkäuferkanal-Kontext.",
         "required": [
           "Seller ID",
           "Client ID",
           "Client Secret"
         ],
         "steps": [
-          "Complete Pazarama seller application and integration authorization.",
-          "Get Client ID and Client Secret from the seller panel or integration team.",
-          "Enter Seller ID in Seller / Store No and Client ID/Client Secret in credential fields.",
-          "Queue product, price and stock operations and track results from the job screen."
+          "Pazarama-Verkäuferantrag und Integrationsfreigabe abschließen.",
+          "Client ID und Client Secret aus Seller Panel oder Integrationsteam erhalten.",
+          "Seller ID in Verkäufer- / Shop-Nr. und Client ID/Client Secret in die Zugangsdaten eintragen.",
+          "Produkt-, Preis- und Bestandsoperationen in die Queue stellen und Ergebnisse im Job-Bildschirm verfolgen."
         ],
         "links": {
-          "apiPdf": "API integration documentation",
-          "sellerPanel": "Seller application"
+          "apiPdf": "API-Integrationsdokumentation",
+          "sellerPanel": "Verkäuferantrag"
         },
-        "setupSummary": "Pazarama integration obtains a token with clientId/clientSecret; product, price-stock and order operations run by seller channel.",
+        "setupSummary": "Die Pazarama-Integration erzeugt ein Token mit clientId/clientSecret; Produkt-, Preis-/Bestands- und Bestelloperationen laufen je Verkäuferkanal.",
         "credentialHelp": {
-          "sellerId": "Pazarama seller/store id. Used as store context in channel and token requests.",
-          "clientId": "Client id provided after Pazarama integration application.",
-          "clientSecret": "Secret key used in the Pazarama token flow."
+          "sellerId": "Pazarama Verkäufer-/Shop-ID. Wird als Shop-Kontext in Kanal- und Token-Anfragen genutzt.",
+          "clientId": "Client ID nach Pazarama-Integrationsantrag.",
+          "clientSecret": "Secret Key für den Pazarama-Tokenfluss."
         }
       },
       "PttAvm": {
-        "title": "Where do I get PTT AVM credentials?",
-        "summary": "PTT AVM catalog integration works with products/upsert. Product, price and stock submissions are tracked with trackingid.",
+        "title": "Wo finde ich PTT AVM-Zugangsdaten?",
+        "summary": "Die PTT AVM-Katalogintegration arbeitet mit products/upsert. Produkt-, Preis- und Bestandsübermittlungen werden über trackingid verfolgt.",
         "required": [
           "Seller ID",
           "API Key",
           "Token"
         ],
         "steps": [
-          "Enable API access from the PTT AVM developer or seller integration panel.",
-          "Get API Key and Token values.",
-          "Enter Seller ID in Seller / Store No and API Key/Token in credential fields.",
-          "Track the trackingid result from the Hangfire monitoring screen after product, price or stock submission."
+          "API-Zugriff im PTT AVM Developer- oder Verkäufer-Integrationspanel aktivieren.",
+          "API Key und Token übernehmen.",
+          "Seller ID in Verkäufer- / Shop-Nr. und API Key/Token in die Zugangsdaten eintragen.",
+          "Nach Produkt-, Preis- oder Bestandsübermittlung die trackingid im Hangfire-Monitoring prüfen."
         ],
         "links": {
-          "productUpsert": "Product upsert documentation",
+          "productUpsert": "Dokumentation Produkt-Upsert",
           "developer": "PTT AVM Developer"
         },
-        "warning": "In the PTT AVM upsert flow, missing variants or missing fields can affect existing product data. Test catalog mapper fields before production.",
-        "setupSummary": "PTT AVM catalog integration works with products/upsert. Product, price and stock submissions are tracked with trackingid.",
+        "warning": "Im PTT AVM-Upsert-Ablauf können fehlende Varianten oder Felder bestehende Produktdaten beeinflussen. Katalog-Mapping-Felder vor Produktion testen.",
+        "setupSummary": "Die PTT AVM-Katalogintegration arbeitet mit products/upsert. Produkt-, Preis- und Bestandsübermittlungen werden über trackingid verfolgt.",
         "credentialHelp": {
-          "sellerId": "PTT AVM store/seller id.",
-          "apiKey": "API key obtained from the PTT AVM developer/integration panel.",
-          "token": "Access value used as Bearer token in PTT AVM API requests."
+          "sellerId": "PTT AVM Shop-/Verkäufer-ID.",
+          "apiKey": "API Key aus dem PTT AVM Developer-/Integrationspanel.",
+          "token": "Zugriffswert, der als Bearer Token in PTT AVM API-Anfragen genutzt wird."
         }
       },
       "Idefix": {
-        "title": "Where do I get İdefix credentials?",
-        "summary": "İdefix product integration works with vendorId, API key and secret. Product creation and stock/price submissions are tracked through batch results.",
+        "title": "Wo finde ich İdefix-Zugangsdaten?",
+        "summary": "Die İdefix-Produktintegration arbeitet mit vendorId, API Key und Secret. Produktanlage sowie Bestands-/Preisübermittlungen werden über Batch-Ergebnisse verfolgt.",
         "required": [
           "Vendor ID",
           "API Key",
           "API Secret"
         ],
         "steps": [
-          "Prepare API access from the İdefix developer or seller integration panel.",
-          "Get Vendor ID, API Key and API Secret values.",
-          "Enter Vendor ID in Seller / Store No and API Key/API Secret in credential fields.",
-          "Track batch results after product creation and stock/price submissions."
+          "API-Zugriff im İdefix Developer- oder Verkäufer-Integrationspanel vorbereiten.",
+          "Vendor ID, API Key und API Secret übernehmen.",
+          "Vendor ID in Verkäufer- / Shop-Nr. und API Key/API Secret in die Zugangsdaten eintragen.",
+          "Batch-Ergebnisse nach Produktanlage und Bestands-/Preisübermittlung verfolgen."
         ],
         "links": {
-          "productIntegration": "Product integration",
-          "priceStock": "Stock and price submission"
+          "productIntegration": "Produktintegration",
+          "priceStock": "Bestands- und Preisübermittlung"
         },
-        "setupSummary": "İdefix product integration works with vendorId, API key and secret. Product creation and stock/price submissions are tracked through batch results.",
+        "setupSummary": "Die İdefix-Produktintegration arbeitet mit vendorId, API Key und Secret. Produktanlage sowie Bestands-/Preisübermittlungen werden über Batch-Ergebnisse verfolgt.",
         "credentialHelp": {
-          "vendorId": "İdefix seller/vendor id. Used as path parameter in product and inventory endpoints.",
-          "apiKey": "API key obtained from the İdefix developer panel.",
-          "apiSecret": "Secret key used together with API Key for Basic/Auth flow."
+          "vendorId": "İdefix Verkäufer-/Vendor-ID. Wird als Pfadparameter in Produkt- und Inventar-Endpunkten genutzt.",
+          "apiKey": "API Key aus dem İdefix Developer Panel.",
+          "apiSecret": "Secret Key, der zusammen mit API Key für Basic/Auth verwendet wird."
         }
       },
       "Ciceksepeti": {
-        "title": "Where do I get Çiçeksepeti credentials?",
-        "summary": "Çiçeksepeti marketplace API credentials are obtained from the seller panel or integration team. Product, price, stock and order operations are managed with channel path settings.",
+        "title": "Wo finde ich Çiçeksepeti-Zugangsdaten?",
+        "summary": "Çiçeksepeti Marketplace API-Zugangsdaten werden aus dem Seller Panel oder vom Integrationsteam bereitgestellt. Produkt-, Preis-, Bestands- und Bestelloperationen werden über Kanalpfade gesteuert.",
         "required": [
           "Seller ID",
           "API Key",
-          "Optional Token"
+          "Optionaler Token"
         ],
         "steps": [
-          "Complete Çiçeksepeti seller application and marketplace integration authorization.",
-          "Get API Key and optional Token from the seller panel or integration team.",
-          "Enter Seller ID in Seller / Store No and API Key/Token in credential fields.",
-          "Track product, price and stock submission results from the job monitoring screen."
+          "Çiçeksepeti-Verkäuferantrag und Marketplace-Integrationsfreigabe abschließen.",
+          "API Key und optionalen Token aus Seller Panel oder Integrationsteam übernehmen.",
+          "Seller ID in Verkäufer- / Shop-Nr. und API Key/Token in die Zugangsdaten eintragen.",
+          "Produkt-, Preis- und Bestandsübermittlung im Job-Monitoring verfolgen."
         ],
         "links": {
-          "sellerPanel": "Seller application",
+          "sellerPanel": "Verkäuferantrag",
           "integration": "Çiçeksepeti"
         },
-        "warning": "Çiçeksepeti public documentation is limited. Confirm live endpoint paths from the seller panel and update provider options before production.",
-        "setupSummary": "Çiçeksepeti marketplace API credentials are obtained from the seller panel or integration team. Product, price, stock and order operations are managed with provider path settings.",
+        "warning": "Die öffentliche Çiçeksepeti-Dokumentation ist begrenzt. Live-Endpunktpfade vor Produktion im Seller Panel bestätigen und Anbieteroptionen aktualisieren.",
+        "setupSummary": "Çiçeksepeti Marketplace API-Zugangsdaten werden aus dem Seller Panel oder vom Integrationsteam bereitgestellt. Produkt-, Preis-, Bestands- und Bestelloperationen werden über Anbieterpfade gesteuert.",
         "credentialHelp": {
-          "sellerId": "Çiçeksepeti store/seller id.",
-          "apiKey": "API key obtained from Çiçeksepeti seller panel or integration team.",
-          "token": "Optional access value if the channel requires Bearer token."
+          "sellerId": "Çiçeksepeti Shop-/Verkäufer-ID.",
+          "apiKey": "API Key aus dem Çiçeksepeti Seller Panel oder vom Integrationsteam.",
+          "token": "Optionaler Zugriffswert, falls der Kanal Bearer Token benötigt."
         }
       },
       "Ebay": {
-        "title": "Where do I get eBay credentials?",
-        "summary": "eBay Sell Inventory API publishes products through inventory item, offer and publish steps. Price and stock use the bulk update price quantity endpoint.",
+        "title": "Wo finde ich eBay-Zugangsdaten?",
+        "summary": "Die eBay Sell Inventory API veröffentlicht Produkte über Inventory Item, Offer und Publish. Preis und Bestand nutzen den Bulk Update Price Quantity-Endpunkt.",
         "required": [
           "Seller ID",
           "Marketplace ID",
           "Access Token"
         ],
         "steps": [
-          "Prepare an eBay Developer account and Sell Inventory API permissions.",
-          "Generate an access token with Inventory API scopes from seller authorization.",
-          "Select Marketplace ID according to the target country. Examples: EBAY_US, EBAY_GB, EBAY_DE.",
-          "Complete eBay category, merchant location and listing policy values in catalog attributes before publishing products.",
-          "Save Seller ID, Marketplace ID and Access Token on this screen."
+          "eBay Developer-Konto und Sell Inventory API-Berechtigungen vorbereiten.",
+          "Access Token mit Inventory API Scopes über Verkäuferautorisierung erzeugen.",
+          "Marketplace ID je Zielland auswählen. Beispiele: EBAY_US, EBAY_GB, EBAY_DE.",
+          "eBay-Kategorie, Merchant Location und Listing-Policy-Werte in den Katalogattributen vervollständigen.",
+          "Seller ID, Marketplace ID und Access Token auf diesem Bildschirm speichern."
         ],
         "links": {
           "inventoryApi": "Sell Inventory API",
-          "bulkPriceQuantity": "Bulk price/quantity"
+          "bulkPriceQuantity": "Bulk Preis/Menge"
         },
-        "warning": "eBay product publish requires category, merchant location key and listing policy values. The API rejects product creation when these values are missing.",
-        "setupSummary": "eBay Sell Inventory API publishes products through inventory item, offer and publish steps. Price and stock use the bulk update price quantity endpoint.",
+        "warning": "eBay-Produktveröffentlichung benötigt Kategorie, Merchant Location Key und Listing-Policy-Werte. Die API lehnt Produktanlage ab, wenn diese Werte fehlen.",
+        "setupSummary": "Die eBay Sell Inventory API veröffentlicht Produkte über Inventory Item, Offer und Publish. Preis und Bestand nutzen den Bulk Update Price Quantity-Endpunkt.",
         "credentialHelp": {
-          "sellerId": "eBay seller account id.",
-          "marketplaceId": "eBay marketplace code for the target country. Examples: EBAY_US, EBAY_GB, EBAY_DE.",
-          "accessToken": "OAuth access token generated with Sell Inventory API scopes."
+          "sellerId": "eBay Verkäuferkonto-ID.",
+          "marketplaceId": "eBay-Marktplatzcode für das Zielland. Beispiele: EBAY_US, EBAY_GB, EBAY_DE.",
+          "accessToken": "OAuth Access Token mit Sell Inventory API Scopes."
         },
-        "connectionModeHelp": "Most eBay flows require an OAuth access token with Inventory scope; seller and marketplace context should be sent if the listing uses country-specific marketplaces.",
+        "connectionModeHelp": "Die meisten eBay-Abläufe benötigen ein OAuth Access Token mit Inventory Scope; Verkäufer- und Marktplatzkontext sollten für länderspezifische Marktplätze mitgesendet werden.",
         "connectionChecklist": [
-          "Complete OAuth token flow in eBay Developer Console for Inventory scope.",
-          "Confirm marketplace and seller context for each publish request.",
-          "Populate category, merchant location and policy values before publishing.",
-          "Run a sandbox or non-critical test offer and confirm response IDs and offer status."
+          "OAuth-Tokenfluss in der eBay Developer Console für den Inventory Scope abschließen.",
+          "Marktplatz- und Verkäuferkontext für jede Veröffentlichung prüfen.",
+          "Kategorie, Merchant Location und Policy-Werte vor Veröffentlichung pflegen.",
+          "Sandbox- oder unkritisches Testangebot ausführen und Response-IDs sowie Angebotsstatus prüfen."
         ]
       },
       "Shopify": {
-        "title": "Where do I get Shopify credentials?",
-        "summary": "Shopify Admin API works with product create, variant price update and inventory_levels/set stock update flows.",
+        "title": "Wo finde ich Shopify-Zugangsdaten?",
+        "summary": "Die Shopify Admin API arbeitet mit Produktanlage, Variantenpreis-Update und inventory_levels/set für Bestandsupdates.",
         "required": [
-          "Shop Domain",
+          "Shop-Domain",
           "Admin Access Token",
-          "API Version",
+          "API-Version",
           "Location ID"
         ],
         "steps": [
-          "Create a custom app or admin app in Shopify admin and enable Admin API permissions.",
-          "Generate an Admin API access token with Products and Inventory permissions.",
-          "Save the Shop Domain with the myshopify.com domain.",
-          "Find the Location ID that will be used for stock updates.",
-          "Save Shop Domain, Admin Access Token, API Version and Location ID on this screen."
+          "Custom App oder Admin App im Shopify Admin erstellen und Admin API-Berechtigungen aktivieren.",
+          "Admin API Access Token mit Produkt- und Inventarberechtigungen erzeugen.",
+          "Shop-Domain mit der myshopify.com-Domain speichern.",
+          "Location ID für Bestandsupdates ermitteln.",
+          "Shop-Domain, Admin Access Token, API-Version und Location ID auf diesem Bildschirm speichern."
         ],
         "links": {
           "adminApi": "Admin API",
-          "inventoryLevels": "Inventory levels"
+          "inventoryLevels": "Inventory Levels"
         },
-        "warning": "Shopify stock updates use inventory item id and location id, not variant id. This mapping is stored after product creation.",
-        "setupSummary": "Shopify Admin API works with product create, variant price update and inventory_levels/set stock update flows.",
+        "warning": "Shopify-Bestandsupdates nutzen inventory item id und location id, nicht variant id. Diese Zuordnung wird nach Produktanlage gespeichert.",
+        "setupSummary": "Die Shopify Admin API arbeitet mit Produktanlage, Variantenpreis-Update und inventory_levels/set für Bestandsupdates.",
         "credentialHelp": {
-          "shopDomain": "Shopify store domain. Example: store.myshopify.com.",
-          "accessToken": "Admin API access token with Products and Inventory permissions.",
-          "apiVersion": "Shopify Admin API version to use. Example: 2026-01.",
-          "locationId": "Shopify location id used for stock updates."
+          "shopDomain": "Shopify-Shop-Domain. Beispiel: store.myshopify.com.",
+          "accessToken": "Admin API Access Token mit Produkt- und Inventarberechtigungen.",
+          "apiVersion": "Zu verwendende Shopify Admin API-Version. Beispiel: 2026-01.",
+          "locationId": "Shopify Location ID für Bestandsupdates."
         }
       },
       "WooCommerce": {
-        "title": "Where do I get WooCommerce credentials?",
-        "summary": "WooCommerce REST API uses Consumer Key/Secret for product create, price update and stock update operations through the products endpoint.",
+        "title": "Wo finde ich WooCommerce-Zugangsdaten?",
+        "summary": "Die WooCommerce REST API nutzt Consumer Key/Secret für Produktanlage, Preisupdate und Bestandsupdate über den products-Endpunkt.",
         "required": [
-          "Store URL",
+          "Store-URL",
           "Consumer Key",
           "Consumer Secret",
-          "API Version"
+          "API-Version"
         ],
         "steps": [
-          "Open WooCommerce > Settings > Advanced > REST API in WordPress admin.",
-          "Create Read/Write Consumer Key and Consumer Secret credentials.",
-          "Save Store URL with the HTTPS site address.",
-          "Save Store URL, Consumer Key, Consumer Secret and API Version on this screen."
+          "WooCommerce > Einstellungen > Erweitert > REST API im WordPress Admin öffnen.",
+          "Read/Write Consumer Key und Consumer Secret erstellen.",
+          "Store-URL mit der HTTPS-Seitenadresse speichern.",
+          "Store-URL, Consumer Key, Consumer Secret und API-Version auf diesem Bildschirm speichern."
         ],
         "links": {
           "restApi": "REST API",
-          "authentication": "Authentication"
+          "authentication": "Authentifizierung"
         },
-        "warning": "WooCommerce price and stock updates use product id. For variable products, store variation id mapping inside the listing id.",
-        "setupSummary": "WooCommerce REST API uses Consumer Key/Secret for product create, price update and stock update operations through the products endpoint.",
+        "warning": "WooCommerce-Preis- und Bestandsupdates nutzen product id. Bei variablen Produkten die variation id-Zuordnung in der Listing-ID speichern.",
+        "setupSummary": "Die WooCommerce REST API nutzt Consumer Key/Secret für Produktanlage, Preisupdate und Bestandsupdate über den products-Endpunkt.",
         "credentialHelp": {
-          "storeUrl": "WooCommerce store base URL. Example: https://store.com.",
+          "storeUrl": "WooCommerce Store-Basis-URL. Beispiel: https://store.com.",
           "consumerKey": "WooCommerce REST API Consumer Key.",
           "consumerSecret": "WooCommerce REST API Consumer Secret.",
-          "apiVersion": "REST API version to use. Example: wc/v3."
+          "apiVersion": "Zu verwendende REST API-Version. Beispiel: wc/v3."
         }
       },
       "AdobeCommerce": {
-        "title": "Where do I get Adobe Commerce credentials?",
-        "summary": "Adobe Commerce/Magento REST API uses an access token for product create, price update and MSI source item stock sync.",
+        "title": "Wo finde ich Adobe Commerce-Zugangsdaten?",
+        "summary": "Adobe Commerce/Magento REST API nutzt ein Access Token für Produktanlage, Preisupdate und MSI Source Item-Bestandssync.",
         "required": [
           "Base URL",
           "Access Token",
@@ -4475,61 +4475,61 @@
           "Source Code"
         ],
         "steps": [
-          "Create an Integration in Adobe Commerce admin and grant Catalog and Inventory permissions.",
-          "Copy the Access Token after activating the integration.",
-          "Select Store Code for REST paths. Most installations use default.",
-          "Select Source Code for MSI stock sync.",
-          "Save Base URL, Access Token, Store Code and Source Code on this screen."
+          "Integration in Adobe Commerce Admin erstellen und Katalog- sowie Inventarberechtigungen vergeben.",
+          "Access Token nach Aktivierung der Integration kopieren.",
+          "Store Code für REST-Pfade auswählen. Die meisten Installationen nutzen default.",
+          "Source Code für MSI-Bestandssync auswählen.",
+          "Base URL, Access Token, Store Code und Source Code auf diesem Bildschirm speichern."
         ],
         "links": {
           "restApi": "REST API",
-          "inventoryApi": "Inventory API"
+          "inventoryApi": "Inventar-API"
         },
-        "warning": "Adobe Commerce stock update uses MSI source items. In multi-warehouse/source setups, sourceCode should be managed with ERP warehouse mapping.",
-        "setupSummary": "Adobe Commerce/Magento REST API uses an access token for product create, price update and MSI source item stock sync.",
+        "warning": "Adobe Commerce-Bestandsupdates nutzen MSI Source Items. Bei mehreren Lagern/Sources sollte sourceCode über ERP-Lagerzuordnung verwaltet werden.",
+        "setupSummary": "Adobe Commerce/Magento REST API nutzt ein Access Token für Produktanlage, Preisupdate und MSI Source Item-Bestandssync.",
         "credentialHelp": {
-          "baseUrl": "Adobe Commerce/Magento store base URL. Example: https://store.com.",
-          "accessToken": "Bearer token obtained from Integration or admin token flow.",
-          "storeCode": "Store code used inside REST path. Example: default.",
-          "sourceCode": "MSI source code used for stock sync. Example: default."
+          "baseUrl": "Adobe Commerce/Magento Store-Basis-URL. Beispiel: https://store.com.",
+          "accessToken": "Bearer Token aus Integration oder Admin-Tokenfluss.",
+          "storeCode": "Store Code im REST-Pfad. Beispiel: default.",
+          "sourceCode": "MSI Source Code für Bestandssync. Beispiel: default."
         }
       },
       "Amazon": {
-        "title": "Where do I get Amazon SP-API credentials?",
-        "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",
+        "title": "Wo finde ich Amazon SP-API-Zugangsdaten?",
+        "summary": "Amazon ist der umfangreichste Ablauf. Seller Central Developer-Profil, App-Registrierung, LWA OAuth und AWS SigV4-Zugangsdaten werden gemeinsam benötigt.",
         "required": [
           "Seller ID",
           "Marketplace ID",
-          "LWA Client ID/Secret",
+          "LWA Client ID",
+          "LWA Client Secret",
           "Refresh Token",
-          "AWS Access Key/Secret",
-          "Region",
-          "Optional Role ARN"
+          "AWS Access Key",
+          "AWS Secret Key"
         ],
         "steps": [
-          "Complete developer profile and SP-API app registration in Seller Central.",
-          "Get Login with Amazon client id and secret for the app.",
-          "Generate a refresh token from seller authorization.",
-          "Prepare AWS IAM/SigV4 credentials and Role ARN if needed.",
-          "Choose Marketplace ID and region according to the target country."
+          "Developer-Profil in Seller Central vorbereiten und SP-API-App registrieren.",
+          "LWA Client ID, Client Secret und Refresh Token erstellen.",
+          "AWS IAM/SigV4-Zugangsdaten und Role/Region-Kontext vorbereiten.",
+          "Seller ID und Marketplace ID passend zur Region auswählen.",
+          "Alle Zugangsdaten speichern und danach den Verbindungstest ausführen."
         ],
         "links": {
-          "registration": "SP-API registration",
+          "registration": "SP-API-Registrierung",
           "marketplaceIds": "Marketplace IDs",
-          "endpoints": "SP-API endpoints"
+          "endpoints": "SP-API-Endpunkte"
         },
-        "warning": "PROD/SANDBOX and marketplace region selection are critical for Amazon. Requests can fail even with a valid signature if region or marketplace ID is wrong.",
-        "setupSummary": "Amazon SP-API requires developer profile, app registration, Seller Central authorization, LWA refresh token and AWS SigV4 credentials together.",
+        "warning": "Amazon SP-API benötigt korrekte Region, Marketplace ID, LWA Refresh Token und AWS SigV4-Signatur. Kleine Abweichungen führen zu Authentifizierungsfehlern.",
+        "setupSummary": "Amazon SP-API benötigt Seller Central App-Registrierung, LWA OAuth, Refresh Token und AWS SigV4-Zugangsdaten. Marketplace ID und Region müssen zusammenpassen.",
         "credentialHelp": {
-          "sellerId": "Merchant/seller identifier of the Seller Central account.",
-          "marketplaceId": "Amazon marketplace identifier for the target country; verify from Amazon Marketplace IDs documentation.",
-          "region": "SP-API endpoint region. Turkey/Europe typically uses the EU endpoint family.",
-          "lwaClientId": "Login with Amazon client id created after app registration.",
-          "lwaClientSecret": "LWA client secret; store securely.",
-          "refreshToken": "Long-lived refresh token received after seller authorization.",
-          "awsAccessKey": "IAM access key used for SP-API request signing.",
-          "awsSecretKey": "IAM secret key used for SP-API request signing.",
-          "roleArn": "Role ARN if IAM role based access is used."
+          "sellerId": "Amazon Seller ID aus Seller Central.",
+          "marketplaceId": "Amazon Marketplace ID der Zielregion. Beispiel Türkei: A33AVAJ2PDY3EV.",
+          "lwaClientId": "Login with Amazon Client ID aus der SP-API-App.",
+          "lwaClientSecret": "Login with Amazon Client Secret aus der SP-API-App.",
+          "refreshToken": "OAuth Refresh Token, erzeugt durch Verkäuferautorisierung.",
+          "awsAccessKey": "AWS Access Key für SigV4-Signatur.",
+          "awsSecretKey": "AWS Secret Key für SigV4-Signatur.",
+          "region": "SP-API-Endpunktregion. Türkei/Europa verwendet typischerweise die EU-Endpunktfamilie.",
+          "roleArn": "Role ARN, falls IAM-Rollen-basierter Zugriff verwendet wird."
         },
         "connectionModeHelp": "Amazon SP-API requires LWA OAuth + AWS Signature Version 4 together. Seller ID and region must match the target marketplace before sending requests.",
         "connectionChecklist": [
@@ -4541,54 +4541,57 @@
         ]
       },
       "Etsy": {
-        "title": "Where do I get Etsy credentials?",
-        "summary": "Etsy Open API v3 uses OAuth. App registration provides keystring/shared secret and shop access is authorized through OAuth scopes.",
+        "title": "Wo finde ich Etsy-Zugangsdaten?",
+        "summary": "Etsy Open API nutzt OAuth. Shop ID, Client ID/Keystring und Token-Werte werden für Listing-, Preis- und Bestandsoperationen benötigt.",
         "required": [
           "Shop ID",
-          "Client ID / API keystring",
-          "Client Secret / shared secret",
+          "Client ID / Keystring",
+          "Access Token",
           "Refresh Token",
-          "Required OAuth scopes"
+          "OAuth Scope"
         ],
         "steps": [
-          "Create an app in Etsy Developer portal.",
-          "Copy API keystring and shared secret.",
-          "Complete OAuth authorization for the shop and generate a refresh token.",
-          "Save Shop ID and token values in this screen."
+          "Etsy Developer App erstellen und OAuth-Berechtigungen aktivieren.",
+          "Shop ID aus dem Verkäuferkonto ermitteln.",
+          "Access Token und Refresh Token mit passenden Listing-/Shop-Scopes erzeugen.",
+          "Shop ID, Client ID und Token-Werte auf diesem Bildschirm speichern."
         ],
         "links": {
-          "openApi": "Etsy Open API documentation",
-          "oauth": "OAuth guide"
+          "openApi": "Open API",
+          "oauth": "OAuth-Authentifizierung"
         },
-        "setupSummary": "Etsy app registration provides API keystring/shared secret; shop access is authorized through OAuth token scopes.",
+        "setupSummary": "Etsy Open API nutzt OAuth. Shop ID, Client ID/Keystring und Token-Werte werden für Listing-, Preis- und Bestandsoperationen benötigt.",
         "credentialHelp": {
-          "shopId": "Etsy shop id to connect.",
-          "clientId": "Etsy app API key keystring.",
-          "clientSecret": "Etsy app shared secret.",
-          "refreshToken": "Refresh token received after OAuth authorization."
+          "shopId": "Etsy Shop ID des Verkäuferkontos.",
+          "clientId": "Etsy App Client ID oder Keystring.",
+          "refreshToken": "OAuth Refresh Token zur Token-Erneuerung.",
+          "clientSecret": "Etsy App Shared Secret."
         }
       }
     },
     "status": {
-      "active": "Active",
-      "passive": "Passive"
+      "active": "Aktiv",
+      "passive": "Passiv"
     },
-    "connectionChecklist": "Connection readiness checklist",
-    "connectionModes": "Supported connection methods",
-    "lastConnection": "Last connection",
-    "requiredField": "Field {{index}}",
-    "defaultStep": "Step {{index}}",
-    "defaultWarning": "Production integration should be carefully validated because extra configuration requirements can be provider-specific.",
+    "connectionChecklist": "Checkliste zur Verbindungsbereitschaft",
+    "connectionModes": "Unterstützte Verbindungsmethoden",
+    "lastConnection": "Letzte Verbindung",
+    "requiredField": "Feld {{index}}",
+    "defaultStep": "Schritt {{index}}",
+    "defaultWarning": "Die Produktivintegration sollte sorgfältig geprüft werden, da zusätzliche Anforderungen je nach Anbieter unterschiedlich sein können.",
     "actions": {
-      "testConnection": "Test connection"
+      "testConnection": "Verbindung testen"
     },
     "connectionStatus": {
-      "unknown": "Status unknown",
-      "not-tested": "Not tested yet",
-      "testing": "Testing",
-      "success": "Connection successful",
-      "failed": "Connection failed"
-    }
+      "unknown": "Status unbekannt",
+      "not-tested": "Noch nicht getestet",
+      "testing": "Wird getestet",
+      "success": "Verbindung erfolgreich",
+      "failed": "Verbindung fehlgeschlagen"
+    },
+    "channels": "Kanäle",
+    "searchProviders": "Integration suchen...",
+    "noProvidersFound": "Keine passende Integration gefunden."
   },
   "marketplaceWorkbench": {
     "badge": "Marketplace Operations",

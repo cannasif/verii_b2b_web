@@ -5288,7 +5288,10 @@
     "status": {
       "active": "Aktif",
       "passive": "Pasif"
-    }
+    },
+    "channels": "Kanallar",
+    "searchProviders": "Entegrasyon ara...",
+    "noProvidersFound": "Aramanıza uygun entegrasyon bulunamadı."
   },
   "marketplaceWorkbench": {
     "badge": "Marketplace Operasyon",

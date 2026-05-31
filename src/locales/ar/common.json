@@ -4588,7 +4588,10 @@
       "testing": "Testing",
       "success": "Connection successful",
       "failed": "Connection failed"
-    }
+    },
+    "channels": "القنوات",
+    "searchProviders": "ابحث عن تكامل...",
+    "noProvidersFound": "لم يتم العثور على تكامل مطابق للبحث."
   },
   "marketplaceWorkbench": {
     "badge": "Marketplace Operations",
