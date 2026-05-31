@@ -3973,6 +3973,35 @@
           "apiVersion": "REST API version to use. Example: wc/v3."
         }
       },
+      "AdobeCommerce": {
+        "title": "Where do I get Adobe Commerce credentials?",
+        "summary": "Adobe Commerce/Magento REST API uses an access token for product create, price update and MSI source item stock sync.",
+        "required": [
+          "Base URL",
+          "Access Token",
+          "Store Code",
+          "Source Code"
+        ],
+        "steps": [
+          "Create an Integration in Adobe Commerce admin and grant Catalog and Inventory permissions.",
+          "Copy the Access Token after activating the integration.",
+          "Select Store Code for REST paths. Most installations use default.",
+          "Select Source Code for MSI stock sync.",
+          "Save Base URL, Access Token, Store Code and Source Code on this screen."
+        ],
+        "links": {
+          "restApi": "REST API",
+          "inventoryApi": "Inventory API"
+        },
+        "warning": "Adobe Commerce stock update uses MSI source items. In multi-warehouse/source setups, sourceCode should be managed with ERP warehouse mapping.",
+        "setupSummary": "Adobe Commerce/Magento REST API uses an access token for product create, price update and MSI source item stock sync.",
+        "credentialHelp": {
+          "baseUrl": "Adobe Commerce/Magento store base URL. Example: https://store.com.",
+          "accessToken": "Bearer token obtained from Integration or admin token flow.",
+          "storeCode": "Store code used inside REST path. Example: default.",
+          "sourceCode": "MSI source code used for stock sync. Example: default."
+        }
+      },
       "Amazon": {
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",

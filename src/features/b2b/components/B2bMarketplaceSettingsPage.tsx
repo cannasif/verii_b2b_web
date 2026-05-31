@@ -125,6 +125,15 @@ const providerGuides: Record<string, ProviderGuideDefinition> = {
     ],
     hasWarning: true,
   },
+  AdobeCommerce: {
+    requiredCount: 4,
+    stepCount: 5,
+    links: [
+      { label: 'restApi', href: 'https://developer.adobe.com/commerce/webapi/rest/' },
+      { label: 'inventoryApi', href: 'https://developer.adobe.com/commerce/webapi/rest/inventory/' },
+    ],
+    hasWarning: true,
+  },
   Amazon: {
     requiredCount: 7,
     stepCount: 5,

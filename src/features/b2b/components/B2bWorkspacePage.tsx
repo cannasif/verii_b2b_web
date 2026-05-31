@@ -663,6 +663,7 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
         { label: 'eBay', value: 'Ebay' },
         { label: 'Shopify', value: 'Shopify' },
         { label: 'WooCommerce', value: 'WooCommerce' },
+        { label: 'Adobe Commerce', value: 'AdobeCommerce' },
         { label: 'Amazon SP-API', value: 'Amazon' },
         { label: 'Etsy', value: 'Etsy' },
       ] },

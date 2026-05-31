@@ -5142,6 +5142,35 @@
           "apiVersion": "Kullanılacak REST API versiyonu. Örn. wc/v3."
         }
       },
+      "AdobeCommerce": {
+        "title": "Adobe Commerce bilgileri nereden alınır?",
+        "summary": "Adobe Commerce/Magento REST API access token ile ürün oluşturma, fiyat güncelleme ve MSI source item stok aktarımı yapılır.",
+        "required": [
+          "Base URL",
+          "Access Token",
+          "Store Code",
+          "Source Code"
+        ],
+        "steps": [
+          "Adobe Commerce admin panelinde Integration oluşturup Catalog ve Inventory izinlerini verin.",
+          "Integration aktivasyonu sonrası Access Token bilgisini alın.",
+          "REST path için Store Code bilgisini belirleyin. Çoğu kurulumda default kullanılır.",
+          "MSI stok aktarımı için Source Code bilgisini belirleyin.",
+          "Bu ekranda Base URL, Access Token, Store Code ve Source Code bilgilerini kaydedin."
+        ],
+        "links": {
+          "restApi": "REST API",
+          "inventoryApi": "Inventory API"
+        },
+        "warning": "Adobe Commerce stok güncellemesi MSI source item yapısıyla çalışır. Çoklu depo/source kullanan firmalarda sourceCode ERP depo eşleşmesiyle yönetilmelidir.",
+        "setupSummary": "Adobe Commerce/Magento REST API access token ile ürün oluşturma, fiyat güncelleme ve MSI source item stok aktarımı yapılır.",
+        "credentialHelp": {
+          "baseUrl": "Adobe Commerce/Magento mağaza ana adresi. Örn. https://magaza.com.",
+          "accessToken": "Integration veya admin token üzerinden alınan Bearer token.",
+          "storeCode": "REST path içinde kullanılacak store code. Örn. default.",
+          "sourceCode": "MSI stok aktarımında kullanılacak source code. Örn. default."
+        }
+      },
       "Amazon": {
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",
