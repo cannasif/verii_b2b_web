@@ -5007,6 +5007,31 @@
           "token": "Access value used as Bearer token in PTT AVM API requests."
         }
       },
+      "Idefix": {
+        "title": "Where do I get İdefix credentials?",
+        "summary": "İdefix product integration works with vendorId, API key and secret. Product creation and stock/price submissions are tracked through batch results.",
+        "required": [
+          "Vendor ID",
+          "API Key",
+          "API Secret"
+        ],
+        "steps": [
+          "Prepare API access from the İdefix developer or seller integration panel.",
+          "Get Vendor ID, API Key and API Secret values.",
+          "Enter Vendor ID in Seller / Store No and API Key/API Secret in credential fields.",
+          "Track batch results after product creation and stock/price submissions."
+        ],
+        "links": {
+          "productIntegration": "Product integration",
+          "priceStock": "Stock and price submission"
+        },
+        "setupSummary": "İdefix product integration works with vendorId, API key and secret. Product creation and stock/price submissions are tracked through batch results.",
+        "credentialHelp": {
+          "vendorId": "İdefix seller/vendor id. Used as path parameter in product and inventory endpoints.",
+          "apiKey": "API key obtained from the İdefix developer panel.",
+          "apiSecret": "Secret key used together with API Key for Basic/Auth flow."
+        }
+      },
       "Amazon": {
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",

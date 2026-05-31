@@ -81,6 +81,14 @@ const providerGuides: Record<string, ProviderGuideDefinition> = {
     ],
     hasWarning: true,
   },
+  Idefix: {
+    requiredCount: 3,
+    stepCount: 4,
+    links: [
+      { label: 'productIntegration', href: 'https://developer.idefix.com/api/urun-entegrasyonu' },
+      { label: 'priceStock', href: 'https://developer.idefix.com/api/urun-entegrasyonu/stok-ve-fiyat-gonderim' },
+    ],
+  },
   Amazon: {
     requiredCount: 7,
     stepCount: 5,

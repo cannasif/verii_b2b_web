@@ -5007,6 +5007,31 @@
           "token": "PTT AVM API isteklerinde Bearer token olarak kullanılan erişim bilgisi."
         }
       },
+      "Idefix": {
+        "title": "İdefix bilgileri nereden alınır?",
+        "summary": "İdefix ürün entegrasyonu vendorId, API key ve secret ile çalışır. Ürün oluşturma ve stok/fiyat gönderimleri batch sonucu üzerinden takip edilir.",
+        "required": [
+          "Vendor ID",
+          "API Key",
+          "API Secret"
+        ],
+        "steps": [
+          "İdefix developer veya satıcı entegrasyon panelinden API erişimini hazırlayın.",
+          "Vendor ID, API Key ve API Secret bilgilerini alın.",
+          "Bu ekranda Satıcı / Mağaza No alanına Vendor ID bilgisini, credential alanlarına API Key ve API Secret bilgisini girin.",
+          "Ürün oluşturma ve stok/fiyat gönderimleri sonrası batch sonuçlarını job takip ekranından izleyin."
+        ],
+        "links": {
+          "productIntegration": "Ürün entegrasyonu",
+          "priceStock": "Stok ve fiyat gönderimi"
+        },
+        "setupSummary": "İdefix ürün entegrasyonu vendorId, API key ve secret ile çalışır. Ürün oluşturma ve stok/fiyat gönderimleri batch sonucu üzerinden takip edilir.",
+        "credentialHelp": {
+          "vendorId": "İdefix satıcı/vendor kimliği. Ürün ve envanter endpointlerinde path parametresi olarak kullanılır.",
+          "apiKey": "İdefix developer panelinden alınan API anahtarı.",
+          "apiSecret": "Basic/Auth akışında API Key ile birlikte kullanılan gizli anahtar."
+        }
+      },
       "Amazon": {
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",
