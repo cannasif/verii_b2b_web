@@ -1,7 +1,23 @@
 import { type ReactElement, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Boxes, ExternalLink, PackageSearch, RefreshCcw, Search, Send, Tag, Warehouse } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowRight,
+  Boxes,
+  CheckCircle2,
+  Clock3,
+  ExternalLink,
+  PackageSearch,
+  PlusCircle,
+  RefreshCcw,
+  Search,
+  Send,
+  ShoppingBag,
+  SlidersHorizontal,
+  Tag,
+  Warehouse,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,6 +30,8 @@ import { b2bApi } from '../api/b2b.api';
 import type { MarketplaceListingDto } from '../types/b2b.types';
 
 type MarketplaceAction = 'product-create' | 'price-update' | 'stock-update' | 'clone-to-channel';
+type QuickOperation = 'price-update' | 'stock-update';
+type ListingFilter = 'all' | 'published' | 'pending' | 'failed' | 'needs-action';
 
 type ActionState = {
   type: MarketplaceAction;
@@ -43,6 +61,15 @@ function statusTone(status?: string): string {
   return 'bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300';
 }
 
+function listingBucket(listing: MarketplaceListingDto): ListingFilter {
+  const status = normalize(listing.status);
+  if (status.includes('fail') || status.includes('error') || status.includes('hata')) return 'failed';
+  if (status.includes('pending') || status.includes('ready') || status.includes('draft')) return 'pending';
+  if (listing.lastPushedPrice == null || listing.lastPushedQuantity == null) return 'needs-action';
+  if (status.includes('published') || status.includes('success') || status.includes('yay')) return 'published';
+  return 'needs-action';
+}
+
 export function B2bMarketplaceListingsPage(): ReactElement {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -53,6 +80,8 @@ export function B2bMarketplaceListingsPage(): ReactElement {
   const [quantity, setQuantity] = useState('');
   const [currencyCode, setCurrencyCode] = useState('TRY');
   const [targetChannelId, setTargetChannelId] = useState('');
+  const [listingFilter, setListingFilter] = useState<ListingFilter>('all');
+  const [quickValues, setQuickValues] = useState<Record<number, { price: string; quantity: string; currencyCode: string }>>({});
 
   const channelsQuery = useQuery({
     queryKey: ['b2b-marketplace-workbench', 'channels'],
@@ -76,15 +105,16 @@ export function B2bMarketplaceListingsPage(): ReactElement {
     const term = normalize(search);
     return listings.filter((item) => {
       const channelMatches = selectedChannelId === 'all' || String(item.channelId) === selectedChannelId;
+      const statusMatches = listingFilter === 'all' || listingBucket(item) === listingFilter;
       const searchMatches = !term
         || normalize(item.sku).includes(term)
         || normalize(item.catalogProductName).includes(term)
         || normalize(item.channelName).includes(term)
         || normalize(item.marketplaceListingId).includes(term)
         || normalize(item.marketplaceProductId).includes(term);
-      return channelMatches && searchMatches;
+      return channelMatches && statusMatches && searchMatches;
     });
-  }, [listings, search, selectedChannelId]);
+  }, [listings, listingFilter, search, selectedChannelId]);
 
   const selectedChannel = selectedChannelId === 'all'
     ? null
@@ -93,6 +123,14 @@ export function B2bMarketplaceListingsPage(): ReactElement {
   const pendingEventCount = (eventsQuery.data?.data ?? []).filter((event) => normalize(event.status).includes('pending')).length;
   const failedListingCount = listings.filter((item) => normalize(item.status).includes('fail')).length;
   const missingPriceCount = listings.filter((item) => item.lastPushedPrice == null).length;
+  const latestEvents = eventsQuery.data?.data ?? [];
+  const listingFilterOptions: Array<{ key: ListingFilter; label: string; count: number; icon: ReactElement }> = [
+    { key: 'all', label: t('marketplaceWorkbench.filters.all'), count: listings.length, icon: <ShoppingBag className="size-4" /> },
+    { key: 'published', label: t('marketplaceWorkbench.filters.published'), count: listings.filter((item) => listingBucket(item) === 'published').length, icon: <CheckCircle2 className="size-4" /> },
+    { key: 'pending', label: t('marketplaceWorkbench.filters.pending'), count: listings.filter((item) => listingBucket(item) === 'pending').length, icon: <Clock3 className="size-4" /> },
+    { key: 'failed', label: t('marketplaceWorkbench.filters.failed'), count: listings.filter((item) => listingBucket(item) === 'failed').length, icon: <AlertTriangle className="size-4" /> },
+    { key: 'needs-action', label: t('marketplaceWorkbench.filters.needsAction'), count: listings.filter((item) => listingBucket(item) === 'needs-action').length, icon: <SlidersHorizontal className="size-4" /> },
+  ];
 
   const operationMutation = useMutation({
     mutationFn: async () => {
@@ -147,6 +185,35 @@ export function B2bMarketplaceListingsPage(): ReactElement {
     onError: (error: Error) => toast.error(error.message || t('marketplaceWorkbench.toasts.queueFailed')),
   });
 
+  const quickMutation = useMutation({
+    mutationFn: async ({ listing, type, override }: { listing: MarketplaceListingDto; type: QuickOperation; override?: Partial<{ price: string; quantity: string; currencyCode: string }> }) => {
+      const provider = listing.providerKey || channels.find((channel) => channel.id === listing.channelId)?.providerKey;
+      if (!provider) throw new Error(t('marketplaceWorkbench.errors.providerMissing'));
+      const defaults = {
+        price: listing.lastPushedPrice != null ? String(listing.lastPushedPrice) : '',
+        quantity: listing.lastPushedQuantity != null ? String(listing.lastPushedQuantity) : '',
+        currencyCode: listing.currencyCode || 'TRY',
+      };
+      const values = { ...defaults, ...(quickValues[listing.id] ?? {}), ...(override ?? {}) };
+      const payload: Record<string, unknown> = {
+        listingId: listing.id,
+        operationType: type === 'price-update' ? 'PriceUpdate' : 'StockUpdate',
+        currencyCode: values.currencyCode || listing.currencyCode || 'TRY',
+      };
+      if (type === 'price-update') payload.price = Number(values.price);
+      if (type === 'stock-update') payload.quantity = Number(values.quantity);
+      return b2bApi.queueMarketplaceProviderOperation(provider, type, payload);
+    },
+    onSuccess: async () => {
+      toast.success(t('marketplaceWorkbench.toasts.queued'));
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['b2b-marketplace-workbench'] }),
+        queryClient.invalidateQueries({ queryKey: ['b2b-workspace', 'marketplace-listings'] }),
+      ]);
+    },
+    onError: (error: Error) => toast.error(error.message || t('marketplaceWorkbench.toasts.queueFailed')),
+  });
+
   function openAction(type: MarketplaceAction, listing: MarketplaceListingDto): void {
     setAction({ type, listing });
     setPrice(listing.lastPushedPrice != null ? String(listing.lastPushedPrice) : '');
@@ -160,6 +227,24 @@ export function B2bMarketplaceListingsPage(): ReactElement {
     setPrice('');
     setQuantity('');
     setTargetChannelId('');
+  }
+
+  function getQuickValue(listing: MarketplaceListingDto): { price: string; quantity: string; currencyCode: string } {
+    return quickValues[listing.id] ?? {
+      price: listing.lastPushedPrice != null ? String(listing.lastPushedPrice) : '',
+      quantity: listing.lastPushedQuantity != null ? String(listing.lastPushedQuantity) : '',
+      currencyCode: listing.currencyCode || 'TRY',
+    };
+  }
+
+  function updateQuickValue(listing: MarketplaceListingDto, key: 'price' | 'quantity' | 'currencyCode', value: string): void {
+    setQuickValues((current) => ({
+      ...current,
+      [listing.id]: {
+        ...getQuickValue(listing),
+        [key]: key === 'currencyCode' ? value.toUpperCase() : value,
+      },
+    }));
   }
 
   const targetChannels = action
@@ -224,17 +309,57 @@ export function B2bMarketplaceListingsPage(): ReactElement {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <GuideCard title={t('marketplaceWorkbench.flow.view.title')} description={t('marketplaceWorkbench.flow.view.description')} icon={<PackageSearch className="size-5" />} />
-        <GuideCard title={t('marketplaceWorkbench.flow.update.title')} description={t('marketplaceWorkbench.flow.update.description')} icon={<Tag className="size-5" />} />
-        <GuideCard title={t('marketplaceWorkbench.flow.publish.title')} description={t('marketplaceWorkbench.flow.publish.description')} icon={<Send className="size-5" />} />
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <Card className="border-slate-200 dark:border-white/10">
+          <CardContent className="p-4">
+            <div className="flex flex-wrap gap-2">
+              {listingFilterOptions.map((option) => (
+                <Button
+                  key={option.key}
+                  type="button"
+                  variant={listingFilter === option.key ? 'default' : 'outline'}
+                  className="h-auto gap-2 rounded-2xl px-4 py-3"
+                  onClick={() => setListingFilter(option.key)}
+                >
+                  {option.icon}
+                  <span>{option.label}</span>
+                  <Badge variant={listingFilter === option.key ? 'secondary' : 'outline'} className="rounded-full">{option.count}</Badge>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-slate-200 dark:border-white/10">
+          <CardContent className="p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{t('marketplaceWorkbench.events.title')}</p>
+            <div className="mt-3 space-y-2">
+              {latestEvents.slice(0, 3).map((event) => (
+                <div key={event.id} className="rounded-2xl border border-slate-200 bg-white p-3 dark:border-white/10 dark:bg-white/5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-black text-slate-950 dark:text-white">{event.sku || event.operationType}</p>
+                      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{event.channelName || event.providerKey} · {event.operationType}</p>
+                    </div>
+                    <span className={`rounded-full px-2 py-1 text-[11px] font-black ${statusTone(event.status)}`}>{event.status}</span>
+                  </div>
+                </div>
+              ))}
+              {latestEvents.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-slate-300 p-4 text-sm font-semibold text-slate-500 dark:border-white/15 dark:text-slate-400">
+                  {t('marketplaceWorkbench.events.empty')}
+                </div>
+              ) : null}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4">
         {filteredListings.map((listing) => (
           <Card key={listing.id} className="overflow-hidden border-slate-200 dark:border-white/10">
             <CardContent className="p-0">
-              <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_420px]">
+              <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_500px]">
                 <div className="p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
@@ -258,6 +383,51 @@ export function B2bMarketplaceListingsPage(): ReactElement {
                     <InfoTile label={t('marketplaceWorkbench.card.marketplaceProductId')} value={listing.marketplaceProductId || '-'} />
                     <InfoTile label={t('marketplaceWorkbench.card.marketplaceListingId')} value={listing.marketplaceListingId || '-'} />
                   </div>
+                  <div className="mt-4 grid gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/[0.03] md:grid-cols-3">
+                    <LabeledField label={t('marketplaceWorkbench.quick.price')}>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={getQuickValue(listing).price}
+                        onChange={(event) => updateQuickValue(listing, 'price', event.target.value)}
+                      />
+                    </LabeledField>
+                    <LabeledField label={t('marketplaceWorkbench.quick.quantity')}>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={getQuickValue(listing).quantity}
+                        onChange={(event) => updateQuickValue(listing, 'quantity', event.target.value)}
+                      />
+                    </LabeledField>
+                    <LabeledField label={t('marketplaceWorkbench.quick.currency')}>
+                      <Input
+                        value={getQuickValue(listing).currencyCode}
+                        maxLength={3}
+                        onChange={(event) => updateQuickValue(listing, 'currencyCode', event.target.value)}
+                      />
+                    </LabeledField>
+                    <div className="md:col-span-3 grid gap-2 sm:grid-cols-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => quickMutation.mutate({ listing, type: 'price-update' })}
+                        disabled={quickMutation.isPending}
+                      >
+                        <Tag className="mr-2 size-4" />
+                        {t('marketplaceWorkbench.quick.queuePrice')}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => quickMutation.mutate({ listing, type: 'stock-update' })}
+                        disabled={quickMutation.isPending}
+                      >
+                        <Warehouse className="mr-2 size-4" />
+                        {t('marketplaceWorkbench.quick.queueStock')}
+                      </Button>
+                    </div>
+                  </div>
                   {listing.errorMessage ? (
                     <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-800 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-200">
                       {listing.errorMessage}
@@ -277,11 +447,18 @@ export function B2bMarketplaceListingsPage(): ReactElement {
                       <ArrowRight className="size-4" />
                     </Button>
                     <Button variant="outline" className="justify-between" onClick={() => openAction('product-create', listing)}>
-                      {t('marketplaceWorkbench.actions.publishSameChannel')}
+                      <span className="flex items-center gap-2"><PlusCircle className="size-4" />{t('marketplaceWorkbench.actions.publishSameChannel')}</span>
                       <ArrowRight className="size-4" />
                     </Button>
                     <Button className="justify-between" onClick={() => openAction('clone-to-channel', listing)}>
-                      {t('marketplaceWorkbench.actions.publishAnotherChannel')}
+                      <span className="flex items-center gap-2"><Send className="size-4" />{t('marketplaceWorkbench.actions.publishAnotherChannel')}</span>
+                      <ArrowRight className="size-4" />
+                    </Button>
+                    <Button variant="secondary" className="justify-between" onClick={() => {
+                      updateQuickValue(listing, 'quantity', '0');
+                      quickMutation.mutate({ listing, type: 'stock-update', override: { quantity: '0' } });
+                    }}>
+                      {t('marketplaceWorkbench.actions.removeFromSale')}
                       <ArrowRight className="size-4" />
                     </Button>
                   </div>
@@ -366,18 +543,6 @@ function MetricCard({ icon, label, value }: { icon: ReactElement; label: string;
         </div>
       </div>
     </div>
-  );
-}
-
-function GuideCard({ title, description, icon }: { title: string; description: string; icon: ReactElement }): ReactElement {
-  return (
-    <Card className="border-slate-200 dark:border-white/10">
-      <CardContent className="p-5">
-        <span className="grid size-11 place-items-center rounded-2xl bg-cyan-100 text-cyan-700 dark:bg-cyan-500/15 dark:text-cyan-200">{icon}</span>
-        <h3 className="mt-4 font-black text-slate-950 dark:text-white">{title}</h3>
-        <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">{description}</p>
-      </CardContent>
-    </Card>
   );
 }
 

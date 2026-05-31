@@ -5017,6 +5017,11 @@
     "filters": {
       "channel": "Channel",
       "allChannels": "All channels",
+      "all": "All",
+      "published": "Published",
+      "pending": "Pending",
+      "failed": "Failed",
+      "needsAction": "Needs Action",
       "searchPlaceholder": "Search SKU, product, channel or marketplace id",
       "selectedChannel": "Showing products for {{channel}}",
       "allChannelsHelp": "Products from all marketplace channels are listed."
@@ -5048,7 +5053,19 @@
       "updatePrice": "Update price",
       "updateStock": "Update stock",
       "publishSameChannel": "Send product to this channel",
-      "publishAnotherChannel": "Add to another channel"
+      "publishAnotherChannel": "Add to another channel",
+      "removeFromSale": "Remove from sale"
+    },
+    "quick": {
+      "price": "Quick price",
+      "quantity": "Quick stock",
+      "currency": "Currency",
+      "queuePrice": "Queue price",
+      "queueStock": "Queue stock"
+    },
+    "events": {
+      "title": "Latest sync tracking",
+      "empty": "No sync activity yet."
     },
     "empty": {
       "title": "No marketplace products yet",

@@ -5017,6 +5017,11 @@
     "filters": {
       "channel": "Kanal",
       "allChannels": "Tüm kanallar",
+      "all": "Tümü",
+      "published": "Yayında",
+      "pending": "Bekleyen",
+      "failed": "Hatalı",
+      "needsAction": "İşlem Bekleyen",
       "searchPlaceholder": "SKU, ürün, kanal veya pazar yeri ürün no ara",
       "selectedChannel": "{{channel}} ürünleri gösteriliyor",
       "allChannelsHelp": "Tüm pazaryeri kanallarındaki ürünler listeleniyor."
@@ -5048,7 +5053,19 @@
       "updatePrice": "Fiyat güncelle",
       "updateStock": "Stok güncelle",
       "publishSameChannel": "Bu kanala ürün gönder",
-      "publishAnotherChannel": "Başka kanala da ekle"
+      "publishAnotherChannel": "Başka kanala da ekle",
+      "removeFromSale": "Satıştan kaldır"
+    },
+    "quick": {
+      "price": "Hızlı fiyat",
+      "quantity": "Hızlı stok",
+      "currency": "Para birimi",
+      "queuePrice": "Fiyatı kuyruğa al",
+      "queueStock": "Stoku kuyruğa al"
+    },
+    "events": {
+      "title": "Son aktarım takibi",
+      "empty": "Henüz aktarım hareketi yok."
     },
     "empty": {
       "title": "Henüz pazaryeri ürünü yok",
