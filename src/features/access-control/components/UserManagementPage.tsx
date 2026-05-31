@@ -1,6 +1,6 @@
 import { type FormEvent, type ReactElement, type ReactNode, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, Building2, Pencil, Plus, ShieldCheck, Trash2, UserRoundCog, Users2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Building2, KeyRound, Pencil, Plus, ShieldCheck, Trash2, UserRoundCog, Users2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Badge } from '@/components/ui/badge';
@@ -53,7 +53,7 @@ const emptyForm: UserFormState = {
   phoneNumber: '',
   roleId: '',
   isActive: true,
-  accountType: 'Buyer',
+  accountType: 'Admin',
   b2bCompanyId: '',
   b2bBuyerRoleCode: 'Buyer',
   b2bOrderLimit: '',
@@ -78,6 +78,15 @@ function mapSortBy(value: UserColumnKey): string {
 
 function isB2bAccount(type: UserFormState['accountType']): boolean {
   return type === 'Buyer' || type === 'CompanyAdmin' || type === 'Approver';
+}
+
+function getBuyerRoleCode(type: UserFormState['accountType']): UserFormState['b2bBuyerRoleCode'] {
+  return type === 'CompanyAdmin' || type === 'Approver' ? type : 'Buyer';
+}
+
+function roleLooksLikeBuyer(title?: string): boolean {
+  const normalized = (title ?? '').toLocaleLowerCase('tr-TR');
+  return normalized.includes('b2b') || normalized.includes('buyer') || normalized.includes('alıcı') || normalized.includes('musteri') || normalized.includes('müşteri');
 }
 
 function toNumberOrNull(value: string): number | null {
@@ -121,7 +130,7 @@ export function UserManagementPage(): ReactElement {
 
   const companiesQuery = useQuery({
     queryKey: ['b2b', 'companies', 'user-management-picker'],
-    queryFn: () => b2bApi.getCompanies({ pageNumber: 0, pageSize: 500, sortBy: 'CompanyName', sortDirection: 'asc' }),
+    queryFn: () => b2bApi.getCompanies({ pageNumber: 1, pageSize: 500, sortBy: 'CompanyName', sortDirection: 'asc' }),
   });
 
   const createMutation = useMutation({
@@ -199,6 +208,33 @@ export function UserManagementPage(): ReactElement {
     setFormOpen(true);
   }
 
+  function handleRoleChange(value: string): void {
+    const selectedRole = roleOptions.find((role) => String(role.id) === value);
+    setForm((state) => {
+      if (!roleLooksLikeBuyer(selectedRole?.title) || isB2bAccount(state.accountType)) {
+        return { ...state, roleId: value };
+      }
+
+      return {
+        ...state,
+        roleId: value,
+        accountType: 'Buyer',
+        b2bBuyerRoleCode: 'Buyer',
+      };
+    });
+  }
+
+  function handleAccountTypeChange(value: UserFormState['accountType']): void {
+    setForm((state) => ({
+      ...state,
+      accountType: value,
+      b2bBuyerRoleCode: getBuyerRoleCode(value),
+      b2bCompanyId: isB2bAccount(value) ? state.b2bCompanyId : '',
+      b2bOrderLimit: isB2bAccount(value) ? state.b2bOrderLimit : '',
+      b2bRequiresApproval: isB2bAccount(value) ? state.b2bRequiresApproval : false,
+    }));
+  }
+
   async function openEdit(user: UserManagementDto): Promise<void> {
     const [detail, groups] = await Promise.all([
       userManagementApi.getById(user.id),
@@ -258,14 +294,18 @@ export function UserManagementPage(): ReactElement {
       toast.error('B2B kullanıcısı için şirket seçmelisiniz.');
       return;
     }
+    if (!payload.firstName?.trim() || !payload.lastName?.trim()) {
+      toast.error('Ad ve soyad zorunludur.');
+      return;
+    }
 
     if (editingUser) {
       await updateMutation.mutateAsync({ id: editingUser.id, payload });
       return;
     }
 
-    if (!payload.username || !payload.email) {
-      toast.error('Kullanıcı adı ve e-posta zorunludur.');
+    if (!payload.username || !payload.email || !payload.password) {
+      toast.error('Kullanıcı adı, e-posta ve şifre zorunludur.');
       return;
     }
 
@@ -403,35 +443,75 @@ export function UserManagementPage(): ReactElement {
           </DialogHeader>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField label="Kullanıcı adı">
-                <Input value={form.username} onChange={(event) => setForm((state) => ({ ...state, username: event.target.value }))} disabled={Boolean(editingUser)} required />
+            <div className="grid gap-3 md:grid-cols-3">
+              <button
+                type="button"
+                className={`rounded-3xl border p-4 text-left transition ${form.accountType === 'Admin' ? 'border-cyan-400 bg-cyan-50 text-cyan-950 shadow-sm dark:border-cyan-500/60 dark:bg-cyan-500/10 dark:text-cyan-100' : 'border-slate-200 bg-white/70 text-slate-700 hover:border-cyan-200 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}
+                onClick={() => handleAccountTypeChange('Admin')}
+              >
+                <ShieldCheck className="mb-3 size-5" />
+                <p className="font-black">Satıcı / İç kullanıcı</p>
+                <p className="mt-1 text-xs font-medium opacity-75">CRM’deki gibi panel kullanıcısı ve yetki grupları.</p>
+              </button>
+              <button
+                type="button"
+                className={`rounded-3xl border p-4 text-left transition ${form.accountType === 'Buyer' ? 'border-emerald-400 bg-emerald-50 text-emerald-950 shadow-sm dark:border-emerald-500/60 dark:bg-emerald-500/10 dark:text-emerald-100' : 'border-slate-200 bg-white/70 text-slate-700 hover:border-emerald-200 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}
+                onClick={() => handleAccountTypeChange('Buyer')}
+              >
+                <Building2 className="mb-3 size-5" />
+                <p className="font-black">B2B alıcı</p>
+                <p className="mt-1 text-xs font-medium opacity-75">Firma ile eşleşir, portalda kendi sepet ve siparişlerini görür.</p>
+              </button>
+              <button
+                type="button"
+                className={`rounded-3xl border p-4 text-left transition ${form.accountType === 'CompanyAdmin' || form.accountType === 'Approver' ? 'border-pink-400 bg-pink-50 text-pink-950 shadow-sm dark:border-pink-500/60 dark:bg-pink-500/10 dark:text-pink-100' : 'border-slate-200 bg-white/70 text-slate-700 hover:border-pink-200 dark:border-white/10 dark:bg-white/5 dark:text-slate-200'}`}
+                onClick={() => handleAccountTypeChange('CompanyAdmin')}
+              >
+                <Users2 className="mb-3 size-5" />
+                <p className="font-black">Firma yetkilisi</p>
+                <p className="mt-1 text-xs font-medium opacity-75">Alıcı firma yöneticisi veya satın alma onaycısı.</p>
+              </button>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5">
+              <div className="mb-4 flex items-center gap-2">
+                <UserRoundCog className="size-5 text-cyan-500" />
+                <div>
+                  <p className="text-sm font-black text-slate-900 dark:text-white">Kullanıcı kimliği</p>
+                  <p className="text-xs font-medium text-slate-500 dark:text-slate-400">CRM kullanıcı formuyla aynı temel bilgiler.</p>
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+              <FormField label="Ad *">
+                <Input value={form.firstName} onChange={(event) => setForm((state) => ({ ...state, firstName: event.target.value }))} required />
               </FormField>
-              <FormField label="E-posta">
+              <FormField label="Soyad *">
+                <Input value={form.lastName} onChange={(event) => setForm((state) => ({ ...state, lastName: event.target.value }))} required />
+              </FormField>
+              <FormField label="E-posta *">
                 <Input type="email" value={form.email} onChange={(event) => setForm((state) => ({ ...state, email: event.target.value }))} required />
               </FormField>
-              <FormField label="Ad">
-                <Input value={form.firstName} onChange={(event) => setForm((state) => ({ ...state, firstName: event.target.value }))} />
-              </FormField>
-              <FormField label="Soyad">
-                <Input value={form.lastName} onChange={(event) => setForm((state) => ({ ...state, lastName: event.target.value }))} />
+              <FormField label="Kullanıcı adı *">
+                <Input value={form.username} onChange={(event) => setForm((state) => ({ ...state, username: event.target.value }))} disabled={Boolean(editingUser)} required />
               </FormField>
               <FormField label="Telefon">
                 <Input value={form.phoneNumber} onChange={(event) => setForm((state) => ({ ...state, phoneNumber: event.target.value }))} />
               </FormField>
-              <FormField label={editingUser ? 'Yeni şifre' : 'Şifre'}>
+              <FormField label={editingUser ? 'Yeni şifre' : 'Şifre *'}>
                 <Input
                   type="password"
                   value={editingUser ? form.newPassword : form.password}
                   onChange={(event) => setForm((state) => editingUser ? { ...state, newPassword: event.target.value } : { ...state, password: event.target.value })}
-                  placeholder={editingUser ? 'Boş bırakırsanız değişmez' : 'Boşsa varsayılan şifre atanır'}
+                  placeholder={editingUser ? 'Boş bırakırsanız değişmez' : 'Geçici şifre girin'}
+                  required={!editingUser}
                 />
               </FormField>
+              </div>
             </div>
 
             <div className="grid gap-4 rounded-3xl border border-slate-200 bg-white/70 p-4 dark:border-white/10 dark:bg-white/5 md:grid-cols-2">
               <FormField label="Sistem rolü">
-                <Select value={form.roleId} onValueChange={(value) => setForm((state) => ({ ...state, roleId: value }))}>
+                <Select value={form.roleId} onValueChange={handleRoleChange}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Rol seç" />
                   </SelectTrigger>
@@ -442,10 +522,10 @@ export function UserManagementPage(): ReactElement {
                   </SelectContent>
                 </Select>
               </FormField>
-              <FormField label="Kullanıcı tipi">
-                <Select value={form.accountType} onValueChange={(value) => setForm((state) => ({ ...state, accountType: value as UserFormState['accountType'], b2bBuyerRoleCode: value === 'Admin' ? 'Buyer' : value as UserFormState['b2bBuyerRoleCode'] }))}>
+              <FormField label="B2B kullanıcı profili">
+                <Select value={form.accountType} onValueChange={(value) => handleAccountTypeChange(value as UserFormState['accountType'])}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Tip seç" />
+                    <SelectValue placeholder="Profil seç" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Admin">Admin / İç kullanıcı</SelectItem>
@@ -457,20 +537,36 @@ export function UserManagementPage(): ReactElement {
               </FormField>
               {isB2bAccount(form.accountType) ? (
                 <>
-                  <FormField label="Şirket">
+                  <FormField label="Eşleşeceği firma *">
                     <Combobox
                       options={companyOptions}
                       value={form.b2bCompanyId}
                       onValueChange={(value) => setForm((state) => ({ ...state, b2bCompanyId: value }))}
-                      placeholder="Şirket seç"
+                      placeholder="Firma seç"
                       searchPlaceholder="Şirket adı veya kodu ara"
                       emptyText="Şirket bulunamadı"
                       disabled={companiesQuery.isLoading}
                     />
                   </FormField>
+                  <FormField label="Firma içi yetki">
+                    <Select value={form.b2bBuyerRoleCode} onValueChange={(value) => setForm((state) => ({ ...state, b2bBuyerRoleCode: value as UserFormState['b2bBuyerRoleCode'], accountType: value as UserFormState['accountType'] }))}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Firma içi yetki seç" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Buyer">Alıcı</SelectItem>
+                        <SelectItem value="CompanyAdmin">Firma yöneticisi</SelectItem>
+                        <SelectItem value="Approver">Satın alma onaycısı</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormField>
                   <FormField label="Sipariş limiti">
                     <Input type="number" min="0" step="0.01" value={form.b2bOrderLimit} onChange={(event) => setForm((state) => ({ ...state, b2bOrderLimit: event.target.value }))} />
                   </FormField>
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm font-semibold text-emerald-900 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-100">
+                    <KeyRound className="mb-2 size-4" />
+                    Bu kullanıcı firma portalına kendi e-postası ve şifresiyle girer; sepet, teklif, sipariş ve ödeme geçmişi kendi firma hesabına bağlanır.
+                  </div>
                 </>
               ) : null}
               <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 dark:border-white/10 dark:bg-white/5">
