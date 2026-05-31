@@ -4931,6 +4931,31 @@
           "apiSecret": "Token almak veya Basic/Auth akışında kullanılan secret."
         }
       },
+      "N11": {
+        "title": "n11 bilgileri nereden alınır?",
+        "summary": "n11 REST API appKey/appSecret ile çalışır. Fiyat ve stok güncellemeleri taskId üretir; sonuçlar job tarafından takip edilir.",
+        "required": [
+          "Seller ID",
+          "App Key",
+          "App Secret"
+        ],
+        "steps": [
+          "n11 satıcı paneline yetkili kullanıcıyla girin.",
+          "API/entegrasyon bilgileri bölümünden App Key ve App Secret bilgisini alın.",
+          "Bu ekranda Satıcı / Mağaza No alanına Seller ID bilgisini, credential alanlarına App Key ve App Secret bilgisini girin.",
+          "Fiyat/stok güncelleme sonrası task takip ekranından sonucu izleyin."
+        ],
+        "links": {
+          "priceStock": "Fiyat-stok güncelleme dokümanı",
+          "sellerSupport": "n11 mağaza destek"
+        },
+        "setupSummary": "n11 satıcı panelinden appKey/appSecret bilgileri alınır. Fiyat-stok güncelleme taskId üretir; task sonucu Hangfire job tarafından takip edilir.",
+        "credentialHelp": {
+          "sellerId": "n11 mağaza/satıcı kimliği. Kanal eşlemesinde mağaza kodu olarak kullanılır.",
+          "appKey": "n11 REST API erişimi için satıcı panelinden alınan uygulama anahtarı.",
+          "appSecret": "n11 REST API erişimi için appKey ile birlikte kullanılan gizli anahtar."
+        }
+      },
       "Amazon": {
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",

@@ -56,6 +56,14 @@ const providerGuides: Record<string, ProviderGuideDefinition> = {
       { label: 'developer', href: 'https://developers.hepsiburada.com/' },
     ],
   },
+  N11: {
+    requiredCount: 3,
+    stepCount: 4,
+    links: [
+      { label: 'priceStock', href: 'https://magazadestek.n11.com/satis-surecleri/restapi-urun-bilgileri-ve-fiyat-stok-guncelleme-servisi-10173' },
+      { label: 'sellerSupport', href: 'https://magazadestek.n11.com/' },
+    ],
+  },
   Amazon: {
     requiredCount: 7,
     stepCount: 5,

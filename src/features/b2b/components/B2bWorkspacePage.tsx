@@ -655,6 +655,7 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
       { name: 'providerKey', label: 'Pazar Yeri', type: 'select', required: true, options: [
         { label: 'Trendyol', value: 'Trendyol' },
         { label: 'Hepsiburada', value: 'Hepsiburada' },
+        { label: 'n11', value: 'N11' },
         { label: 'Amazon SP-API', value: 'Amazon' },
         { label: 'Etsy', value: 'Etsy' },
       ] },

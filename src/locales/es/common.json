@@ -3762,6 +3762,31 @@
           "apiSecret": "Secret used for token generation or Basic/Auth flow."
         }
       },
+      "N11": {
+        "title": "Where do I get n11 credentials?",
+        "summary": "n11 REST API works with appKey/appSecret. Price and stock updates create a taskId; results are tracked by the sync job.",
+        "required": [
+          "Seller ID",
+          "App Key",
+          "App Secret"
+        ],
+        "steps": [
+          "Log in to the n11 seller panel with an authorized user.",
+          "Get App Key and App Secret from the API/integration information area.",
+          "Enter Seller ID in Seller / Store No and App Key/App Secret in credential fields.",
+          "Track task results after price or stock updates."
+        ],
+        "links": {
+          "priceStock": "Price-stock update documentation",
+          "sellerSupport": "n11 seller support"
+        },
+        "setupSummary": "AppKey/appSecret values are obtained from the n11 seller panel. Price-stock updates create a taskId and the result is tracked by the Hangfire job.",
+        "credentialHelp": {
+          "sellerId": "n11 store/seller id. Used as the store identifier in channel mapping.",
+          "appKey": "Application key obtained from n11 seller panel for REST API access.",
+          "appSecret": "Secret key used together with appKey for n11 REST API access."
+        }
+      },
       "Amazon": {
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",
