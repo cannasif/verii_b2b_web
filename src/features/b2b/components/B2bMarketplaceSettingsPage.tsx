@@ -40,6 +40,7 @@ type ProviderGuideDefinition = {
   links: Array<{ label: string; href: string }>;
   hasWarning?: boolean;
   connectionModeHelp?: string;
+  connectionChecklist?: string[];
 };
 
 type ProviderDefinitionMap = Record<string, ProviderGuideDefinition>;
@@ -48,6 +49,12 @@ const providerGuides: ProviderDefinitionMap = {
   Trendyol: {
     requiredCount: 5,
     stepCount: 4,
+    connectionChecklist: [
+      'Satıcı panelindeki “Entegrasyon Bilgileri” ekranından Supplier ID ve API Key/Secret alın.',
+      'API çağrılarında Seller ve ürün senkronu için doğru ortam URL (prod/sandbox) seçin.',
+      'Katalog eşleşmesi olmadan yayına alınmış satış kalemi göndermeyin.',
+      'Canlıya geçmeden önce test ürünleriyle ürün, fiyat ve stok akışını birer kez koşun.',
+    ],
     links: [
       { label: 'authorization', href: 'https://developers.trendyol.com/tr/docs/2-authorization' },
       { label: 'developer', href: 'https://developers.trendyol.com/' },
@@ -56,6 +63,12 @@ const providerGuides: ProviderDefinitionMap = {
   Hepsiburada: {
     requiredCount: 5,
     stepCount: 4,
+    connectionChecklist: [
+      'Developer/mağaza panelinde uygulama kaydını ve API erişim tipini doğrulayın.',
+      'Merchant ID, API Key ve secret bilgilerini doğrulayın; test ortamını ayrı saklayın.',
+      'Entegrasyon yetkisi verilen hesapla sipariş ve ürün API’lerine erişim test edin.',
+      'Gerekliyse webhook/push callback URL yapılandırmasını tamamlayın.',
+    ],
     links: [
       { label: 'gettingStarted', href: 'https://developers.hepsiburada.com/hepsiburada/docs/getting-started' },
       { label: 'developer', href: 'https://developers.hepsiburada.com/' },
@@ -106,6 +119,12 @@ const providerGuides: ProviderDefinitionMap = {
   Ebay: {
     requiredCount: 3,
     stepCount: 5,
+    connectionChecklist: [
+      'Üretimden önce eBay Developer account ile OAuth token akışını tamamlayın.',
+      'Kullanacağınız Marketplace ID ve seller context değerini doğrulayın (örn. EBAY_US).',
+      'Inventory item + offer + publish akışını sırasıyla tamamlayın.',
+      'Kategori ve policy eksikliği ürün yayınını reddeder; öncelikle katalog atamalarını kontrol edin.',
+    ],
     links: [
       { label: 'inventoryApi', href: 'https://developer.ebay.com/api-docs/sell/inventory/overview.html' },
       { label: 'bulkPriceQuantity', href: 'https://developer.ebay.com/api-docs/sell/inventory/resources/methods' },
@@ -142,6 +161,13 @@ const providerGuides: ProviderDefinitionMap = {
   Amazon: {
     requiredCount: 7,
     stepCount: 5,
+    connectionChecklist: [
+      'Seller Central’da SP-API uygulamasını kaydedin ve LWA client id/secret oluşturun.',
+      'Satıcınız için authorization akışını tamamlayıp refresh token alın.',
+      'AWS IAM erişimi ve Signature V4 için erişim anahtarlarını ekleyin.',
+      'Marketplace ID + region eşleşmesini seçin (ör. EU için bölge uygunluğu).',
+      'Ürünü açmadan önce Listing SKU ve ürün-ürün varyant eşlemesini kontrol edin.',
+    ],
     links: [
       { label: 'registration', href: 'https://developer-docs.amazon.com/sp-api/docs/sp-api-registration-overview' },
       { label: 'marketplaceIds', href: 'https://developer-docs.amazon.com/sp-api/docs/marketplace-ids' },
@@ -191,6 +217,7 @@ function createFallbackGuide(setting: MarketplaceProviderSettingDto): ProviderGu
     requiredLabels,
     defaultSteps: fallbackStepLabels,
     links: [{ label: 'documentation', href: setting.documentationUrl }],
+    connectionChecklist: setting.credentialFields.length > 0 ? setting.credentialFields.map((field) => field.label) : undefined,
   };
 }
 
@@ -221,6 +248,41 @@ function createFallbackProviderSetting(providerKey: string): MarketplaceProvider
 
 function getGuideText(t: (key: string, options?: Record<string, unknown>) => string, key: string, fallback: string): string {
   return t(key, { defaultValue: fallback });
+}
+
+function getGuideList(
+  t: (key: string, options?: Record<string, unknown>) => string,
+  key: string,
+  fallback: string[],
+): string[] {
+  const value = t(key as string, { returnObjects: true, defaultValue: fallback }) as unknown;
+  if (Array.isArray(value) && value.every((item) => typeof item === 'string')) {
+    return value as string[];
+  }
+
+  return fallback;
+}
+
+function resolveChecklistItems(
+  selectedProviderKey: string,
+  guide: ProviderGuideDefinition,
+  t: (key: string, options?: Record<string, unknown>) => string,
+  fallback: string[],
+): string[] {
+  const localized = getGuideList(
+    t,
+    `marketplaceSettings.guides.${selectedProviderKey}.connectionChecklist`,
+    [],
+  );
+  if (localized.length > 0) {
+    return localized;
+  }
+
+  if (guide.connectionChecklist?.length) {
+    return guide.connectionChecklist;
+  }
+
+  return fallback;
 }
 
 function humanizeLinkLabel(label: string): string {
@@ -432,9 +494,9 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="rounded-3xl border border-cyan-200 bg-cyan-50 p-4 text-sm text-cyan-950 dark:border-cyan-500/30 dark:bg-cyan-950/30 dark:text-cyan-100">
-                {t(`marketplaceSettings.guides.${selectedProviderKey}.setupSummary`, { defaultValue: selectedSetting.setupSummary })}
-              </div>
+                  <div className="rounded-3xl border border-cyan-200 bg-cyan-50 p-4 text-sm text-cyan-950 dark:border-cyan-500/30 dark:bg-cyan-950/30 dark:text-cyan-100">
+                    {t(`marketplaceSettings.guides.${selectedProviderKey}.setupSummary`, { defaultValue: selectedSetting.setupSummary })}
+                  </div>
 
               {selectedGuide ? (
                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -462,6 +524,18 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                         </li>
                       ))}
                     </ol>
+                    {resolveChecklistItems(selectedProviderKey, selectedGuide, t, []).length > 0 ? (
+                      <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-950/30 dark:text-emerald-100">
+                        <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">{t('marketplaceSettings.connectionChecklist')}</p>
+                        <ul className="mt-3 space-y-2">
+                          {resolveChecklistItems(selectedProviderKey, selectedGuide, t, []).map((item) => (
+                            <li key={`${selectedProviderKey}-check-${item}`} className="ml-4 list-disc">
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
                     {selectedGuide.connectionModeHelp ? (
                       <p className="mt-4 rounded-2xl border border-cyan-500/20 bg-cyan-50 p-3 text-sm text-cyan-900 dark:border-cyan-500/40 dark:bg-cyan-950/30 dark:text-cyan-100">
                         {getGuideText(

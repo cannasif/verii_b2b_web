@@ -4821,6 +4821,7 @@
     "providerSettingsTitle": "{{provider}} ayarları",
     "officialDocument": "Resmi doküman",
     "requiredInfo": "Gerekli bilgiler",
+    "connectionChecklist": "Bağlantı kontrol listesi",
     "connectionModes": "Desteklenen bağlantı metodları",
     "officialLinks": "Resmi bağlantılar",
     "currentSecret": "Mevcut secret: {{secret}}. Yeni değer girmezseniz mevcut credential korunur.",
@@ -4882,6 +4883,12 @@
         "title": "Trendyol bilgileri nereden alınır?",
         "summary": "Trendyol entegrasyonu Basic Auth ile çalışır. Ürün, fiyat, stok ve sipariş servislerinde Supplier ID ile API Key/API Secret birlikte kullanılır.",
         "connectionModeHelp": "Trendyol için bu alanda Basic Auth kullanılır; Supplier ID ve API Key/API Secret birlikte girilmezse kimlik doğrulama tamamlanmaz.",
+        "connectionChecklist": [
+          "Satıcı panelindeki Entegrasyon Bilgileri sayfasından Supplier ID/API Key/API Secret doğrulayın.",
+          "Seller/mağaza kodunu ve isteniyorsa test URL’sini ayırın; prod/sandbox karışmasın.",
+          "Katalog, stok ve fiyat mappinglerini ürün kartından kontrol ederek publish akışını başlatın.",
+          "Canlıya geçmeden önce küçük bir SKU ile ürün, fiyat ve stok test kuyruğunu koşup hata loglarını inceleyin."
+        ],
         "required": [
           "Supplier ID",
           "API Key",
@@ -4909,6 +4916,12 @@
       "Hepsiburada": {
         "title": "Hepsiburada bilgileri nereden alınır?",
         "summary": "Hepsiburada tarafında merchant/mağaza bilgisi ve API anahtarları gerekir. İşlemler genelde batch/transaction takip mantığıyla ilerler.",
+        "connectionChecklist": [
+          "Developer hesabı ve merchant mağaza erişimini kontrol edin; API yetkileri aktif olsun.",
+          "Merchant ID ile API key/secret eşleşmesini doğrulayın.",
+          "Sipariş/ürün API kapsamları (scope) için gerekli izinleri sağlayın.",
+          "Callback/webhook kullanıyorsanız hedef URL’yi HTTPS ve kimlik doğrulama başlıklarıyla test edin."
+        ],
         "required": [
           "Merchant ID",
           "API Key veya Client ID",
@@ -5064,6 +5077,12 @@
         "title": "eBay bilgileri nereden alınır?",
         "summary": "eBay Sell Inventory API ürünleri inventory item, offer ve publish adımlarıyla yayınlar. Fiyat ve stok için bulk update price quantity endpointi kullanılır.",
         "connectionModeHelp": "eBay çoğu işlemde OAuth scope token’ı ile çalışır, gerekirse provider tarafına seller/marketplace bağlamı ayrı gönderilir.",
+        "connectionChecklist": [
+          "eBay Developer uygulamasıyla kullanıcı token’ı alma akışını tamamlayın.",
+          "İşlemde hangi marketplace için çalıştığınızı Marketplace ID ile net belirtin.",
+          "Offer publish akışında policy ve location alanlarını doldurun.",
+          "Ürün/özellik seti eksikliklerini önceden category mapping ile kapatın."
+        ],
         "required": [
           "Seller ID",
           "Marketplace ID",
@@ -5178,6 +5197,13 @@
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",
         "connectionModeHelp": "Amazon’da OAuth akışı (LWA) + AWS Signature v4 birlikte çalışır; Seller ID ve Region bilgisi olmadan istek reddedilir.",
+        "connectionChecklist": [
+          "Uygulama oluşturup LWA client bilgilerini ve Seller Central authorization'ı alın.",
+          "Refresh token ile uzun ömürlü API oturumunu doğrulayın.",
+          "AWS Access Key/Secret ile Signature V4 ayarını test endpointte doğrulayın.",
+          "Marketplace ID ve endpoint region’unu ürün satış bölgesiyle eşleyin.",
+          "Fiyat/stok payloadında para birimi ve unit ölçü birimi uyumunu kontrol edin."
+        ],
         "required": [
           "Seller ID",
           "Marketplace ID",

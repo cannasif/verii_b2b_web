@@ -4821,6 +4821,7 @@
     "providerSettingsTitle": "{{provider}} settings",
     "officialDocument": "Official documentation",
     "requiredInfo": "Required information",
+    "connectionChecklist": "Connection readiness checklist",
     "connectionModes": "Supported connection methods",
     "officialLinks": "Official links",
     "currentSecret": "Current secret: {{secret}}. Existing credentials are preserved if you do not enter a new value.",
@@ -4882,6 +4883,12 @@
         "title": "Where do I get Trendyol credentials?",
         "summary": "Trendyol uses Basic Auth. Supplier ID, API Key and API Secret are used for product, price, stock and order services.",
         "connectionModeHelp": "Trendyol uses Basic Auth in this integration; Supplier ID and API Key/API Secret must be filled together or authentication fails.",
+        "connectionChecklist": [
+          "Get Supplier ID, API Key and API Secret from Trendyol seller integration settings.",
+          "Separate production and sandbox environments to avoid URL and token confusion.",
+          "Validate catalog, stock and price mappings before publishing products.",
+          "Run one small test SKU end-to-end before production release."
+        ],
         "required": [
           "Supplier ID",
           "API Key",
@@ -4909,6 +4916,12 @@
       "Hepsiburada": {
         "title": "Where do I get Hepsiburada credentials?",
         "summary": "Hepsiburada requires merchant/store information and API keys. Operations usually run with batch or transaction tracking.",
+        "connectionChecklist": [
+          "Verify developer account and merchant panel access with required API scopes.",
+          "Confirm Merchant ID and API key/secret pair belong to the same seller context.",
+          "Activate order and catalog permissions for the integration.",
+          "If callbacks are enabled, validate HTTPS callback URL and headers."
+        ],
         "required": [
           "Merchant ID",
           "API Key or Client ID",
@@ -5064,6 +5077,12 @@
         "title": "Where do I get eBay credentials?",
         "summary": "eBay Sell Inventory API publishes products through inventory item, offer and publish steps. Price and stock use the bulk update price quantity endpoint.",
         "connectionModeHelp": "Most eBay flows require an OAuth access token with Inventory scope; seller and marketplace context should be sent if the listing uses country-specific marketplaces.",
+        "connectionChecklist": [
+          "Complete OAuth token flow in eBay Developer Console for Inventory scope.",
+          "Confirm marketplace and seller context for each publish request.",
+          "Populate category, merchant location and policy values before publishing.",
+          "Run a sandbox or non-critical test offer and confirm response IDs and offer status."
+        ],
         "required": [
           "Seller ID",
           "Marketplace ID",
@@ -5178,6 +5197,13 @@
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",
         "connectionModeHelp": "Amazon SP-API requires LWA OAuth + AWS Signature Version 4 together. Seller ID and region must match the target marketplace before sending requests.",
+        "connectionChecklist": [
+          "Create SP-API application and get LWA client credentials in Seller Central.",
+          "Complete seller authorization flow and obtain refresh token.",
+          "Validate AWS IAM access keys and Signature V4 region pairing.",
+          "Confirm marketplace IDs and endpoint region for each sales destination.",
+          "Validate listing payload fields (prices, quantities, units) before production."
+        ],
         "required": [
           "Seller ID",
           "Marketplace ID",
