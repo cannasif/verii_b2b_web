@@ -3812,6 +3812,32 @@
           "clientSecret": "Secret key used in the Pazarama token flow."
         }
       },
+      "PttAvm": {
+        "title": "Where do I get PTT AVM credentials?",
+        "summary": "PTT AVM catalog integration works with products/upsert. Product, price and stock submissions are tracked with trackingid.",
+        "required": [
+          "Seller ID",
+          "API Key",
+          "Token"
+        ],
+        "steps": [
+          "Enable API access from the PTT AVM developer or seller integration panel.",
+          "Get API Key and Token values.",
+          "Enter Seller ID in Seller / Store No and API Key/Token in credential fields.",
+          "Track the trackingid result from the Hangfire monitoring screen after product, price or stock submission."
+        ],
+        "links": {
+          "productUpsert": "Product upsert documentation",
+          "developer": "PTT AVM Developer"
+        },
+        "warning": "In the PTT AVM upsert flow, missing variants or missing fields can affect existing product data. Test catalog mapper fields before production.",
+        "setupSummary": "PTT AVM catalog integration works with products/upsert. Product, price and stock submissions are tracked with trackingid.",
+        "credentialHelp": {
+          "sellerId": "PTT AVM store/seller id.",
+          "apiKey": "API key obtained from the PTT AVM developer/integration panel.",
+          "token": "Access value used as Bearer token in PTT AVM API requests."
+        }
+      },
       "Amazon": {
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",

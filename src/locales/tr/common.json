@@ -4981,6 +4981,32 @@
           "clientSecret": "Pazarama token alma akışında kullanılan gizli anahtar."
         }
       },
+      "PttAvm": {
+        "title": "PTT AVM bilgileri nereden alınır?",
+        "summary": "PTT AVM katalog entegrasyonu products/upsert mantığıyla çalışır. Ürün, fiyat ve stok gönderimleri trackingid ile takip edilir.",
+        "required": [
+          "Seller ID",
+          "API Key",
+          "Token"
+        ],
+        "steps": [
+          "PTT AVM developer veya satıcı entegrasyon panelinden API erişimini aktif edin.",
+          "API Key ve Token bilgilerini alın.",
+          "Bu ekranda Satıcı / Mağaza No alanına Seller ID bilgisini, credential alanlarına API Key ve Token bilgisini girin.",
+          "Ürün/fiyat/stok gönderimi sonrası trackingid sonucunu Hangfire takip ekranından izleyin."
+        ],
+        "links": {
+          "productUpsert": "Ürün ekleme/güncelleme dokümanı",
+          "developer": "PTT AVM Developer"
+        },
+        "warning": "PTT AVM upsert akışında eksik varyant veya eksik alan gönderimi mevcut ürün verisini etkileyebilir. Bu yüzden katalog mapper alanları canlıya geçmeden önce test edilmelidir.",
+        "setupSummary": "PTT AVM katalog entegrasyonu products/upsert mantığıyla çalışır. Ürün, fiyat ve stok gönderimleri trackingid ile takip edilir.",
+        "credentialHelp": {
+          "sellerId": "PTT AVM mağaza/satıcı kimliği.",
+          "apiKey": "PTT AVM developer/entegrasyon panelinden alınan API anahtarı.",
+          "token": "PTT AVM API isteklerinde Bearer token olarak kullanılan erişim bilgisi."
+        }
+      },
       "Amazon": {
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",

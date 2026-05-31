@@ -72,6 +72,15 @@ const providerGuides: Record<string, ProviderGuideDefinition> = {
       { label: 'sellerPanel', href: 'https://www.pazarama.com/satici-basvuru' },
     ],
   },
+  PttAvm: {
+    requiredCount: 3,
+    stepCount: 4,
+    links: [
+      { label: 'productUpsert', href: 'https://developers.pttavm.com/tr/katalog-entegrasyonu/ueruen-ekleme-guncelleme' },
+      { label: 'developer', href: 'https://developers.pttavm.com/' },
+    ],
+    hasWarning: true,
+  },
   Amazon: {
     requiredCount: 7,
     stepCount: 5,
