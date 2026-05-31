@@ -335,6 +335,28 @@ function getConnectionStatusText(t: (key: string, options?: Record<string, unkno
   return t(`marketplaceSettings.connectionStatus.${status}`);
 }
 
+function resolvePersistedConnectionState(setting?: MarketplaceProviderSettingDto): ProviderConnectionState {
+  const channel = setting?.channel;
+  if (!setting || !channel?.lastConnectionStatus) {
+    return { status: 'not-tested' };
+  }
+
+  return {
+    status: channel.lastConnectionSuccessful ? 'success' : 'failed',
+    result: {
+      providerKey: setting.providerKey,
+      status: channel.lastConnectionStatus,
+      isSuccessful: Boolean(channel.lastConnectionSuccessful),
+      message: channel.lastConnectionMessage,
+      details: channel.lastConnectionDetails,
+      httpStatusCode: channel.lastConnectionHttpStatusCode,
+      endpoint: channel.lastConnectionEndpoint,
+      errorCode: channel.lastConnectionErrorCode,
+      testedAt: channel.lastConnectionTestDate,
+    },
+  };
+}
+
 export function B2bMarketplaceSettingsPage(): ReactElement {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -364,7 +386,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
     () => toConnectionStateKey(selectedProviderKey, selectedSetting?.channel?.id),
     [selectedProviderKey, selectedSetting?.channel?.id],
   );
-  const selectedConnectionState = providerConnections[selectedConnectionStateKey] ?? { status: 'not-tested' as ConnectionStatus };
+  const selectedConnectionState = providerConnections[selectedConnectionStateKey] ?? resolvePersistedConnectionState(selectedSetting);
 
   useEffect(() => {
     if (!selectedSetting) return;
@@ -498,6 +520,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
         <div className="space-y-3">
           {displaySettings.map((setting) => {
             const selected = setting.providerKey === selectedProvider;
+            const persistedConnection = resolvePersistedConnectionState(setting);
             return (
               <button
                 key={setting.providerKey}
@@ -523,6 +546,12 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                   <MiniFlag active={setting.supportsStockUpdate} label={t('marketplaceSettings.flags.stock')} />
                   <MiniFlag active={setting.supportsOrderImport} label={t('marketplaceSettings.flags.order')} />
                 </div>
+                <div className="mt-3 flex items-center justify-between gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                  <span>{t('marketplaceSettings.lastConnection')}</span>
+                  <span className={persistedConnection.status === 'success' ? 'text-emerald-600 dark:text-emerald-300' : persistedConnection.status === 'failed' ? 'text-red-600 dark:text-red-300' : ''}>
+                    {getConnectionStatusText(t, persistedConnection.status)}
+                  </span>
+                </div>
               </button>
             );
           })}
@@ -545,6 +574,19 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                   <div className="rounded-3xl border border-cyan-200 bg-cyan-50 p-4 text-sm text-cyan-950 dark:border-cyan-500/30 dark:bg-cyan-950/30 dark:text-cyan-100">
                     {t(`marketplaceSettings.guides.${selectedProviderKey}.setupSummary`, { defaultValue: selectedSetting.setupSummary })}
                   </div>
+                  {selectedConnectionState.result ? (
+                    <div className={`rounded-3xl border p-4 text-sm ${selectedConnectionState.status === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-950 dark:border-emerald-500/30 dark:bg-emerald-950/30 dark:text-emerald-100' : 'border-red-200 bg-red-50 text-red-950 dark:border-red-500/30 dark:bg-red-950/30 dark:text-red-100'}`}>
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className="font-semibold">{selectedConnectionState.result.message || getConnectionStatusText(t, selectedConnectionState.status)}</p>
+                        <span className="text-xs font-bold">
+                          {selectedConnectionState.result.testedAt ? new Date(selectedConnectionState.result.testedAt).toLocaleString() : t('marketplaceSettings.connectionStatus.not-tested')}
+                        </span>
+                      </div>
+                      {selectedConnectionState.result.details ? (
+                        <p className="mt-2 text-xs opacity-80">{selectedConnectionState.result.details}</p>
+                      ) : null}
+                    </div>
+                  ) : null}
 
               {selectedGuide ? (
                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">

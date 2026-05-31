@@ -132,7 +132,12 @@ export function B2bMarketplaceListingsPage(): ReactElement {
   const pendingEventCount = (eventsQuery.data?.data ?? []).filter((event) => normalize(event.status).includes('pending')).length;
   const failedListingCount = listings.filter((item) => normalize(item.status).includes('fail')).length;
   const missingPriceCount = listings.filter((item) => item.lastPushedPrice == null).length;
-  const isChannelBlockedByConnection = (channelId: number): boolean => channelConnectionStates[channelId]?.status === 'failed';
+  const isChannelBlockedByConnection = (channelId: number): boolean => {
+    const currentState = channelConnectionStates[channelId];
+    if (currentState?.status === 'failed') return true;
+    if (currentState?.status === 'success') return false;
+    return channels.find((channel) => channel.id === channelId)?.lastConnectionSuccessful === false;
+  };
   const latestEvents = eventsQuery.data?.data ?? [];
   const listingFilterOptions: Array<{ key: ListingFilter; label: string; count: number; icon: ReactElement }> = [
     { key: 'all', label: t('marketplaceWorkbench.filters.all'), count: listings.length, icon: <ShoppingBag className="size-4" /> },

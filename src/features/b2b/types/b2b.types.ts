@@ -44,6 +44,14 @@ export interface MarketplaceChannelDto {
   supportsOrderImport: boolean;
   isActive: boolean;
   lastSyncDate?: string;
+  lastConnectionTestDate?: string;
+  lastConnectionSuccessful?: boolean;
+  lastConnectionStatus?: string;
+  lastConnectionMessage?: string;
+  lastConnectionDetails?: string;
+  lastConnectionHttpStatusCode?: number;
+  lastConnectionEndpoint?: string;
+  lastConnectionErrorCode?: string;
   notes?: string;
 }
 

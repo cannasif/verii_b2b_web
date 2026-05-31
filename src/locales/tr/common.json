@@ -4824,6 +4824,7 @@
     "connectionChecklist": "Bağlantı kontrol listesi",
     "connectionModes": "Desteklenen bağlantı metodları",
     "officialLinks": "Resmi bağlantılar",
+    "lastConnection": "Son bağlantı",
     "currentSecret": "Mevcut secret: {{secret}}. Yeni değer girmezseniz mevcut credential korunur.",
     "tabs": {
       "connection": "Bağlantı",

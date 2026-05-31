@@ -4824,6 +4824,7 @@
     "connectionChecklist": "Connection readiness checklist",
     "connectionModes": "Supported connection methods",
     "officialLinks": "Official links",
+    "lastConnection": "Last connection",
     "currentSecret": "Current secret: {{secret}}. Existing credentials are preserved if you do not enter a new value.",
     "tabs": {
       "connection": "Connection",
