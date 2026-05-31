@@ -29,7 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { b2bApi } from '../api/b2b.api';
 import type { MarketplaceListingDto } from '../types/b2b.types';
 
-type MarketplaceAction = 'product-create' | 'price-update' | 'stock-update' | 'clone-to-channel';
+type MarketplaceAction = 'product-create' | 'price-update' | 'stock-update' | 'bulk-price-update' | 'clone-to-channel';
 type QuickOperation = 'price-update' | 'stock-update';
 type ListingFilter = 'all' | 'published' | 'pending' | 'failed' | 'needs-action';
 
@@ -107,9 +107,9 @@ export function B2bMarketplaceListingsPage(): ReactElement {
     queryFn: () => b2bApi.getMarketplaceSyncEvents({ pageNumber: 1, pageSize: 20, sortBy: 'RequestedDate', sortDirection: 'desc' }),
   });
 
-  const channels = channelsQuery.data?.data ?? [];
+  const channels = useMemo(() => channelsQuery.data?.data ?? [], [channelsQuery.data]);
   const activeChannels = channels.filter((channel) => channel.isActive);
-  const listings = listingsQuery.data?.data ?? [];
+  const listings = useMemo(() => listingsQuery.data?.data ?? [], [listingsQuery.data]);
   const filteredListings = useMemo(() => {
     const term = normalize(search);
     return listings.filter((item) => {
@@ -151,6 +151,19 @@ export function B2bMarketplaceListingsPage(): ReactElement {
     mutationFn: async () => {
       if (!action) throw new Error(t('marketplaceWorkbench.errors.noAction'));
       const listing = action.listing;
+
+      if (action.type === 'bulk-price-update') {
+        if (!listing.erpStockId) throw new Error(t('marketplaceWorkbench.errors.stockMissing'));
+        const nextPrice = Number(price);
+        if (!Number.isFinite(nextPrice) || nextPrice <= 0) throw new Error(t('marketplaceWorkbench.errors.priceRequired'));
+
+        return b2bApi.queueBulkMarketplacePriceUpdateByStock({
+          erpStockId: listing.erpStockId,
+          price: nextPrice,
+          currencyCode,
+        });
+      }
+
       const provider = listing.providerKey || channels.find((channel) => channel.id === listing.channelId)?.providerKey;
       if (!provider) throw new Error(t('marketplaceWorkbench.errors.providerMissing'));
 
@@ -530,6 +543,15 @@ export function B2bMarketplaceListingsPage(): ReactElement {
                     <Button
                       variant="outline"
                       className="justify-between"
+                      onClick={() => openAction('bulk-price-update', listing)}
+                      disabled={!listing.erpStockId}
+                    >
+                      {t('marketplaceWorkbench.actions.bulkUpdateStockPrice')}
+                      <ArrowRight className="size-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="justify-between"
                       onClick={() => openAction('stock-update', listing)}
                       disabled={isChannelBlockedByConnection(listing.channelId)}
                     >
@@ -592,7 +614,7 @@ export function B2bMarketplaceListingsPage(): ReactElement {
             <DialogTitle>{action ? t(`marketplaceWorkbench.dialog.${action.type}.title`) : ''}</DialogTitle>
             <DialogDescription>{action?.listing.sku}</DialogDescription>
           </DialogHeader>
-          {action?.type === 'price-update' ? (
+          {action?.type === 'price-update' || action?.type === 'bulk-price-update' ? (
             <div className="grid gap-4 md:grid-cols-2">
               <LabeledField label={t('marketplaceWorkbench.dialog.price')}>
                 <Input type="number" min="0" step="0.01" value={price} onChange={(event) => setPrice(event.target.value)} />
@@ -600,6 +622,11 @@ export function B2bMarketplaceListingsPage(): ReactElement {
               <LabeledField label={t('marketplaceWorkbench.dialog.currency')}>
                 <Input value={currencyCode} onChange={(event) => setCurrencyCode(event.target.value.toUpperCase())} maxLength={3} />
               </LabeledField>
+              {action?.type === 'bulk-price-update' ? (
+                <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-4 text-sm font-semibold text-cyan-950 dark:border-cyan-500/20 dark:bg-cyan-500/10 dark:text-cyan-100 md:col-span-2">
+                  {t('marketplaceWorkbench.dialog.bulkPriceHelp')}
+                </div>
+              ) : null}
             </div>
           ) : null}
           {action?.type === 'stock-update' ? (
@@ -628,7 +655,7 @@ export function B2bMarketplaceListingsPage(): ReactElement {
             <Button variant="outline" onClick={closeAction}>{t('common.cancel')}</Button>
             <Button
               onClick={() => operationMutation.mutate()}
-              disabled={operationMutation.isPending || !action || isChannelBlockedByConnection(action.listing.channelId)}
+              disabled={operationMutation.isPending || !action || (action.type !== 'bulk-price-update' && isChannelBlockedByConnection(action.listing.channelId))}
             >
               {operationMutation.isPending ? t('common.processing') : t('marketplaceWorkbench.dialog.queue')}
             </Button>

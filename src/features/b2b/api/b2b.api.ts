@@ -22,6 +22,7 @@ import type {
   MarketplaceCapabilityDto,
   MarketplaceChannelDto,
   MarketplaceListingDto,
+  BulkMarketplaceOperationResultDto,
   MarketplaceConnectionTestRequestDto,
   MarketplaceConnectionTestResultDto,
   MarketplaceProviderSettingDto,
@@ -545,6 +546,16 @@ export const b2bApi = {
   async queueMarketplaceProviderOperation(provider: string, operation: 'product-create' | 'price-update' | 'stock-update' | 'order-import', payload: Record<string, unknown>): Promise<MarketplaceSyncEventDto> {
     const route = normalizeProviderRoute(provider);
     const response = await api.post<ApiResponse<MarketplaceSyncEventDto>>(`/api/b2b/marketplaces/${route}/${operation}`, payload);
+    return extractData(response);
+  },
+
+  async queueBulkMarketplacePriceUpdateByStock(payload: {
+    erpStockId: number;
+    price: number;
+    currencyCode: string;
+    channelIds?: number[];
+  }): Promise<BulkMarketplaceOperationResultDto> {
+    const response = await api.post<ApiResponse<BulkMarketplaceOperationResultDto>>('/api/b2b/marketplaces/listings/bulk-price-update-by-stock', payload);
     return extractData(response);
   },
 

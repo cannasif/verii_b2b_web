@@ -5344,7 +5344,8 @@
       "updateStock": "Stok güncelle",
       "publishSameChannel": "Bu kanala ürün gönder",
       "publishAnotherChannel": "Başka kanala da ekle",
-      "removeFromSale": "Satıştan kaldır"
+      "removeFromSale": "Satıştan kaldır",
+      "bulkUpdateStockPrice": "Bu stoğun tüm fiyatlarını güncelle"
     },
     "quick": {
       "price": "Hızlı fiyat",
@@ -5380,7 +5381,11 @@
       "targetChannel": "Hedef kanal",
       "targetChannelPlaceholder": "Hedef pazaryeri kanalını seç",
       "productCreateHelp": "Bu işlem seçili ürünün bağlı olduğu pazaryeri kanalına ürün yayın işini kuyruğa alır. Job çalışınca provider API’ye gönderilir.",
-      "queue": "Kuyruğa Al"
+      "queue": "Kuyruğa Al",
+      "bulk-price-update": {
+        "title": "Stok bazlı toplu fiyat güncelle"
+      },
+      "bulkPriceHelp": "Bu işlem aynı ERP stok kartına bağlı tüm aktif pazaryeri listingleri için fiyat güncelleme işini kuyruğa alır. Bağlantı testi başarısız veya fiyat güncelleme kapalı kanallar atlanır."
     },
     "toasts": {
       "queued": "İşlem kuyruğa alındı.",
@@ -5394,7 +5399,9 @@
       "providerMissing": "Pazaryeri sağlayıcısı bulunamadı.",
       "targetChannelRequired": "Hedef kanal seçmelisiniz.",
       "channelRequired": "Önce kanal seçimi yapılmalı.",
-      "connectionTestFailed": "Pazaryeri bağlantı testi başarısız oldu. Lütfen önce ayarları gözden geçirin."
+      "connectionTestFailed": "Pazaryeri bağlantı testi başarısız oldu. Lütfen önce ayarları gözden geçirin.",
+      "stockMissing": "Bu listing ERP stok kartına bağlı değil.",
+      "priceRequired": "Geçerli bir fiyat girmelisiniz."
     }
   }
 }

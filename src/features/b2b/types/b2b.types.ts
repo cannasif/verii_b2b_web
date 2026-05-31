@@ -140,6 +140,16 @@ export interface MarketplaceSyncEventDto {
   processedDate?: string;
 }
 
+export interface BulkMarketplaceOperationResultDto {
+  erpStockId: number;
+  price: number;
+  currencyCode: string;
+  queuedCount: number;
+  skippedCount: number;
+  events: MarketplaceSyncEventDto[];
+  skippedReasons: string[];
+}
+
 export interface CatalogProductDto {
   id: number;
   sku: string;

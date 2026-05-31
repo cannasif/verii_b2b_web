@@ -5344,7 +5344,8 @@
       "updateStock": "Update stock",
       "publishSameChannel": "Send product to this channel",
       "publishAnotherChannel": "Add to another channel",
-      "removeFromSale": "Remove from sale"
+      "removeFromSale": "Remove from sale",
+      "bulkUpdateStockPrice": "Update all prices for this stock"
     },
     "quick": {
       "price": "Quick price",
@@ -5380,7 +5381,11 @@
       "targetChannel": "Target channel",
       "targetChannelPlaceholder": "Select target marketplace channel",
       "productCreateHelp": "This queues a product publish job for the selected marketplace channel. The job sends it to the provider API when it runs.",
-      "queue": "Queue"
+      "queue": "Queue",
+      "bulk-price-update": {
+        "title": "Queue stock-based bulk price update"
+      },
+      "bulkPriceHelp": "This queues a price update for all active marketplace listings linked to the same ERP stock card. Channels with failed connection tests or disabled price updates are skipped."
     },
     "toasts": {
       "queued": "Operation queued.",
@@ -5394,7 +5399,9 @@
       "providerMissing": "Marketplace provider could not be resolved.",
       "targetChannelRequired": "Please select a target channel.",
       "channelRequired": "A channel must be selected before queueing this operation.",
-      "connectionTestFailed": "Marketplace connection test failed. Please verify integration settings first."
+      "connectionTestFailed": "Marketplace connection test failed. Please verify integration settings first.",
+      "stockMissing": "This listing is not linked to an ERP stock card.",
+      "priceRequired": "Enter a valid price."
     }
   }
 }
