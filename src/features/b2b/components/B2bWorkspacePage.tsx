@@ -42,6 +42,7 @@ import type {
   MarketplaceListingDto,
   MarketplaceSyncEventDto,
   OrderDto,
+  PaymentOrderDto,
   PaymentProviderOperationDto,
   PaymentTransactionDto,
   PurchaseApprovalRuleDto,
@@ -68,6 +69,7 @@ type WorkspaceRow =
   | PurchaseApprovalRuleDto
   | QuoteRequestDto
   | OrderDto
+  | PaymentOrderDto
   | PaymentTransactionDto
   | PaymentProviderOperationDto
   | MarketplaceChannelDto
@@ -592,17 +594,26 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
     submit: b2bApi.createQuote,
   },
   payments: {
-    defaults: { orderId: '', providerKey: '', externalTransactionId: '', amount: '', currencyCode: 'TRY', paymentMethod: '' },
+    defaults: { orderId: '', providerKey: 'PAYTR', paymentMethod: 'CARD', paymentTermDays: '', dueDate: '', installmentCount: '1', notes: '' },
     fields: [
       { name: 'orderId', label: 'Sipariş', type: 'lookup', lookupKind: 'order', required: true },
-      { name: 'providerKey', label: 'Sağlayıcı Kodu', required: true },
-      { name: 'externalTransactionId', label: 'Dış İşlem No' },
-      { name: 'amount', label: 'Tutar', type: 'number', required: true },
-      { name: 'currencyCode', label: 'Para Birimi', type: 'currency', required: true },
+      { name: 'providerKey', label: 'Sağlayıcı', type: 'select', options: [{ label: 'PayTR', value: 'PAYTR' }, { label: 'iyzico', value: 'IYZICO' }, { label: 'Açık Hesap', value: 'ACCOUNT' }] },
       { name: 'paymentMethod', label: 'Ödeme Yöntemi' },
+      { name: 'paymentTermDays', label: 'Vade Günü', type: 'number' },
+      { name: 'dueDate', label: 'Son Ödeme Tarihi', type: 'date' },
+      { name: 'installmentCount', label: 'Taksit Sayısı', type: 'number', required: true },
+      { name: 'notes', label: 'Not', type: 'textarea', colSpan: 'full' },
     ],
-    transform: (values) => ({ ...baseTransform(values), orderId: toRequiredNumber(values.orderId), amount: toRequiredNumber(values.amount) }),
-    submit: b2bApi.createPayment,
+    transform: (values) => ({
+      orderId: toRequiredNumber(values.orderId),
+      providerKey: trimOptional(values.providerKey),
+      paymentMethod: trimOptional(values.paymentMethod),
+      paymentTermDays: toOptionalNumber(values.paymentTermDays),
+      dueDate: trimOptional(values.dueDate),
+      installmentCount: toRequiredNumber(values.installmentCount),
+      notes: trimOptional(values.notes),
+    }),
+    submit: (payload) => b2bApi.createPaymentOrder(payload as unknown as Parameters<typeof b2bApi.createPaymentOrder>[0]),
   },
   'payment-operations': {
     defaults: { paymentTransactionId: '', operationType: 'REFUND', amount: '', currencyCode: 'TRY', idempotencyKey: '', reason: '' },
@@ -842,7 +853,7 @@ function getWorkspaceTableConfig(kind: B2bWorkspaceKind): WorkspaceTableConfig {
     'approval-rules': { primary: 'RuleName', secondary: 'ApproverRoleCode', scope: 'CompanyId', status: 'IsActive', amount: 'MinOrderAmount' },
     quotes: { primary: 'QuoteNumber', scope: 'CustomerId', status: 'Status', amount: 'EstimatedTotal', date: 'SubmittedDate' },
     orders: { primary: 'OrderNumber', scope: 'CustomerId', status: 'Status', amount: 'GrandTotal', date: 'SubmittedDate' },
-    payments: { primary: 'ProviderKey', secondary: 'ExternalTransactionId', scope: 'OrderId', status: 'Status', amount: 'Amount', date: 'CompletedDate' },
+    payments: { primary: 'PaymentOrderNumber', secondary: 'PaymentLinkStatus', scope: 'OrderId', status: 'Status', amount: 'RemainingAmount', date: 'DueDate' },
     'payment-operations': { primary: 'OperationType', secondary: 'ExternalOperationId', scope: 'PaymentTransactionId', status: 'Status', amount: 'Amount', date: 'RequestedDate' },
     'marketplace-channels': { primary: 'Name', secondary: 'Code', scope: 'ProviderKey', status: 'IsActive', date: 'LastSyncDate' },
     'marketplace-listings': { primary: 'Sku', secondary: 'MarketplaceListingId', scope: 'ChannelId', status: 'Status', amount: 'LastPushedPrice', date: 'LastPriceSyncDate' },
@@ -1143,14 +1154,14 @@ function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKe
     return values[columnKey];
   }
   if (kind === 'payments') {
-    const item = row as PaymentTransactionDto;
+    const item = row as PaymentOrderDto;
     const values = {
-      primary: item.providerKey,
-      secondary: item.externalTransactionId || '-',
-      scope: 'Sipariş bağlı',
+      primary: <span className="font-mono text-sm">{item.paymentOrderNumber}</span>,
+      secondary: item.paymentLinkUrl ? 'Link hazır' : item.providerKey || item.paymentMethod || '-',
+      scope: `Sipariş #${item.orderId}`,
       status: renderStatusBadge(item.status),
-      amount: formatMoney(item.amount, item.currencyCode),
-      date: formatDate(item.completedDate || item.requestedDate),
+      amount: formatMoney(item.remainingAmount || item.amount, item.currencyCode),
+      date: item.paymentLinkExpiresAt ? `Link: ${formatDate(item.paymentLinkExpiresAt)}` : formatDate(item.dueDate),
     };
     return values[columnKey];
   }
@@ -2110,6 +2121,36 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
                       }}
                     >
                       Sağlayıcıya Gönder
+                    </Button>
+                  </div>
+                );
+              }
+              if (kind === 'payments') {
+                const paymentOrder = row as PaymentOrderDto;
+                return (
+                  <div className="flex justify-end gap-1">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      disabled={isActionBusy}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        void runAction(async () => {
+                          const result = await b2bApi.generatePaymentOrderLink(paymentOrder.id, {
+                            portalBaseUrl: window.location.origin,
+                            providerKey: paymentOrder.providerKey || 'PAYTR',
+                            customerEmail: paymentOrder.paymentLinkCustomerEmail,
+                            shareChannel: 'COPY',
+                          });
+                          if (result.paymentLinkUrl && navigator.clipboard) {
+                            await navigator.clipboard.writeText(result.paymentLinkUrl);
+                          }
+                          return `${result.paymentOrderNumber} ödeme linki hazırlandı${result.paymentLinkUrl ? ' ve kopyalandı' : ''}.`;
+                        });
+                      }}
+                    >
+                      Link Oluştur
                     </Button>
                   </div>
                 );

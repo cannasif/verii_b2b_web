@@ -79,7 +79,7 @@ export function useB2bWorkspaceQuery(kind: B2bWorkspaceKind, params: PagedParams
         case 'orders':
           return b2bApi.getOrders(params) as Promise<PagedResponse<WorkspaceRow>>;
         case 'payments':
-          return b2bApi.getPayments(params) as Promise<PagedResponse<WorkspaceRow>>;
+          return b2bApi.getPaymentOrders(params) as Promise<PagedResponse<WorkspaceRow>>;
         case 'payment-operations':
           return b2bApi.getPaymentProviderOperations(params) as Promise<PagedResponse<WorkspaceRow>>;
         case 'marketplace-channels':

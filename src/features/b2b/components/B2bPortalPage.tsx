@@ -1,7 +1,7 @@
-import { type ReactElement, useMemo, useState } from 'react';
+import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, BarChart3, Building2, CheckCircle2, ClipboardList, CreditCard, FileText, Heart, PackageSearch, Repeat2, ShoppingCart, Sparkles, Upload } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +34,7 @@ const portalCapabilities = [
 
 export function B2bPortalPage(): ReactElement {
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
   const [companyCode, setCompanyCode] = useState('');
   const [buyerEmail, setBuyerEmail] = useState('');
   const [companyLookupOpen, setCompanyLookupOpen] = useState(false);
@@ -74,6 +75,20 @@ export function B2bPortalPage(): ReactElement {
     }),
     [selectedBuyer],
   );
+  const paymentLinkToken = searchParams.get('paymentLinkToken')?.trim() ?? '';
+
+  const paymentLinkQuery = useQuery({
+    queryKey: ['b2b-payment-link', paymentLinkToken],
+    queryFn: () => b2bApi.getPaymentOrderByLinkToken(paymentLinkToken),
+    enabled: paymentLinkToken.length > 0,
+  });
+
+  useEffect(() => {
+    if (paymentLinkQuery.data) {
+      setPaymentOrder(paymentLinkQuery.data);
+      setMessage(`${paymentLinkQuery.data.paymentOrderNumber} ödeme emri linkten açıldı.`);
+    }
+  }, [paymentLinkQuery.data]);
 
   const sessionMutation = useMutation({
     mutationFn: (input: { selectedCompanyCode: string; selectedBuyerEmail: string }) => b2bApi.createPortalSession(input.selectedCompanyCode, input.selectedBuyerEmail),
@@ -359,6 +374,24 @@ export function B2bPortalPage(): ReactElement {
               </Button>
             </div>
           </header>
+
+          {paymentLinkQuery.data ? (
+            <div className="mb-6 rounded-3xl border border-emerald-900/10 bg-white/80 p-5 shadow-sm backdrop-blur">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Ödeme emri</p>
+                  <h2 className="mt-1 text-2xl font-black text-emerald-950">{paymentLinkQuery.data.paymentOrderNumber}</h2>
+                  <p className="mt-1 text-sm font-semibold text-emerald-950/65">
+                    Son ödeme: {new Date(paymentLinkQuery.data.dueDate).toLocaleDateString('tr-TR')} · Durum: {paymentLinkQuery.data.status}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-emerald-950 px-5 py-4 text-right text-white">
+                  <p className="text-xs font-bold text-white/60">Kalan tutar</p>
+                  <p className="text-2xl font-black">{formatMoney(paymentLinkQuery.data.remainingAmount || paymentLinkQuery.data.amount, paymentLinkQuery.data.currencyCode)}</p>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <div className="grid gap-6 lg:grid-cols-[1fr_440px] lg:items-start">
             <div className="space-y-5">

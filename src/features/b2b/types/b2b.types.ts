@@ -520,8 +520,24 @@ export interface PaymentOrderDto {
   providerRate?: number;
   providerCommissionAmount?: number;
   providerInstallmentSnapshotJson?: string;
+  paymentLinkUrl?: string;
+  paymentLinkToken?: string;
+  paymentLinkProvider?: string;
+  paymentLinkStatus?: string;
+  paymentLinkExpiresAt?: string;
+  paymentLinkSentAt?: string;
+  paymentLinkCustomerEmail?: string;
+  paymentLinkShareChannel?: string;
   notes?: string;
   installments: PaymentInstallmentDto[];
+}
+
+export interface GeneratePaymentOrderLinkDto {
+  portalBaseUrl?: string;
+  providerKey?: string;
+  customerEmail?: string;
+  shareChannel?: string;
+  expiresAt?: string;
 }
 
 export interface PaymentInstallmentDto {

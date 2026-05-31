@@ -35,6 +35,7 @@ import type {
   PaymentInstallmentOptionsRequestDto,
   PaymentOrderDto,
   CreatePaymentOrderDto,
+  GeneratePaymentOrderLinkDto,
   PaymentMethodOptionDto,
   CreateIyzico3dsPaymentDto,
   Iyzico3dsInitializeDto,
@@ -400,11 +401,27 @@ export const b2bApi = {
     return normalizePaged(response);
   },
 
+  async getPaymentOrderByLinkToken(token: string): Promise<PaymentOrderDto> {
+    const response = await api.get<ApiResponse<PaymentOrderDto>>(
+      `/api/b2b/payments/orders/link/${encodeURIComponent(token)}`,
+      publicRequestConfig,
+    );
+    return extractData(response);
+  },
+
   async createPaymentOrder(payload: CreatePaymentOrderDto, portalToken?: string): Promise<PaymentOrderDto> {
     const response = await api.post<ApiResponse<PaymentOrderDto>>(
       '/api/b2b/payments/orders',
       payload,
       portalToken ? portalRequestConfig(portalToken) : undefined,
+    );
+    return extractData(response);
+  },
+
+  async generatePaymentOrderLink(paymentOrderId: number, payload: GeneratePaymentOrderLinkDto): Promise<PaymentOrderDto> {
+    const response = await api.post<ApiResponse<PaymentOrderDto>>(
+      `/api/b2b/payments/orders/${paymentOrderId}/payment-link`,
+      payload,
     );
     return extractData(response);
   },
