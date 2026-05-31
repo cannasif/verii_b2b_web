@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "i18n:check-locale-consistency": "node scripts/check-locale-consistency.mjs",
     "i18n:quality-review": "node scripts/localization-quality-review.mjs",
-    "i18n:quality-review:machine": "node scripts/localization-quality-review.mjs --machine true"
+    "i18n:quality-review:machine": "node scripts/localization-quality-review.mjs --machine true",
+    "i18n:quality-review:apply": "node scripts/apply-localized-review.mjs",
+    "i18n:quality-review:apply:auto": "node scripts/apply-localized-review.mjs --auto true"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

@@ -182,6 +182,29 @@ npm run i18n:quality-review
 - `docs/localization/generated/review/{dil}/{namespace}.review.json`
 - `docs/localization/generated/review/readme.md`
 
+### 7.1 Sonrası (Onaylıları Uygula)
+
+Tüm onaylı (`approved: true`) alanları hedef dil dosyalarına taşımak için:
+```bash
+npm run i18n:quality-review:apply
+```
+
+Komut şu şekilde çalışır:
+- Sadece `approved: true` işaretli kayıtları ana locale dosyalarına yazar.
+- Hedef dosya yoksa atlar.
+- Gerçekten taşımadan önce görmek için dry-run ile:
+```bash
+node scripts/apply-localized-review.mjs --dryRun true
+```
+- Tüm diller için:
+```bash
+node scripts/apply-localized-review.mjs --languages ar,de,es,fr,it --dryRun true
+```
+- Test ortamında otomatik öneriler ile uygulamak istenirse:
+```bash
+npm run i18n:quality-review:apply:auto
+```
+
 ### 7.2 Issue Türleri
 - `MISSING_KEY`: Hedef dilde anahtar eksik.
 - `EMPTY_VALUE`: Değer boş.
