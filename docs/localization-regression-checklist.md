@@ -167,3 +167,37 @@ Bu doküman, dil bazlı arayüz kontrollerini sistematik olarak test etmek için
 ## 6) Sonraki Aşama (Öneri)
 - Bu checklist her sprint sonunda CI benzeri bir adım olarak çalıştırılsın.
 - Eksik anahtar sayacı `yapıdaki yeni key` eklenmeden önce commit’e girmemeli (öncesinde `pre-commit`/`pre-push` check listesine eklenebilir).
+
+## 7) Tam Lokalizasyon Akışı (Otomatik + Manuel Onay)
+
+- Amaç: anahtar eşitliği değil, metin kalitesi ve dil doğallığını güvence altına almak.
+
+### 7.1 Otomatik Taramayı Çalıştır
+```bash
+npm run i18n:quality-review
+```
+
+Çıktılar:
+- `docs/localization/generated/localization-quality-report.json`
+- `docs/localization/generated/review/{dil}/{namespace}.review.json`
+- `docs/localization/generated/review/readme.md`
+
+### 7.2 Issue Türleri
+- `MISSING_KEY`: Hedef dilde anahtar eksik.
+- `EMPTY_VALUE`: Değer boş.
+- `SOURCE_COPY`: Hedef değer kaynak dille aynı kalmış (en`kopya).
+- `LIKELY_LANGUAGE_MISMATCH`: İfade muhtemelen İngilizce kalmış veya dil karışık.
+
+### 7.3 Manuel Onay
+1. `docs/localization/generated/review/{dil}` altını rota sırasıyla incele.
+2. Her kayıt için `source`, `current`, `reason` alanlarını karşılaştır.
+3. Gerekirse `suggested`/`approvedValue` yaz.
+4. Çeviri tamamlanan öğeleri işaretle (`approved`) ve sonraki adımda ana lokallere taşınır.
+
+### 7.4 Sonraki Adım
+- Onaylı çeviri aktarımı tamamlandıktan sonra kalite kapanışı için:
+```bash
+npm run i18n:quality-review
+npm run i18n:check-locale-consistency
+npm run build
+```
