@@ -660,6 +660,7 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
         { label: 'PTT AVM', value: 'PttAvm' },
         { label: 'İdefix', value: 'Idefix' },
         { label: 'Çiçeksepeti', value: 'Ciceksepeti' },
+        { label: 'eBay', value: 'Ebay' },
         { label: 'Amazon SP-API', value: 'Amazon' },
         { label: 'Etsy', value: 'Etsy' },
       ] },

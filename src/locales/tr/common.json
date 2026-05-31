@@ -5058,6 +5058,33 @@
           "token": "Kanal Bearer token istiyorsa kullanılacak opsiyonel erişim bilgisi."
         }
       },
+      "Ebay": {
+        "title": "eBay bilgileri nereden alınır?",
+        "summary": "eBay Sell Inventory API ürünleri inventory item, offer ve publish adımlarıyla yayınlar. Fiyat ve stok için bulk update price quantity endpointi kullanılır.",
+        "required": [
+          "Seller ID",
+          "Marketplace ID",
+          "Access Token"
+        ],
+        "steps": [
+          "eBay Developer hesabı ve Sell Inventory API izinlerini hazırlayın.",
+          "Satıcı yetkilendirmesinden Inventory API scope'larını içeren access token alın.",
+          "Marketplace ID bilgisini satış yapılacak ülkeye göre seçin. Örn. EBAY_US, EBAY_GB, EBAY_DE.",
+          "Ürün yayınlamadan önce eBay kategori, merchant location ve listing policy bilgilerini katalog attributes içinde tamamlayın.",
+          "Bu ekranda Seller ID, Marketplace ID ve Access Token bilgilerini kaydedin."
+        ],
+        "links": {
+          "inventoryApi": "Sell Inventory API",
+          "bulkPriceQuantity": "Bulk price/quantity"
+        },
+        "warning": "eBay ürün yayınında kategori, merchant location key ve listing policy bilgileri zorunludur. Bu değerler eksikse ürün açma API tarafından reddedilir.",
+        "setupSummary": "eBay Sell Inventory API ürünleri inventory item, offer ve publish adımlarıyla yayınlar. Fiyat ve stok için bulk update price quantity endpointi kullanılır.",
+        "credentialHelp": {
+          "sellerId": "eBay seller account kimliği.",
+          "marketplaceId": "Satış yapılacak eBay marketplace kodu. Örn. EBAY_US, EBAY_GB, EBAY_DE.",
+          "accessToken": "Sell Inventory API scope'larıyla üretilmiş OAuth access token."
+        }
+      },
       "Amazon": {
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",

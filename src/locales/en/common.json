@@ -5058,6 +5058,33 @@
           "token": "Optional access value if the channel requires Bearer token."
         }
       },
+      "Ebay": {
+        "title": "Where do I get eBay credentials?",
+        "summary": "eBay Sell Inventory API publishes products through inventory item, offer and publish steps. Price and stock use the bulk update price quantity endpoint.",
+        "required": [
+          "Seller ID",
+          "Marketplace ID",
+          "Access Token"
+        ],
+        "steps": [
+          "Prepare an eBay Developer account and Sell Inventory API permissions.",
+          "Generate an access token with Inventory API scopes from seller authorization.",
+          "Select Marketplace ID according to the target country. Examples: EBAY_US, EBAY_GB, EBAY_DE.",
+          "Complete eBay category, merchant location and listing policy values in catalog attributes before publishing products.",
+          "Save Seller ID, Marketplace ID and Access Token on this screen."
+        ],
+        "links": {
+          "inventoryApi": "Sell Inventory API",
+          "bulkPriceQuantity": "Bulk price/quantity"
+        },
+        "warning": "eBay product publish requires category, merchant location key and listing policy values. The API rejects product creation when these values are missing.",
+        "setupSummary": "eBay Sell Inventory API publishes products through inventory item, offer and publish steps. Price and stock use the bulk update price quantity endpoint.",
+        "credentialHelp": {
+          "sellerId": "eBay seller account id.",
+          "marketplaceId": "eBay marketplace code for the target country. Examples: EBAY_US, EBAY_GB, EBAY_DE.",
+          "accessToken": "OAuth access token generated with Sell Inventory API scopes."
+        }
+      },
       "Amazon": {
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",

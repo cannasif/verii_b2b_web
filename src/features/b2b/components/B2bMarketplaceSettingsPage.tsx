@@ -98,6 +98,15 @@ const providerGuides: Record<string, ProviderGuideDefinition> = {
     ],
     hasWarning: true,
   },
+  Ebay: {
+    requiredCount: 3,
+    stepCount: 5,
+    links: [
+      { label: 'inventoryApi', href: 'https://developer.ebay.com/api-docs/sell/inventory/overview.html' },
+      { label: 'bulkPriceQuantity', href: 'https://developer.ebay.com/api-docs/sell/inventory/resources/methods' },
+    ],
+    hasWarning: true,
+  },
   Amazon: {
     requiredCount: 7,
     stepCount: 5,
