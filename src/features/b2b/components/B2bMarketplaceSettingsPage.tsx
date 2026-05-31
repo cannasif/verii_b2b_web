@@ -1,7 +1,7 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { BookOpenCheck, CheckCircle2, ExternalLink, KeyRound, RefreshCcw, Settings2, Store, TriangleAlert } from 'lucide-react';
+import { BookOpenCheck, CheckCircle2, ExternalLink, KeyRound, RefreshCcw, Search, Settings2, Store, TriangleAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -313,10 +313,25 @@ function buildCredentialJson(form: ProviderFormState): string | undefined {
 
 function buildDisplaySettings(settings: MarketplaceProviderSettingDto[]): MarketplaceProviderSettingDto[] {
   const settingMap = new Map(settings.map((item) => [item.providerKey.toLowerCase(), item] as const));
-  const orderedProviders = Object.keys(providerGuides);
-  const merged = orderedProviders.map((providerKey) => settingMap.get(providerKey.toLowerCase()) ?? createFallbackProviderSetting(providerKey));
-  const unknownProviders = settings.filter((item) => !Object.prototype.hasOwnProperty.call(providerGuides, item.providerKey));
-  return [...merged, ...unknownProviders];
+  const providerKeys = new Map<string, string>();
+
+  const addProviderKey = (providerKey: string) => {
+    const trimmed = providerKey.trim();
+    if (!trimmed) return;
+    const lowered = trimmed.toLowerCase();
+    if (!providerKeys.has(lowered)) {
+      providerKeys.set(lowered, trimmed);
+    }
+  };
+
+  Object.keys(providerGuides).forEach(addProviderKey);
+  settings.forEach((setting) => addProviderKey(setting.providerKey));
+
+  const orderedProviderKeys = [...providerKeys.values()].sort((a, b) =>
+    a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }),
+  );
+
+  return orderedProviderKeys.map((providerKey) => settingMap.get(providerKey.toLowerCase()) ?? createFallbackProviderSetting(providerKey));
 }
 
 function createRequestPayload(selectedSetting?: MarketplaceProviderSettingDto | null, form?: ProviderFormState) {
@@ -369,8 +384,9 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
     queryFn: () => b2bApi.getMarketplaceSettings(),
   });
 
-  const settings = settingsQuery.data ?? [];
+  const settings = useMemo(() => settingsQuery.data ?? [], [settingsQuery.data]);
   const displaySettings = useMemo(() => buildDisplaySettings(settings), [settings]);
+  const [providerSearch, setProviderSearch] = useState('');
 
   const selectedSetting = useMemo(
     () => displaySettings.find((item) => item.providerKey === selectedProvider) ?? displaySettings[0],
@@ -387,12 +403,19 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
     [selectedProviderKey, selectedSetting?.channel?.id],
   );
   const selectedConnectionState = providerConnections[selectedConnectionStateKey] ?? resolvePersistedConnectionState(selectedSetting);
+  const filteredDisplaySettings = useMemo(() => {
+    const search = providerSearch.trim().toLowerCase();
+    if (!search) return displaySettings;
+    return displaySettings.filter((item) =>
+      `${item.providerKey} ${item.name}`.toLowerCase().includes(search),
+    );
+  }, [displaySettings, providerSearch]);
 
   useEffect(() => {
     if (!selectedSetting) return;
     setSelectedProvider(selectedSetting.providerKey);
     setForm(createDefaultState(selectedSetting));
-  }, [selectedSetting?.providerKey, selectedSetting?.channel?.id]);
+  }, [selectedSetting]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -518,43 +541,83 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
 
       <div className="grid gap-4 xl:grid-cols-[380px_minmax(0,1fr)]">
         <div className="space-y-3">
-          {displaySettings.map((setting) => {
-            const selected = setting.providerKey === selectedProvider;
-            const persistedConnection = resolvePersistedConnectionState(setting);
-            return (
-              <button
-                key={setting.providerKey}
-                type="button"
-                onClick={() => setSelectedProvider(setting.providerKey)}
-                className={`w-full rounded-3xl border p-4 text-left transition ${selected ? 'border-cyan-400 bg-cyan-50 text-slate-950 dark:border-cyan-500 dark:bg-cyan-950/30 dark:text-white' : 'border-slate-200 bg-white dark:border-white/10 dark:bg-slate-950'}`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="grid size-11 place-items-center rounded-2xl bg-slate-950 text-white dark:bg-white dark:text-slate-950">
-                      <Store size={18} />
-                    </span>
-                    <div>
-                      <p className="font-semibold">{setting.name}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{setting.channel?.name || t('marketplaceSettings.channelNotCreated')}</p>
+          <Card className="border-slate-200 bg-white dark:border-white/10 dark:bg-slate-950">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  {t('marketplaceSettings.channels', { defaultValue: 'Channels' })}
+                </p>
+                <Badge variant="outline">{filteredDisplaySettings.length}</Badge>
+              </div>
+              <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-2 dark:border-white/10 dark:bg-slate-900/40">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    value={providerSearch}
+                    onChange={(event) => setProviderSearch(event.target.value)}
+                    placeholder={t('marketplaceSettings.searchProviders', { defaultValue: 'Search integrations...' })}
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {filteredDisplaySettings.length === 0 ? (
+                <p className="px-2 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                  {t('marketplaceSettings.noProvidersFound', { defaultValue: 'No integrations match your search.' })}
+                </p>
+              ) : null}
+              {filteredDisplaySettings.map((setting) => {
+                const selected = setting.providerKey === selectedProvider;
+                const persistedConnection = resolvePersistedConnectionState(setting);
+                return (
+                  <button
+                    key={setting.providerKey}
+                    type="button"
+                    onClick={() => setSelectedProvider(setting.providerKey)}
+                    className={`w-full rounded-3xl border p-4 text-left transition ${selected ? 'border-cyan-400 bg-cyan-50 text-slate-950 dark:border-cyan-500 dark:bg-cyan-950/30 dark:text-white' : 'border-slate-200 bg-white dark:border-white/10 dark:bg-slate-950'}`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <span className="grid size-11 place-items-center rounded-2xl bg-slate-950 text-white dark:bg-white dark:text-slate-950">
+                          <Store size={18} />
+                        </span>
+                        <div>
+                          <p className="font-semibold">{setting.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{setting.channel?.name || t('marketplaceSettings.channelNotCreated')}</p>
+                        </div>
+                      </div>
+                      {setting.channel?.isActive ? (
+                        <CheckCircle2 className="text-emerald-500" size={20} />
+                      ) : (
+                        <TriangleAlert className="text-amber-500" size={20} />
+                      )}
                     </div>
-                  </div>
-                  {setting.channel?.isActive ? <CheckCircle2 className="text-emerald-500" size={20} /> : <TriangleAlert className="text-amber-500" size={20} />}
-                </div>
-                <div className="mt-4 grid grid-cols-4 gap-2 text-[11px] font-semibold">
-                  <MiniFlag active={setting.supportsProductCreate} label={t('marketplaceSettings.flags.product')} />
-                  <MiniFlag active={setting.supportsPriceUpdate} label={t('marketplaceSettings.flags.price')} />
-                  <MiniFlag active={setting.supportsStockUpdate} label={t('marketplaceSettings.flags.stock')} />
-                  <MiniFlag active={setting.supportsOrderImport} label={t('marketplaceSettings.flags.order')} />
-                </div>
-                <div className="mt-3 flex items-center justify-between gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  <span>{t('marketplaceSettings.lastConnection')}</span>
-                  <span className={persistedConnection.status === 'success' ? 'text-emerald-600 dark:text-emerald-300' : persistedConnection.status === 'failed' ? 'text-red-600 dark:text-red-300' : ''}>
-                    {getConnectionStatusText(t, persistedConnection.status)}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
+                    <div className="mt-4 grid grid-cols-4 gap-2 text-[11px] font-semibold">
+                      <MiniFlag active={setting.supportsProductCreate} label={t('marketplaceSettings.flags.product')} />
+                      <MiniFlag active={setting.supportsPriceUpdate} label={t('marketplaceSettings.flags.price')} />
+                      <MiniFlag active={setting.supportsStockUpdate} label={t('marketplaceSettings.flags.stock')} />
+                      <MiniFlag active={setting.supportsOrderImport} label={t('marketplaceSettings.flags.order')} />
+                    </div>
+                    <div className="mt-3 flex items-center justify-between gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                      <span>{t('marketplaceSettings.lastConnection')}</span>
+                      <span
+                        className={
+                          persistedConnection.status === 'success'
+                            ? 'text-emerald-600 dark:text-emerald-300'
+                            : persistedConnection.status === 'failed'
+                              ? 'text-red-600 dark:text-red-300'
+                              : ''
+                        }
+                      >
+                        {getConnectionStatusText(t, persistedConnection.status)}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </CardContent>
+          </Card>
         </div>
 
         {selectedSetting ? (
