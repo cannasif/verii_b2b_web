@@ -3680,7 +3680,8 @@
     },
     "advancedJson": {
       "title": "Advanced JSON mode",
-      "description": "Use this to paste the provider credential JSON exactly as documented."
+      "description": "Use this to paste the provider credential JSON exactly as documented.",
+      "placeholder": "{\"apiKey\":\"...\",\"apiSecret\":\"...\"}"
     },
     "operations": {
       "product": {
@@ -3702,7 +3703,9 @@
     },
     "toasts": {
       "saved": "Integration settings saved.",
-      "saveFailed": "Integration settings could not be saved."
+      "saveFailed": "Integration settings could not be saved.",
+      "connectionTestSuccess": "Connection test succeeded.",
+      "connectionTestFailed": "Connection test failed."
     },
     "errors": {
       "providerNotFound": "Provider settings could not be found."
@@ -3733,7 +3736,14 @@
           "supplierId": "The supplier/seller number shown in Trendyol Integration Information.",
           "apiKey": "Trendyol API key visible to the master/authorized user.",
           "apiSecret": "Secret key used together with API Key for Basic Auth."
-        }
+        },
+        "connectionModeHelp": "Trendyol uses Basic Auth in this integration; Supplier ID and API Key/API Secret must be filled together or authentication fails.",
+        "connectionChecklist": [
+          "Get Supplier ID, API Key and API Secret from Trendyol seller integration settings.",
+          "Separate production and sandbox environments to avoid URL and token confusion.",
+          "Validate catalog, stock and price mappings before publishing products.",
+          "Run one small test SKU end-to-end before production release."
+        ]
       },
       "Hepsiburada": {
         "title": "Where do I get Hepsiburada credentials?",
@@ -3760,7 +3770,13 @@
           "merchantId": "Unique merchant/store id from Hepsiburada merchant panel.",
           "apiKey": "Client/API key from developer portal or authorized integrator account.",
           "apiSecret": "Secret used for token generation or Basic/Auth flow."
-        }
+        },
+        "connectionChecklist": [
+          "Verify developer account and merchant panel access with required API scopes.",
+          "Confirm Merchant ID and API key/secret pair belong to the same seller context.",
+          "Activate order and catalog permissions for the integration.",
+          "If callbacks are enabled, validate HTTPS callback URL and headers."
+        ]
       },
       "N11": {
         "title": "Where do I get n11 credentials?",
@@ -3914,7 +3930,14 @@
           "sellerId": "eBay seller account id.",
           "marketplaceId": "eBay marketplace code for the target country. Examples: EBAY_US, EBAY_GB, EBAY_DE.",
           "accessToken": "OAuth access token generated with Sell Inventory API scopes."
-        }
+        },
+        "connectionModeHelp": "Most eBay flows require an OAuth access token with Inventory scope; seller and marketplace context should be sent if the listing uses country-specific marketplaces.",
+        "connectionChecklist": [
+          "Complete OAuth token flow in eBay Developer Console for Inventory scope.",
+          "Confirm marketplace and seller context for each publish request.",
+          "Populate category, merchant location and policy values before publishing.",
+          "Run a sandbox or non-critical test offer and confirm response IDs and offer status."
+        ]
       },
       "Shopify": {
         "title": "Where do I get Shopify credentials?",
@@ -4038,7 +4061,15 @@
           "awsAccessKey": "IAM access key used for SP-API request signing.",
           "awsSecretKey": "IAM secret key used for SP-API request signing.",
           "roleArn": "Role ARN if IAM role based access is used."
-        }
+        },
+        "connectionModeHelp": "Amazon SP-API requires LWA OAuth + AWS Signature Version 4 together. Seller ID and region must match the target marketplace before sending requests.",
+        "connectionChecklist": [
+          "Create SP-API application and get LWA client credentials in Seller Central.",
+          "Complete seller authorization flow and obtain refresh token.",
+          "Validate AWS IAM access keys and Signature V4 region pairing.",
+          "Confirm marketplace IDs and endpoint region for each sales destination.",
+          "Validate listing payload fields (prices, quantities, units) before production."
+        ]
       },
       "Etsy": {
         "title": "Where do I get Etsy credentials?",
@@ -4072,6 +4103,22 @@
     "status": {
       "active": "Active",
       "passive": "Passive"
+    },
+    "connectionChecklist": "Connection readiness checklist",
+    "connectionModes": "Supported connection methods",
+    "lastConnection": "Last connection",
+    "requiredField": "Field {{index}}",
+    "defaultStep": "Step {{index}}",
+    "defaultWarning": "Production integration should be carefully validated because extra configuration requirements can be provider-specific.",
+    "actions": {
+      "testConnection": "Test connection"
+    },
+    "connectionStatus": {
+      "unknown": "Status unknown",
+      "not-tested": "Not tested yet",
+      "testing": "Testing",
+      "success": "Connection successful",
+      "failed": "Connection failed"
     }
   },
   "marketplaceWorkbench": {
@@ -4170,7 +4217,12 @@
     "errors": {
       "noAction": "No action selected.",
       "providerMissing": "Marketplace provider could not be resolved.",
-      "targetChannelRequired": "Please select a target channel."
+      "targetChannelRequired": "Please select a target channel.",
+      "channelRequired": "A channel must be selected before queueing this operation.",
+      "connectionTestFailed": "Marketplace connection test failed. Please verify integration settings first."
+    },
+    "messages": {
+      "connectionBlocked": "Connection test failed for this channel. Run Test Connection first, then retry the operation."
     }
   }
 }
