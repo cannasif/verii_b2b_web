@@ -402,10 +402,10 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
       { name: 'categoryPath', label: 'Portal Kategorisi', placeholder: 'Örn. Profil / Alüminyum / Aksesuar', colSpan: 'full' },
       { name: 'shortDescription', label: 'Kısa Tanıtım', type: 'textarea', placeholder: 'Liste ve ürün kartında görünecek net satış özeti.', colSpan: 'full' },
       { name: 'primaryImageUrl', label: 'Ana Görsel Bağlantısı', placeholder: 'https://...', colSpan: 'full', helpText: 'Boş bırakabilirsiniz; ürün yine taslak/yayında kaydedilir.' },
-      { name: 'mediaGalleryJson', label: 'Medya Galerisi JSON', type: 'textarea', placeholder: '[{\"url\":\"https://...\",\"alt\":\"Ön görünüm\"}]', colSpan: 'full', helpText: 'Amazon/Sahibinden tarzı çoklu ürün görselleri için kullanılır.' },
-      { name: 'bulletPointsJson', label: 'Öne Çıkan Maddeler JSON', type: 'textarea', placeholder: '[\"Hızlı montaj\", \"Korozyona dayanıklı\", \"ERP stokla eşleşir\"]', colSpan: 'full' },
-      { name: 'attributesJson', label: 'Teknik Özellikler JSON', type: 'textarea', placeholder: '{\"Malzeme\":\"Alüminyum\", \"Ölçü\":\"40x60\", \"Renk\":\"Eloksal\"}', colSpan: 'full', helpText: 'Filtreleme ve ürün karşılaştırma için yapılandırılmış teknik özellikler.' },
-      { name: 'documentsJson', label: 'Teknik Dokümanlar JSON', type: 'textarea', placeholder: '[{\"name\":\"Teknik föy\", \"url\":\"https://...\"}]', colSpan: 'full' },
+      { name: 'mediaGalleryJson', label: 'Medya Galerisi JSON', type: 'textarea', placeholder: '[{"url":"https://...","alt":"Ön görünüm"}]', colSpan: 'full', helpText: 'Amazon/Sahibinden tarzı çoklu ürün görselleri için kullanılır.' },
+      { name: 'bulletPointsJson', label: 'Öne Çıkan Maddeler JSON', type: 'textarea', placeholder: '["Hızlı montaj", "Korozyona dayanıklı", "ERP stokla eşleşir"]', colSpan: 'full' },
+      { name: 'attributesJson', label: 'Teknik Özellikler JSON', type: 'textarea', placeholder: '{"Malzeme":"Alüminyum", "Ölçü":"40x60", "Renk":"Eloksal"}', colSpan: 'full', helpText: 'Filtreleme ve ürün karşılaştırma için yapılandırılmış teknik özellikler.' },
+      { name: 'documentsJson', label: 'Teknik Dokümanlar JSON', type: 'textarea', placeholder: '[{"name":"Teknik föy", "url":"https://..."}]', colSpan: 'full' },
       { name: 'description', label: 'Detaylı Açıklama', type: 'textarea', placeholder: 'Kullanım alanı, teknik notlar, uyumluluk ve satış açıklaması yazın.', colSpan: 'full' },
       { name: 'minOrderQuantity', label: 'Minimum Sipariş Miktarı', type: 'number' },
       { name: 'packageQuantity', label: 'Paket / Koli Miktarı', type: 'number' },
@@ -2228,7 +2228,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
       setLookupLabels({});
       if (kind === 'quotes') setQuoteLines([createEmptyQuoteLine()]);
     }
-  }, [detailQuery.data, formConfig, isEdit]);
+  }, [detailQuery.data, formConfig, isEdit, kind]);
 
   useEffect(() => {
     if (kind !== 'catalog' || !focusedCatalogSection) return;
