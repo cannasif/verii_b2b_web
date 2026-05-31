@@ -5085,6 +5085,35 @@
           "accessToken": "Sell Inventory API scope'larıyla üretilmiş OAuth access token."
         }
       },
+      "Shopify": {
+        "title": "Shopify bilgileri nereden alınır?",
+        "summary": "Shopify Admin API ürün oluşturma, varyant fiyatı ve inventory_levels/set stok güncelleme akışlarıyla çalışır.",
+        "required": [
+          "Shop Domain",
+          "Admin Access Token",
+          "API Version",
+          "Location ID"
+        ],
+        "steps": [
+          "Shopify admin panelinde custom app veya admin app oluşturup Admin API izinlerini açın.",
+          "Products ve Inventory izinleri olan Admin API access token bilgisini alın.",
+          "Shop Domain bilgisini myshopify.com domainiyle kaydedin.",
+          "Stok güncelleme yapılacak lokasyon için Location ID bilgisini belirleyin.",
+          "Bu ekranda Shop Domain, Admin Access Token, API Version ve Location ID bilgilerini kaydedin."
+        ],
+        "links": {
+          "adminApi": "Admin API",
+          "inventoryLevels": "Inventory levels"
+        },
+        "warning": "Shopify stok güncellemesi varyant id ile değil inventory item id ve location id ile çalışır. Ürün oluşturma sonrası bu eşleşme sistemde saklanır.",
+        "setupSummary": "Shopify Admin API ürün oluşturma, varyant fiyatı ve inventory_levels/set stok güncelleme akışlarıyla çalışır.",
+        "credentialHelp": {
+          "shopDomain": "Shopify mağaza domaini. Örn. magaza.myshopify.com.",
+          "accessToken": "Products ve Inventory izinleri olan Admin API access token.",
+          "apiVersion": "Kullanılacak Shopify Admin API versiyonu. Örn. 2026-01.",
+          "locationId": "Stok güncellemesinde kullanılacak Shopify location id."
+        }
+      },
       "Amazon": {
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",

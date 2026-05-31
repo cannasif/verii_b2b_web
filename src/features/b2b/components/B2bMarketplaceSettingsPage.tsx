@@ -107,6 +107,15 @@ const providerGuides: Record<string, ProviderGuideDefinition> = {
     ],
     hasWarning: true,
   },
+  Shopify: {
+    requiredCount: 4,
+    stepCount: 5,
+    links: [
+      { label: 'adminApi', href: 'https://shopify.dev/docs/api/admin-rest' },
+      { label: 'inventoryLevels', href: 'https://shopify.dev/docs/api/admin-rest/latest/resources/inventorylevel' },
+    ],
+    hasWarning: true,
+  },
   Amazon: {
     requiredCount: 7,
     stepCount: 5,

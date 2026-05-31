@@ -5085,6 +5085,35 @@
           "accessToken": "OAuth access token generated with Sell Inventory API scopes."
         }
       },
+      "Shopify": {
+        "title": "Where do I get Shopify credentials?",
+        "summary": "Shopify Admin API works with product create, variant price update and inventory_levels/set stock update flows.",
+        "required": [
+          "Shop Domain",
+          "Admin Access Token",
+          "API Version",
+          "Location ID"
+        ],
+        "steps": [
+          "Create a custom app or admin app in Shopify admin and enable Admin API permissions.",
+          "Generate an Admin API access token with Products and Inventory permissions.",
+          "Save the Shop Domain with the myshopify.com domain.",
+          "Find the Location ID that will be used for stock updates.",
+          "Save Shop Domain, Admin Access Token, API Version and Location ID on this screen."
+        ],
+        "links": {
+          "adminApi": "Admin API",
+          "inventoryLevels": "Inventory levels"
+        },
+        "warning": "Shopify stock updates use inventory item id and location id, not variant id. This mapping is stored after product creation.",
+        "setupSummary": "Shopify Admin API works with product create, variant price update and inventory_levels/set stock update flows.",
+        "credentialHelp": {
+          "shopDomain": "Shopify store domain. Example: store.myshopify.com.",
+          "accessToken": "Admin API access token with Products and Inventory permissions.",
+          "apiVersion": "Shopify Admin API version to use. Example: 2026-01.",
+          "locationId": "Shopify location id used for stock updates."
+        }
+      },
       "Amazon": {
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",

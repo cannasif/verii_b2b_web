@@ -661,6 +661,7 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
         { label: 'İdefix', value: 'Idefix' },
         { label: 'Çiçeksepeti', value: 'Ciceksepeti' },
         { label: 'eBay', value: 'Ebay' },
+        { label: 'Shopify', value: 'Shopify' },
         { label: 'Amazon SP-API', value: 'Amazon' },
         { label: 'Etsy', value: 'Etsy' },
       ] },
