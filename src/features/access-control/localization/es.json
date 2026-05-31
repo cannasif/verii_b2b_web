@@ -33,66 +33,66 @@
     "description": "Gestionar los códigos de permisos utilizados en el sistema",
     "add": "Agregar Definición",
     "form": {
-      "editTitle": "Edit Permission Definition",
-      "addTitle": "Add Permission Definition",
-      "editDescription": "Update permission definition details",
-      "addDescription": "Create a new permission definition",
-      "code": "Code",
-      "codePlaceholder": "Select a code",
-      "affectedRoutes": "Affected pages",
-      "affectedRoutesNone": "No matching routes found for this code",
-      "name": "Name",
-      "namePlaceholder": "Display name",
-      "description": "Description",
-      "descriptionPlaceholder": "Optional description",
-      "isActive": "Active",
-      "codeSearchPlaceholder": "Search...",
-      "codeEmpty": "No results found"
+      "editTitle": "Editar definición de permiso",
+      "addTitle": "Añadir definición de permiso",
+      "editDescription": "Actualizar los datos de la definición de permiso",
+      "addDescription": "Crear una nueva definición de permiso",
+      "code": "Código",
+      "codePlaceholder": "Seleccionar un código",
+      "affectedRoutes": "Páginas afectadas",
+      "affectedRoutesNone": "No hay ninguna ruta coincidente para este código",
+      "name": "Nombre",
+      "namePlaceholder": "Nombre visible",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Descripción opcional",
+      "isActive": "Activo",
+      "codeSearchPlaceholder": "Buscar...",
+      "codeEmpty": "Sin resultados"
     },
     "table": {
-      "code": "Code",
-      "name": "Name",
-      "isActive": "Active",
-      "updatedDate": "Updated",
-      "showing": "{{from}}-{{to}} of {{total}}"
+      "code": "Código",
+      "name": "Nombre",
+      "isActive": "Activo",
+      "updatedDate": "Actualizado",
+      "showing": "{{from}}-{{to}} / {{total}}"
     },
     "delete": {
-      "confirmTitle": "Delete Permission Definition",
-      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+      "confirmTitle": "Eliminar definición de permiso",
+      "confirmMessage": "¿Confirma que desea eliminar «{{name}}»? Esta acción no se puede deshacer."
     },
     "syncFromRoutes": "Sincronizar desde rutas"
   },
   "permissionGroups": {
     "title": "Grupos de Permisos",
     "description": "Gestionar grupos de permisos y sus asignaciones",
-    "add": "Agregar Grupo",
+    "add": "Añadir grupo",
     "selectAll": "Seleccionar todo",
     "noDefinitions": "No hay definiciones de permisos disponibles",
     "form": {
-      "editTitle": "Edit Permission Group",
-      "addTitle": "Add Permission Group",
-      "editDescription": "Update permission group details",
-      "addDescription": "Create a new permission group",
-      "name": "Name",
-      "namePlaceholder": "Group name",
-      "description": "Description",
-      "descriptionPlaceholder": "Optional description",
-      "isSystemAdmin": "System Admin",
-      "isActive": "Active",
-      "permissions": "Permissions"
+      "editTitle": "Editar grupo de permisos",
+      "addTitle": "Añadir grupo de permisos",
+      "editDescription": "Actualizar los datos del grupo de permisos",
+      "addDescription": "Crear un nuevo grupo de permisos",
+      "name": "Nombre",
+      "namePlaceholder": "Nombre del grupo",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Descripción opcional",
+      "isSystemAdmin": "Administrador del sistema",
+      "isActive": "Activo",
+      "permissions": "Permisos"
     },
     "table": {
-      "name": "Name",
-      "isSystemAdmin": "System Admin",
-      "isActive": "Active",
-      "permissionCount": "Permissions",
-      "showing": "{{from}}-{{to}} of {{total}}"
+      "name": "Nombre",
+      "isSystemAdmin": "Administrador del sistema",
+      "isActive": "Activo",
+      "permissionCount": "Permisos",
+      "showing": "{{from}}-{{to}} / {{total}}"
     },
     "managePermissions": "Gestionar permisos",
     "permissionsPanel": {
-      "title": "Edit Group Permissions",
-      "description": "Select permissions for this group",
-      "currentCodes": "Current permission codes",
+      "title": "Editar permisos del grupo",
+      "description": "Seleccione los permisos de este grupo",
+      "currentCodes": "Códigos de permiso actuales",
       "introTitle": "What can this group do?",
       "introBody": "Below, you choose which modules this group can view, create, update, or delete. Every user assigned to this group receives the same permission set.",
       "selectionSummaryTitle": "Selected CRUD summary",
@@ -101,8 +101,8 @@
       "selectActionGroup": "Select all {{action}} permissions"
     },
     "delete": {
-      "confirmTitle": "Delete Permission Group",
-      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+      "confirmTitle": "Eliminar grupo de permisos",
+      "confirmMessage": "¿Confirma que desea eliminar «{{name}}»? Esta acción no se puede deshacer."
     },
     "search": "Buscar...",
     "systemAdminLocked": "El grupo de administrador del sistema no se puede modificar"
@@ -110,7 +110,7 @@
   "userGroupAssignments": {
     "title": "Asignaciones de Grupos de Usuarios",
     "description": "Asignar grupos de permisos a usuarios",
-    "selectUser": "Seleccionar Usuario",
+    "selectUser": "Seleccionar usuario",
     "selectUserPlaceholder": "Buscar y seleccionar usuario...",
     "selectUserHint": "Seleccione un usuario para gestionar sus asignaciones de grupos de permisos",
     "assignedGroups": "Grupos de Permisos Asignados",

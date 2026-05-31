@@ -29,27 +29,27 @@
     "add": "Hinzufügen",
     "start": "Starten",
     "actions": "Aktionen",
-    "paginationInfo": "{{current}} - {{total}} of {{totalCount}}",
-    "export": "Exportieren",
-    "exportExcel": "Excel",
-    "exportPdf": "PDF",
-    "page": "Seite",
+    "paginationInfo": "{{start}}-{{end}} / {{total}} Register",
+    "export": "Export",
+    "exportExcel": "Laden Sie Excel herunter",
+    "exportPdf": "PDF herunterladen",
+    "page": "Seite {{current}} / {{total}}",
     "details": "Details",
     "selected": "Ausgewählt",
     "generalError": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "update": "Aktualisieren",
-    "processing": "Wird verarbeitet...",
+    "processing": "Processing...",
     "accessDenied": "Zugriff verweigert",
     "accessDeniedMessage": "Sie haben keine Berechtigung, diese Seite anzuzeigen.",
     "rowsPerPage": "Pro Seite",
     "records": "Einträge",
-    "columns": "Spalten",
+    "columns": "Sichtbare Spalten",
     "visibleColumns": "Sichtbare Spalten",
-    "hiddenColumns": "Versteckte Spalten",
+    "hiddenColumns": "Ausgeblendete Spalten",
     "hide": "Ausblenden",
     "show": "Anzeigen",
     "breadcrumb": "Brotkrumennavigation",
-    "select": "Auswahlen...",
+    "select": "Wählen",
     "user": "Benutzer",
     "systemAdmin": "System Admin",
     "errors": {
@@ -150,23 +150,23 @@
       "permissionDefinitionListLoadFailed": "Liste der Berechtigungsdefinitionen konnte nicht geladen werden."
     },
     "documentDate": "Belge Tarihi",
-    "status": "Durum",
-    "refresh": "Refresh",
+    "status": "Situation",
+    "refresh": "Aktualisieren",
     "noPermission": "Bu işlem için yetkiniz yok.",
     "note": "Not",
     "documentNo": "Belge No",
     "description": "Aciklama",
     "saveSuccess": "Kayıt başarıyla kaydedildi",
-    "deleteSuccess": "Kayıt silindi",
-    "active": "Aktif",
+    "deleteSuccess": "Löschung erfolgreich",
+    "active": "Aktiv",
     "passive": "Pasif",
     "unit": "Birim",
     "projectCode": "Proje",
     "view": "Görüntüle",
-    "create": "Oluştur",
-    "filters": "Filters",
+    "create": "Erstellen",
+    "filters": "Detaillierter Filter",
     "priority": "Priority",
-    "clear": "Clear",
+    "clear": "klar",
     "validation": {
       "selectAtLeastOneItem": "You must select at least one item before continuing."
     },
@@ -196,16 +196,16 @@
   },
   "auth": {
     "login": {
-      "title": "BESTANDS- & VERSANDMANAGEMENT",
-      "subtitle": "VERII WMS",
-      "slogan": "\"VERWALTEN SIE IHR INVENTAR MIT <brand>v3rii</brand>, STATT ES ZU SUCHEN.\"",
+      "title": "Systemanmeldung",
+      "subtitle": "Bitte melden Sie sich an, um fortzufahren",
+      "slogan": "Stärken Sie Ihr Geschäft mit <1>VERII CRM</1>",
       "branch": "Filiale",
       "selectBranch": "Filiale auswählen",
       "branchNotFound": "Filiale nicht gefunden",
       "email": "E-Mail",
       "emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein",
       "password": "Passwort",
-      "passwordPlaceholder": "••••••••",
+      "passwordPlaceholder": "Passwort eingeben",
       "forgotPassword": "Passwort vergessen?",
       "loginButton": "Anmelden",
       "loggingIn": "Wird angemeldet...",
@@ -239,7 +239,7 @@
       "confirmPasswordPlaceholder": "Neues Passwort erneut eingeben",
       "submitButton": "Passwort aktualisieren",
       "processing": "Wird aktualisiert...",
-      "successRedirect": "Ihr Passwort wurde aktualisiert. Weiterleitung zur Anmeldung.",
+      "successRedirect": "Ihr Passwort wurde erfolgreich zurückgesetzt. Sie werden zur Anmeldeseite weitergeleitet...",
       "failed": "Passwort konnte nicht aktualisiert werden.",
       "error": "Beim Aktualisieren des Passworts ist ein Fehler aufgetreten.",
       "invalidToken": "Ungültiger oder fehlender Reset-Link.",
@@ -257,11 +257,11 @@
     "logout": "Abmelden"
   },
   "navbar": {
-    "VERII WMS": "VERII WMS",
-    "search_placeholder": "Schnellsuche..."
+    "VERII WMS": "DATEN-WMS",
+    "search_placeholder": "Machen Sie eine schnelle Suche..."
   },
   "sidebar": {
-    "dashboard": "Dashboard",
+    "dashboard": "Armaturenbrett",
     "goodsReceipt": "Wareneingang",
     "goodsReceiptCreate": "Wareneingang erfassen",
     "goodsReceiptList": "Wareneingangsliste",
@@ -308,8 +308,8 @@
     "userManagement": "Benutzerverwaltung",
     "permissionDefinitions": "Berechtigungsdefinitionen",
     "permissionGroups": "Berechtigungsgruppen",
-    "userGroupAssignments": "Benutzergruppen-Zuweisungen",
-    "mailSettings": "E-Mail-Einstellungen",
+    "userGroupAssignments": "Benutzer-Gruppenzuweisungen",
+    "mailSettings": "Mail Settings",
     "hangfireMonitoring": "Hangfire Uberwachung",
     "settings": "Einstellungen",
     "subcontracting": "Fremdarbeit",
@@ -441,8 +441,8 @@
     "goToDashboard": "Zum Dashboard"
   },
   "dashboard": {
-    "title": "Dashboard",
-    "subtitle": "Willkommen im Lagerverwaltungssystem",
+    "title": "Armaturenbrett",
+    "subtitle": "Willkommen im CRM-System",
     "totalStock": "Gesamtbestand",
     "totalStockChange": "im Vergleich zum Vormonat",
     "goodsReceipt": "Wareneingang",
@@ -559,7 +559,7 @@
     "report": {
       "title": "Wareneingangsbericht",
       "searchPlaceholder": "Bestellnummer, Kundencode, Belegnummer...",
-      "id": "ID",
+      "id": "AUSWEIS",
       "orderId": "Bestellnummer",
       "customerCode": "Kundencode",
       "projectCode": "Projektcode",
@@ -721,7 +721,7 @@
     "list": {
       "title": "Versandauftragsliste",
       "searchPlaceholder": "Belegnummer, Kundencode, Lager...",
-      "id": "ID",
+      "id": "AUSWEIS",
       "documentNo": "Belegnummer",
       "documentDate": "Belegdatum",
       "customerCode": "Kundencode",
@@ -892,7 +892,7 @@
     "list": {
       "title": "Transferauftragsliste",
       "searchPlaceholder": "Belegnummer, Kundencode, Lager...",
-      "id": "ID",
+      "id": "AUSWEIS",
       "documentNo": "Belegnummer",
       "documentDate": "Belegdatum",
       "customerCode": "Kundencode",
@@ -1191,7 +1191,7 @@
       "assignedList": {
         "title": "Zugewiesene Subunternehmer-Ausgangsaufträge",
         "searchPlaceholder": "Belegnummer, Kundencode, Lager...",
-        "id": "ID",
+        "id": "AUSWEIS",
         "documentNo": "Belegnummer",
         "documentDate": "Belegdatum",
         "customerCode": "Kundencode",
@@ -1236,7 +1236,7 @@
       "assignedList": {
         "title": "Zugewiesene Subunternehmer-Eingangsaufträge",
         "searchPlaceholder": "Belegnummer, Kundencode, Lager...",
-        "id": "ID",
+        "id": "AUSWEIS",
         "documentNo": "Belegnummer",
         "documentDate": "Belegdatum",
         "customerCode": "Kundencode",
@@ -1502,7 +1502,7 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} WMS. Alle Rechte vorbehalten."
+    "copyright": "© {{year}} CRM. Alle Rechte vorbehalten."
   },
   "theme": {
     "toggle": "Design wechseln",
@@ -1514,7 +1514,7 @@
     "list": {
       "title": "Parameterliste",
       "searchPlaceholder": "Suchen...",
-      "id": "ID",
+      "id": "AUSWEIS",
       "allowLessQuantity": "Weniger Menge basierend auf Bestellung erlauben",
       "allowMoreQuantity": "Mehr Menge basierend auf Bestellung erlauben",
       "requireApproval": "Genehmigung vor ERP erforderlich",
@@ -1537,7 +1537,7 @@
       "requireAllOrderItemsCollectedDescription": "Wenn dieser Parameter aktiv ist, müssen alle Positionen in der Bestellung gesammelt werden.",
       "editDescription": "Sie können die bestehenden Parametereinstellungen bearbeiten",
       "createDescription": "Sie können neue Parametereinstellungen erstellen",
-      "updateButton": "Aktualisieren",
+      "updateButton": "Update",
       "createButton": "Speichern"
     },
     "create": {
@@ -1638,9 +1638,9 @@
       "deleteConfirmMessage": "Sind Sie sicher, dass Sie diese Verpackung löschen möchten?",
       "deleteSuccess": "Verpackung erfolgreich gelöscht",
       "deleteError": "Fehler beim Löschen der Verpackung",
-      "id": "Datensatz-Nr.",
-      "sourceType": "Quelltyp",
-      "matchedSource": "Zugeordnete Quelle",
+      "id": "Record No",
+      "sourceType": "Source Type",
+      "matchedSource": "Matched Source",
       "customerName": "Kundenname"
     },
     "wizard": {
@@ -1922,36 +1922,36 @@
       "wi": "Lagerzugang",
       "wo": "Lagerabgang",
       "sh": "Versand",
-      "GR": "Wareneingang",
+      "GR": "Goods Receipt",
       "WT": "Lagerübertragung",
-      "SH": "Versand",
-      "PR": "Produktion",
+      "SH": "Shipment",
+      "PR": "Production",
       "PT": "Produktionsübertragung",
-      "SIT": "Fremdarbeitsausgabe",
-      "SRT": "Fremdarbeitseingang",
-      "WI": "Lagerzugang",
-      "WO": "Lagerabgang"
+      "SIT": "Subcontracting Issue",
+      "SRT": "Subcontracting Receipt",
+      "WI": "Warehouse Inbound",
+      "WO": "Warehouse Outbound"
     },
     "cargoCompany": {
       "None": "Keine",
-      "YurtiçiKargo": "Yurtiçi Kargo",
-      "ArasKargo": "Aras Kargo",
-      "MNGKargo": "MNG Kargo",
-      "PTTKargo": "PTT Kargo",
-      "SüratKargo": "Sürat Kargo",
+      "YurtiçiKargo": "Inländische Fracht",
+      "ArasKargo": "Suchens Cargo",
+      "MNGKargo": "MNG-Fracht",
+      "PTTKargo": "PTT-Fracht",
+      "SüratKargo": "Schnelle Fracht",
       "UPS": "UPS",
       "DHL": "DHL",
       "FedEx": "FedEx",
       "TNT": "TNT",
       "HorozLojistik": "Horoz Logistik",
-      "CEVA": "CEVA",
-      "KargoTurk": "Kargo Türk",
+      "CEVA": "ANTWORT",
+      "KargoTurk": "Fracht Türkisch",
       "HepsiJET": "HepsiJET",
       "TrendyolExpress": "Trendyol Express",
-      "AmazonLogistics": "Amazon Logistics",
+      "AmazonLogistics": "Amazon Logistik",
       "Scotty": "Scotty",
-      "KolayGelsin": "Kolay Gelsin",
-      "BirGundeKargo": "Bir Günde Kargo"
+      "KolayGelsin": "Viel Glück",
+      "BirGundeKargo": "Versand innerhalb eines Tages"
     }
   },
   "notification": {
@@ -2025,13 +2025,13 @@
     "invalidGender": "Ungültiger Geschlechtswert"
   },
   "roles": {
-    "admin": "Administrator"
+    "admin": "Exekutive"
   },
   "profile": {
-    "title": "Profil"
+    "title": "Profilinformationen"
   },
-  "language_choice": "Sprache",
-  "appearance": "Darstellung",
+  "language_choice": "Sprachoption",
+  "appearance": "Ansichtsmodus",
   "warehouse": {
     "validation": {
       "operationTypeRequired": "Vorgangstyp ist erforderlich",
@@ -4695,24 +4695,24 @@
     }
   },
   "mailSettings": {
-    "PageTitle": "SMTP / Mail Settings",
-    "PageDescription": "Manage SMTP configuration for B2B portal notifications, password reset, and system emails.",
-    "SavedSuccessfully": "Mail settings saved successfully.",
+    "PageTitle": "E-Mail-Einstellungen",
+    "PageDescription": "Konfigurieren Sie die SMTP-Servereinstellungen",
+    "SavedSuccessfully": "Einstellungen erfolgreich gespeichert",
     "Fields": {
-      "Host": "SMTP Host",
-      "Port": "Port",
-      "EnableSsl": "Use SSL",
-      "Username": "Username",
-      "Password": "Password",
-      "PasswordPlaceholder": "Leave empty if you do not want to change it",
-      "FromEmail": "Sender Email",
-      "FromName": "Sender Name",
-      "Timeout": "Timeout (sec)"
+      "Host": "Moderator",
+      "Port": "Verbindungsport",
+      "EnableSsl": "Verwenden Sie SSL",
+      "Username": "Benutzername",
+      "Password": "Passwort",
+      "PasswordPlaceholder": "Geben Sie zum Ändern ein neues Passwort ein",
+      "FromEmail": "Von E-Mail",
+      "FromName": "Absendername",
+      "Timeout": "Zeitüberschreitung (Sek.)"
     },
     "TestMail": {
-      "Send": "Send Test Mail",
-      "Sending": "Sending test mail...",
-      "Success": "Test mail sent successfully."
+      "Send": "Test-E-Mail senden",
+      "Sending": "Test wird gesendet...",
+      "Success": "Test-E-Mail gesendet"
     }
   },
   "vehicleCheckIn": {

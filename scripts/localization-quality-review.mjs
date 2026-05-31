@@ -77,6 +77,9 @@ const LANGUAGE_HINT_WORDS = {
   it: new Set(['il', 'la', 'i', 'i', 'gli', 'una', 'per', 'di', 'e', 'con', 'non', 'si', 'come', 'come']),
 };
 
+const MACHINE_TRANSLATION_MISS = '__mt_miss__';
+
+
 function parseArgs(argv) {
   const out = new Map();
   for (let i = 2; i < argv.length; i += 1) {
@@ -225,6 +228,10 @@ async function maybeMachineTranslate(value, targetLanguage, sourceLanguage, mach
   return null;
 }
 
+function makeTranslationCacheKey(text, sourceLanguage, targetLanguage) {
+  return `${sourceLanguage}=>${targetLanguage}::${text}`;
+}
+
 async function generateReviewForLanguage({
   sourceLanguage,
   targetLanguage,
@@ -237,6 +244,8 @@ async function generateReviewForLanguage({
   const findings = [];
   const summary = { totalStrings: 0, reviewCount: 0, missingKeyCount: 0, copyFromSource: 0, likelyEnglish: 0 };
   const crmLocaleRoot = crmRoot ? path.join(crmRoot, 'src', 'locales', lang) : null;
+  const crmFeatureRoot = crmRoot ? path.join(crmRoot, 'src', 'features') : null;
+  const translationCache = new Map();
 
   const processNamespace = async (type, namespace) => {
     const sourcePath = getLocalePath(sourceLanguage, namespace, type);
@@ -254,6 +263,13 @@ async function generateReviewForLanguage({
     let crmFlatLeaves = null;
     if (type === 'core' && crmLocaleRoot && fs.existsSync(path.join(crmLocaleRoot, `${namespace}.json`))) {
       crmFlatLeaves = flattenLeaves(readJson(path.join(crmLocaleRoot, `${namespace}.json`)));
+    }
+    if (
+      type === 'feature' &&
+      crmFeatureRoot &&
+      fs.existsSync(path.join(crmFeatureRoot, namespace, 'localization', `${lang}.json`))
+    ) {
+      crmFlatLeaves = flattenLeaves(readJson(path.join(crmFeatureRoot, namespace, 'localization', `${lang}.json`)));
     }
 
     const namespaceFindings = [];
@@ -295,6 +311,20 @@ async function generateReviewForLanguage({
           const crmValue = crmFlatLeaves.get(key);
           if (typeof crmValue === 'string' && crmValue.trim() && crmValue !== targetText) {
             suggested = crmValue;
+          }
+        } else if (machineConfig.enabled) {
+          const cacheKey = makeTranslationCacheKey(sourceText, sourceLanguage, lang);
+          if (translationCache.has(cacheKey)) {
+            const cacheValue = translationCache.get(cacheKey);
+            suggested = cacheValue === MACHINE_TRANSLATION_MISS ? null : cacheValue;
+          } else {
+            const translated = await maybeMachineTranslate(sourceText, lang, sourceLanguage, machineConfig);
+            if (typeof translated === 'string' && translated.trim()) {
+              translationCache.set(cacheKey, translated.trim());
+              suggested = translated.trim();
+            } else {
+              translationCache.set(cacheKey, MACHINE_TRANSLATION_MISS);
+            }
           }
         }
         namespaceFindings.push({

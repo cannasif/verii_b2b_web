@@ -29,70 +29,70 @@
     }
   },
   "permissionDefinitions": {
-    "title": "Permission Definitions",
-    "description": "Manage permission codes used in the system",
-    "add": "Add Definition",
+    "title": "Berechtigungsdefinitionen",
+    "description": "Im System verwendete Berechtigungscodes verwalten",
+    "add": "Definition hinzufügen",
     "form": {
-      "editTitle": "Edit Permission Definition",
-      "addTitle": "Add Permission Definition",
-      "editDescription": "Update permission definition details",
-      "addDescription": "Create a new permission definition",
+      "editTitle": "Berechtigungsdefinition bearbeiten",
+      "addTitle": "Berechtigungsdefinition hinzufügen",
+      "editDescription": "Details der Berechtigungsdefinition aktualisieren",
+      "addDescription": "Neue Berechtigungsdefinition anlegen",
       "code": "Code",
       "name": "Name",
-      "namePlaceholder": "Display name",
-      "description": "Description",
-      "descriptionPlaceholder": "Optional description",
-      "isActive": "Active",
+      "namePlaceholder": "Anzeigename",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Optionale Beschreibung",
+      "isActive": "Aktiv",
       "codePlaceholder": "Code auswählen",
       "affectedRoutes": "Betroffene Seiten",
       "affectedRoutesNone": "Für diesen Code wurde keine passende Route gefunden",
       "codeSearchPlaceholder": "Suchen...",
-      "codeEmpty": "Keine Ergebnisse gefunden"
+      "codeEmpty": "Keine Ergebnisse"
     },
     "table": {
       "code": "Code",
       "name": "Name",
-      "isActive": "Active",
-      "updatedDate": "Updated",
-      "showing": "{{from}}-{{to}} of {{total}}"
+      "isActive": "Aktiv",
+      "updatedDate": "Aktualisiert",
+      "showing": "{{from}}-{{to}} / {{total}}"
     },
     "delete": {
-      "confirmTitle": "Delete Permission Definition",
-      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+      "confirmTitle": "Berechtigungsdefinition löschen",
+      "confirmMessage": "Möchten Sie „{{name}}“ wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden."
     },
-    "syncFromRoutes": "Von Routen synchronisieren"
+    "syncFromRoutes": "Aus Routen synchronisieren"
   },
   "permissionGroups": {
-    "title": "Permission Groups",
-    "description": "Manage permission groups and their assignments",
-    "add": "Add Group",
-    "selectAll": "Select all",
-    "noDefinitions": "No permission definitions available",
+    "title": "Berechtigungsgruppen",
+    "description": "Berechtigungsgruppen und Zuweisungen verwalten",
+    "add": "Gruppe hinzufügen",
+    "selectAll": "Alle auswählen",
+    "noDefinitions": "Keine Berechtigungsdefinitionen verfügbar",
     "form": {
-      "editTitle": "Edit Permission Group",
-      "addTitle": "Add Permission Group",
-      "editDescription": "Update permission group details",
-      "addDescription": "Create a new permission group",
+      "editTitle": "Berechtigungsgruppe bearbeiten",
+      "addTitle": "Berechtigungsgruppe hinzufügen",
+      "editDescription": "Details der Berechtigungsgruppe aktualisieren",
+      "addDescription": "Neue Berechtigungsgruppe anlegen",
       "name": "Name",
-      "namePlaceholder": "Group name",
-      "description": "Description",
-      "descriptionPlaceholder": "Optional description",
-      "isSystemAdmin": "System Admin",
-      "isActive": "Active",
-      "permissions": "Permissions"
+      "namePlaceholder": "Gruppenname",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Optionale Beschreibung",
+      "isSystemAdmin": "Systemadministrator",
+      "isActive": "Aktiv",
+      "permissions": "Berechtigungen"
     },
     "table": {
       "name": "Name",
-      "isSystemAdmin": "System Admin",
-      "isActive": "Active",
-      "permissionCount": "Permissions",
-      "showing": "{{from}}-{{to}} of {{total}}"
+      "isSystemAdmin": "Systemadministrator",
+      "isActive": "Aktiv",
+      "permissionCount": "Berechtigungen",
+      "showing": "{{from}}-{{to}} / {{total}}"
     },
-    "managePermissions": "Manage permissions",
+    "managePermissions": "Berechtigungen verwalten",
     "permissionsPanel": {
-      "title": "Edit Group Permissions",
-      "description": "Select permissions for this group",
-      "currentCodes": "Current permission codes",
+      "title": "Gruppenberechtigungen bearbeiten",
+      "description": "Berechtigungen für diese Gruppe auswählen",
+      "currentCodes": "Aktuelle Berechtigungscodes",
       "introTitle": "What can this group do?",
       "introBody": "Below, you choose which modules this group can view, create, update, or delete. Every user assigned to this group receives the same permission set.",
       "selectionSummaryTitle": "Selected CRUD summary",
@@ -101,44 +101,44 @@
       "selectActionGroup": "Select all {{action}} permissions"
     },
     "delete": {
-      "confirmTitle": "Delete Permission Group",
-      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+      "confirmTitle": "Berechtigungsgruppe löschen",
+      "confirmMessage": "Möchten Sie „{{name}}“ wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden."
     },
     "search": "Suchen...",
     "systemAdminLocked": "Die System-Admin-Gruppe kann nicht geändert werden"
   },
   "userGroupAssignments": {
-    "title": "User Group Assignments",
-    "description": "Assign permission groups to users",
-    "selectUser": "Select User",
-    "selectUserPlaceholder": "Search and select user...",
-    "selectUserHint": "Select a user to manage their permission group assignments",
-    "assignedGroups": "Assigned Permission Groups",
-    "noUsers": "No users found",
-    "noGroups": "No permission groups available",
-    "selectAll": "Select all"
+    "title": "Benutzer-Gruppenzuweisungen",
+    "description": "Benutzern Berechtigungsgruppen zuweisen",
+    "selectUser": "Benutzer auswählen",
+    "selectUserPlaceholder": "Benutzer suchen und auswählen...",
+    "selectUserHint": "Wählen Sie einen Benutzer, um dessen Gruppenzuweisungen zu verwalten",
+    "assignedGroups": "Zugewiesene Berechtigungsgruppen",
+    "noUsers": "Keine Benutzer gefunden",
+    "noGroups": "Keine Berechtigungsgruppen verfügbar",
+    "selectAll": "Alle auswählen"
   },
   "common": {
-    "cancel": "Stornieren",
-    "saving": "Sparen...",
+    "cancel": "Abbrechen",
+    "saving": "Wird gespeichert...",
     "save": "Speichern und anwenden",
-    "loading": "Laden...",
+    "loading": "Wird geladen...",
     "search": "Suchen...",
     "noData": "Keine Daten",
     "actions": "Aktionen",
     "yes": "Ja",
-    "no": "NEIN",
+    "no": "Nein",
     "edit": "Bearbeiten",
     "delete": "Löschen",
-    "previous": "Vorherige",
+    "previous": "Zurück",
     "next": "Nächste",
-    "processing": "Verarbeitung..."
+    "processing": "Wird verarbeitet..."
   },
   "sidebar": {
-    "accessControl": "Zugangskontrolle",
+    "accessControl": "Zugriffskontrolle",
     "permissionDefinitions": "Berechtigungsdefinitionen",
     "permissionGroups": "Berechtigungsgruppen",
-    "userGroupAssignments": "Benutzergruppenzuweisungen",
+    "userGroupAssignments": "Benutzer-Gruppenzuweisungen",
     "wmsScopePolicies": "B2B Scope Policies",
     "wmsScopeAssignments": "B2B Scope Assignments"
   },

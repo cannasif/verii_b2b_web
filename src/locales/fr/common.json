@@ -29,27 +29,27 @@
     "add": "Ajouter",
     "start": "Démarrer",
     "actions": "Actions",
-    "paginationInfo": "{{current}} - {{total}} of {{totalCount}}",
+    "paginationInfo": "Registre {{start}}-{{end}} / {{total}}",
     "export": "Exporter",
-    "exportExcel": "Excel",
-    "exportPdf": "PDF",
-    "page": "Page",
+    "exportExcel": "Télécharger Excel",
+    "exportPdf": "Télécharger le PDF",
+    "page": "Page {{current}} / {{total}}",
     "details": "Détails",
     "selected": "Sélectionné",
     "generalError": "Une erreur s'est produite. Veuillez réessayer.",
     "update": "Mettre à jour",
-    "processing": "Traitement...",
+    "processing": "Processing...",
     "accessDenied": "Accès refusé",
     "accessDeniedMessage": "Vous n'avez pas la permission de voir cette page.",
     "rowsPerPage": "Par page",
     "records": "enregistrements",
-    "columns": "Colonnes",
+    "columns": "Colonnes visibles",
     "visibleColumns": "Colonnes visibles",
-    "hiddenColumns": "Colonnes masquees",
+    "hiddenColumns": "Colonnes masquées",
     "hide": "Masquer",
     "show": "Afficher",
     "breadcrumb": "Fil d'ariane",
-    "select": "Selectionner...",
+    "select": "Sélectionner",
     "user": "Utilisateur",
     "systemAdmin": "System Admin",
     "errors": {
@@ -150,23 +150,23 @@
       "permissionDefinitionListLoadFailed": "Impossible de charger la liste des définitions d'autorisation."
     },
     "documentDate": "Belge Tarihi",
-    "status": "Durum",
-    "refresh": "Refresh",
+    "status": "Statut",
+    "refresh": "Actualiser",
     "noPermission": "Bu işlem için yetkiniz yok.",
     "note": "Not",
     "documentNo": "Belge No",
     "description": "Aciklama",
     "saveSuccess": "Kayıt başarıyla kaydedildi",
-    "deleteSuccess": "Kayıt silindi",
-    "active": "Aktif",
+    "deleteSuccess": "Suppression réussie",
+    "active": "Active",
     "passive": "Pasif",
     "unit": "Birim",
     "projectCode": "Proje",
     "view": "Görüntüle",
-    "create": "Oluştur",
-    "filters": "Filters",
+    "create": "Créer",
+    "filters": "Filtre détaillé",
     "priority": "Priority",
-    "clear": "Clear",
+    "clear": "Effacer",
     "validation": {
       "selectAtLeastOneItem": "You must select at least one item before continuing."
     },
@@ -197,7 +197,7 @@
   "auth": {
     "login": {
       "title": "GESTION STOCKS ET EXPÉDITIONS",
-      "subtitle": "VERII WMS",
+      "subtitle": "Connectez-vous pour continuer",
       "slogan": "\"GÉREZ VOTRE INVENTAIRE AVEC <brand>v3rii</brand>, NE LE CHERCHEZ PLUS.\"",
       "branch": "Succursale",
       "selectBranch": "Sélectionner une succursale",
@@ -205,7 +205,7 @@
       "email": "E-mail",
       "emailPlaceholder": "Entrez votre adresse e-mail",
       "password": "Mot de passe",
-      "passwordPlaceholder": "••••••••",
+      "passwordPlaceholder": "Entrez votre mot de passe",
       "forgotPassword": "Mot de passe oublié ?",
       "loginButton": "Se connecter",
       "loggingIn": "Connexion en cours...",
@@ -257,8 +257,8 @@
     "logout": "Déconnexion"
   },
   "navbar": {
-    "VERII WMS": "VERII WMS",
-    "search_placeholder": "Recherche rapide..."
+    "VERII WMS": "Connectez-vous pour continuer",
+    "search_placeholder": "Faites une recherche rapide..."
   },
   "sidebar": {
     "dashboard": "Tableau de bord",
@@ -559,7 +559,7 @@
     "report": {
       "title": "Rapport de réception de marchandises",
       "searchPlaceholder": "N° de commande, Code client, N° de document...",
-      "id": "ID",
+      "id": "IDENTIFIANT",
       "orderId": "N° de commande",
       "customerCode": "Code client",
       "projectCode": "Code projet",
@@ -596,7 +596,7 @@
       "approvedBy": "Approuvé par",
       "approvalDate": "Date d'approbation",
       "erpInfo": "Informations d'intégration ERP",
-      "erp": "ERP",
+      "erp": "Clients ERP",
       "isERPIntegrated": "ERP intégré",
       "erpReferenceNumber": "N° de référence ERP",
       "erpIntegrationDate": "Date d'intégration ERP",
@@ -721,7 +721,7 @@
     "list": {
       "title": "Liste des ordres d'expédition",
       "searchPlaceholder": "N° de document, Code client, Entrepôt...",
-      "id": "ID",
+      "id": "IDENTIFIANT",
       "documentNo": "N° de document",
       "documentDate": "Date du document",
       "customerCode": "Code client",
@@ -892,7 +892,7 @@
     "list": {
       "title": "Liste des ordres de transfert",
       "searchPlaceholder": "N° de document, Code client, Entrepôt...",
-      "id": "ID",
+      "id": "IDENTIFIANT",
       "documentNo": "N° de document",
       "documentDate": "Date du document",
       "customerCode": "Code client",
@@ -1191,7 +1191,7 @@
       "assignedList": {
         "title": "Ordres de sous-traitance sortants assignés",
         "searchPlaceholder": "N° de document, Code client, Entrepôt...",
-        "id": "ID",
+        "id": "IDENTIFIANT",
         "documentNo": "N° de document",
         "documentDate": "Date du document",
         "customerCode": "Code client",
@@ -1236,7 +1236,7 @@
       "assignedList": {
         "title": "Ordres de sous-traitance entrants assignés",
         "searchPlaceholder": "N° de document, Code client, Entrepôt...",
-        "id": "ID",
+        "id": "IDENTIFIANT",
         "documentNo": "N° de document",
         "documentDate": "Date du document",
         "customerCode": "Code client",
@@ -1514,7 +1514,7 @@
     "list": {
       "title": "Liste des paramètres",
       "searchPlaceholder": "Rechercher...",
-      "id": "ID",
+      "id": "IDENTIFIANT",
       "allowLessQuantity": "Autoriser une quantité inférieure basée sur la commande",
       "allowMoreQuantity": "Autoriser une quantité supérieure basée sur la commande",
       "requireApproval": "Exiger une approbation avant l'ERP",
@@ -1538,7 +1538,7 @@
       "editDescription": "Mevcut parametre ayarlarını düzenleyebilirsiniz",
       "createDescription": "Yeni parametre ayarlarını oluşturabilirsiniz",
       "updateButton": "Güncelle",
-      "createButton": "Kaydet"
+      "createButton": "Enregistrer"
     },
     "create": {
       "success": "Paramètre créé avec succès",
@@ -1638,8 +1638,8 @@
       "deleteConfirmMessage": "Êtes-vous sûr de vouloir supprimer cet emballage ?",
       "deleteSuccess": "Emballage supprimé avec succès",
       "deleteError": "Une erreur s'est produite lors de la suppression de l'emballage",
-      "id": "Kayıt No",
-      "sourceType": "Kaynak Tipi",
+      "id": "Record No",
+      "sourceType": "Source Type",
       "matchedSource": "Eşleşen Kaynak",
       "customerName": "Cari Adı"
     },
@@ -1922,9 +1922,9 @@
       "wi": "Entrée d'entrepôt",
       "wo": "Sortie d'entrepôt",
       "sh": "Expédition",
-      "GR": "Mal Kabul",
-      "WT": "Depo Transferi",
-      "SH": "Sevkiyat",
+      "GR": "Goods Receipt",
+      "WT": "Warehouse Transfer",
+      "SH": "Shipment",
       "PR": "Üretim",
       "PT": "Üretim Transferi",
       "SIT": "Yarı Mamul Çıkış Transferi",
@@ -1934,24 +1934,24 @@
     },
     "cargoCompany": {
       "None": "Aucun",
-      "YurtiçiKargo": "Yurtiçi Kargo",
-      "ArasKargo": "Aras Kargo",
-      "MNGKargo": "MNG Kargo",
-      "PTTKargo": "PTT Kargo",
-      "SüratKargo": "Sürat Kargo",
+      "YurtiçiKargo": "Fret intérieur",
+      "ArasKargo": "Recherchers Cargaison",
+      "MNGKargo": "Cargaison MNG",
+      "PTTKargo": "Cargaison PTT",
+      "SüratKargo": "Cargaison rapide",
       "UPS": "UPS",
       "DHL": "DHL",
       "FedEx": "FedEx",
       "TNT": "TNT",
       "HorozLojistik": "Horoz Logistique",
-      "CEVA": "CEVA",
-      "KargoTurk": "Kargo Türk",
+      "CEVA": "RÉPONDRE",
+      "KargoTurk": "Cargo turc",
       "HepsiJET": "HepsiJET",
       "TrendyolExpress": "Trendyol Express",
-      "AmazonLogistics": "Amazon Logistics",
+      "AmazonLogistics": "Amazon Logistique",
       "Scotty": "Scotty",
-      "KolayGelsin": "Kolay Gelsin",
-      "BirGundeKargo": "Bir Günde Kargo"
+      "KolayGelsin": "Bonne chance",
+      "BirGundeKargo": "Expédition en un jour"
     }
   },
   "notification": {
@@ -1980,9 +1980,9 @@
     "weight": "Poids (kg)",
     "gender": {
       "notSpecified": "Belirtilmemiş",
-      "male": "Erkek",
-      "female": "Kadın",
-      "other": "Diğer"
+      "male": "Homme",
+      "female": "Femme",
+      "other": "Autre"
     },
     "selectGender": "Sélectionner le sexe",
     "gender.notSpecified": "Non spécifié",
@@ -2025,13 +2025,13 @@
     "invalidGender": "Valeur de sexe invalide"
   },
   "roles": {
-    "admin": "Administrateur"
+    "admin": "Exécutif"
   },
   "profile": {
-    "title": "Profil"
+    "title": "Informations sur le profil"
   },
-  "language_choice": "Langue",
-  "appearance": "Apparence",
+  "language_choice": "Option de langue",
+  "appearance": "Mode d'affichage",
   "warehouse": {
     "validation": {
       "operationTypeRequired": "Le type d'opération est requis",
@@ -4695,24 +4695,24 @@
     }
   },
   "mailSettings": {
-    "PageTitle": "SMTP / Mail Settings",
-    "PageDescription": "Manage SMTP configuration for B2B portal notifications, password reset, and system emails.",
-    "SavedSuccessfully": "Mail settings saved successfully.",
+    "PageTitle": "Mail Settings",
+    "PageDescription": "Configurez les paramètres du serveur SMTP",
+    "SavedSuccessfully": "Paramètres enregistrés avec succès",
     "Fields": {
-      "Host": "SMTP Host",
-      "Port": "Port",
-      "EnableSsl": "Use SSL",
-      "Username": "Username",
-      "Password": "Password",
-      "PasswordPlaceholder": "Leave empty if you do not want to change it",
-      "FromEmail": "Sender Email",
-      "FromName": "Sender Name",
-      "Timeout": "Timeout (sec)"
+      "Host": "Présentateur",
+      "Port": "Port de connexion",
+      "EnableSsl": "Utiliser SSL",
+      "Username": "Nom d'utilisateur",
+      "Password": "Mot de passe",
+      "PasswordPlaceholder": "Saisissez un nouveau mot de passe pour modifier",
+      "FromEmail": "E‑mail expéditeur",
+      "FromName": "Nom de l’expéditeur",
+      "Timeout": "Délai d’expiration (s)"
     },
     "TestMail": {
-      "Send": "Send Test Mail",
-      "Sending": "Sending test mail...",
-      "Success": "Test mail sent successfully."
+      "Send": "Envoyer un e-mail de test",
+      "Sending": "Le test est en cours d'envoi...",
+      "Success": "E-mail de test envoyé"
     }
   },
   "vehicleCheckIn": {

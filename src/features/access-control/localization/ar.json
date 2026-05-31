@@ -33,32 +33,32 @@
     "description": "إدارة رموز الأذونات المستخدمة في النظام",
     "add": "إضافة تعريف",
     "form": {
-      "editTitle": "Edit Permission Definition",
-      "addTitle": "Add Permission Definition",
-      "editDescription": "Update permission definition details",
-      "addDescription": "Create a new permission definition",
-      "code": "Code",
-      "codePlaceholder": "Select a code",
-      "affectedRoutes": "Affected pages",
-      "affectedRoutesNone": "No matching routes found for this code",
-      "name": "Name",
-      "namePlaceholder": "Display name",
-      "description": "Description",
-      "descriptionPlaceholder": "Optional description",
-      "isActive": "Active",
-      "codeSearchPlaceholder": "Search...",
-      "codeEmpty": "No results found"
+      "editTitle": "تعديل تعريف الصلاحية",
+      "addTitle": "إضافة تعريف صلاحية",
+      "editDescription": "تحديث بيانات تعريف الصلاحية",
+      "addDescription": "إنشاء تعريف صلاحية جديد",
+      "code": "الرمز",
+      "codePlaceholder": "اختر رمزاً",
+      "affectedRoutes": "الصفحات المتأثرة",
+      "affectedRoutesNone": "لا يوجد مسار مطابق لهذا الرمز",
+      "name": "الاسم",
+      "namePlaceholder": "الاسم الظاهر",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف اختياري",
+      "isActive": "نشط",
+      "codeSearchPlaceholder": "بحث...",
+      "codeEmpty": "لا توجد نتائج"
     },
     "table": {
-      "code": "Code",
-      "name": "Name",
-      "isActive": "Active",
-      "updatedDate": "Updated",
-      "showing": "{{from}}-{{to}} of {{total}}"
+      "code": "الرمز",
+      "name": "الاسم",
+      "isActive": "نشط",
+      "updatedDate": "تاريخ التحديث",
+      "showing": "{{from}}-{{to}} / {{total}}"
     },
     "delete": {
-      "confirmTitle": "Delete Permission Definition",
-      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+      "confirmTitle": "حذف تعريف الصلاحية",
+      "confirmMessage": "هل تريد بالتأكيد حذف «{{name}}»؟ لا يمكن التراجع عن هذا الإجراء."
     },
     "syncFromRoutes": "مزامنة من المسارات"
   },
@@ -69,30 +69,30 @@
     "selectAll": "تحديد الكل",
     "noDefinitions": "لا تتوفر تعريفات أذونات",
     "form": {
-      "editTitle": "Edit Permission Group",
-      "addTitle": "Add Permission Group",
-      "editDescription": "Update permission group details",
-      "addDescription": "Create a new permission group",
-      "name": "Name",
-      "namePlaceholder": "Group name",
-      "description": "Description",
-      "descriptionPlaceholder": "Optional description",
-      "isSystemAdmin": "System Admin",
-      "isActive": "Active",
-      "permissions": "Permissions"
+      "editTitle": "تعديل مجموعة الصلاحيات",
+      "addTitle": "إضافة مجموعة صلاحيات",
+      "editDescription": "تحديث بيانات المجموعة",
+      "addDescription": "إنشاء مجموعة صلاحيات جديدة",
+      "name": "الاسم",
+      "namePlaceholder": "اسم المجموعة",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف اختياري",
+      "isSystemAdmin": "مسؤول النظام",
+      "isActive": "نشط",
+      "permissions": "الصلاحيات"
     },
     "table": {
-      "name": "Name",
-      "isSystemAdmin": "System Admin",
-      "isActive": "Active",
-      "permissionCount": "Permissions",
-      "showing": "{{from}}-{{to}} of {{total}}"
+      "name": "الاسم",
+      "isSystemAdmin": "مسؤول النظام",
+      "isActive": "نشط",
+      "permissionCount": "الصلاحيات",
+      "showing": "{{from}}-{{to}} / {{total}}"
     },
     "managePermissions": "إدارة الأذونات",
     "permissionsPanel": {
-      "title": "Edit Group Permissions",
-      "description": "Select permissions for this group",
-      "currentCodes": "Current permission codes",
+      "title": "تعديل صلاحيات المجموعة",
+      "description": "حدد الصلاحيات لهذه المجموعة",
+      "currentCodes": "رموز الصلاحيات الحالية",
       "introTitle": "What can this group do?",
       "introBody": "Below, you choose which modules this group can view, create, update, or delete. Every user assigned to this group receives the same permission set.",
       "selectionSummaryTitle": "Selected CRUD summary",
@@ -101,8 +101,8 @@
       "selectActionGroup": "Select all {{action}} permissions"
     },
     "delete": {
-      "confirmTitle": "Delete Permission Group",
-      "confirmMessage": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+      "confirmTitle": "حذف مجموعة الصلاحيات",
+      "confirmMessage": "هل تريد بالتأكيد حذف «{{name}}»؟ لا يمكن التراجع عن هذا الإجراء."
     },
     "search": "بحث...",
     "systemAdminLocked": "لا يمكن تعديل مجموعة مسؤول النظام"
