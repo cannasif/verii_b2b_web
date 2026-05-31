@@ -1,6 +1,6 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle2, ExternalLink, KeyRound, Settings2, Store, TriangleAlert } from 'lucide-react';
+import { BookOpenCheck, CheckCircle2, ExternalLink, KeyRound, Settings2, Store, TriangleAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,81 @@ type ProviderFormState = {
   supportsOrderImport: boolean;
   isActive: boolean;
   notes: string;
+};
+
+type ProviderGuide = {
+  title: string;
+  summary: string;
+  required: string[];
+  steps: string[];
+  links: Array<{ label: string; href: string }>;
+  warning?: string;
+};
+
+const providerGuides: Record<string, ProviderGuide> = {
+  Trendyol: {
+    title: 'Trendyol bilgileri nereden alınır?',
+    summary: 'Trendyol entegrasyonu Basic Auth ile çalışır. Ürün, fiyat, stok ve sipariş servislerinde Supplier ID ile API Key/API Secret birlikte kullanılır.',
+    required: ['Supplier ID', 'API Key', 'API Secret', 'Varsa test/stage bilgileri', 'Mağaza operasyon yetkisi'],
+    steps: [
+      'Satıcı paneline master/yetkili kullanıcıyla girin.',
+      'Hesap Bilgilerim > Entegrasyon Bilgileri ekranından Supplier ID, API Key ve API Secret bilgilerini alın.',
+      'Bu ekranda Satıcı / Mağaza No alanına Supplier ID bilgisini, credential alanlarına API Key ve API Secret bilgisini girin.',
+      'Ürün, fiyat, stok ve sipariş operasyonlarından kullanmak istediklerinizi aktif bırakın.',
+    ],
+    links: [
+      { label: 'Yetkilendirme dokümanı', href: 'https://developers.trendyol.com/tr/docs/2-authorization' },
+      { label: 'Trendyol Developer', href: 'https://developers.trendyol.com/' },
+    ],
+  },
+  Hepsiburada: {
+    title: 'Hepsiburada bilgileri nereden alınır?',
+    summary: 'Hepsiburada tarafında merchant/mağaza bilgisi ve API anahtarları gerekir. İşlemler genelde batch/transaction takip mantığıyla ilerler.',
+    required: ['Merchant ID', 'API Key veya Client ID', 'API Secret', 'Developer/merchant panel yetkisi', 'Yetkilendirilmiş entegratör izni'],
+    steps: [
+      'Hepsiburada developer hesabı ve merchant panel erişimini hazırlayın.',
+      'Merchant/mağaza ID bilgisini merchant panelden doğrulayın.',
+      'Developer portalda veya entegratör yetkilendirme ekranında API Key/API Secret bilgilerini oluşturun.',
+      'Bu ekranda Merchant ID bilgisini Satıcı / Mağaza No alanına, anahtarları Kimlik Bilgileri sekmesine girin.',
+    ],
+    links: [
+      { label: 'Başlangıç dokümanı', href: 'https://developers.hepsiburada.com/hepsiburada/docs/getting-started' },
+      { label: 'Hepsiburada Developer', href: 'https://developers.hepsiburada.com/' },
+    ],
+  },
+  Amazon: {
+    title: 'Amazon SP-API bilgileri nereden alınır?',
+    summary: 'Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.',
+    required: ['Seller ID', 'Marketplace ID', 'LWA Client ID/Secret', 'Refresh Token', 'AWS Access Key/Secret', 'Region', 'Varsa Role ARN'],
+    steps: [
+      'Seller Central üzerinden developer profile ve SP-API uygulama kaydını tamamlayın.',
+      'Uygulama için Login with Amazon client id/secret bilgilerini alın.',
+      'Seller authorization akışından refresh token üretin.',
+      'AWS IAM/SigV4 bilgilerini ve gerekiyorsa Role ARN bilgisini hazırlayın.',
+      'Marketplace ID ve region bilgisini satış yapılan ülkeye göre seçin.',
+    ],
+    links: [
+      { label: 'SP-API kayıt süreci', href: 'https://developer-docs.amazon.com/sp-api/docs/sp-api-registration-overview' },
+      { label: 'Marketplace IDs', href: 'https://developer-docs.amazon.com/sp-api/docs/marketplace-ids' },
+      { label: 'SP-API endpoints', href: 'https://developer-docs.amazon.com/sp-api/docs/sp-api-endpoints' },
+    ],
+    warning: 'Amazon bilgilerinde PROD/SANDBOX ve marketplace region ayrımı kritik. Yanlış region veya marketplace ID ile imza doğru olsa bile istekler başarısız olur.',
+  },
+  Etsy: {
+    title: 'Etsy bilgileri nereden alınır?',
+    summary: 'Etsy Open API v3 OAuth tabanlıdır. App registration ile keystring/shared secret alınır, shop erişimi OAuth scopes ile yetkilendirilir.',
+    required: ['Shop ID', 'Client ID / API keystring', 'Client Secret / shared secret', 'Refresh Token', 'Gerekli OAuth scopes'],
+    steps: [
+      'Etsy Developer portalında uygulama oluşturun.',
+      'API keystring ve shared secret bilgilerini alın.',
+      'Shop adına OAuth authorization akışını tamamlayıp refresh token üretin.',
+      'Shop ID ve token bilgilerini bu ekranda kaydedin.',
+    ],
+    links: [
+      { label: 'Etsy Open API dokümanı', href: 'https://developers.etsy.com/documentation/' },
+      { label: 'OAuth rehberi', href: 'https://developers.etsy.com/documentation/essentials/authentication/' },
+    ],
+  },
 };
 
 function createDefaultState(setting?: MarketplaceProviderSettingDto): ProviderFormState {
@@ -84,6 +159,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
     () => settings.find((item) => item.providerKey === selectedProvider) ?? settings[0],
     [selectedProvider, settings],
   );
+  const selectedGuide = selectedSetting ? providerGuides[selectedSetting.providerKey] : undefined;
 
   useEffect(() => {
     if (!selectedSetting) return;
@@ -209,6 +285,56 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                 {selectedSetting.setupSummary}
               </div>
 
+              {selectedGuide ? (
+                <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/5">
+                    <div className="flex items-start gap-3">
+                      <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-slate-950 text-white dark:bg-white dark:text-slate-950">
+                        <BookOpenCheck size={18} />
+                      </span>
+                      <div>
+                        <h2 className="font-bold text-slate-950 dark:text-white">{selectedGuide.title}</h2>
+                        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{selectedGuide.summary}</p>
+                      </div>
+                    </div>
+                    <ol className="mt-4 space-y-2 text-sm text-slate-700 dark:text-slate-200">
+                      {selectedGuide.steps.map((step, index) => (
+                        <li key={step} className="flex gap-3">
+                          <span className="grid size-6 shrink-0 place-items-center rounded-full bg-cyan-100 text-xs font-black text-cyan-800 dark:bg-cyan-500/15 dark:text-cyan-200">{index + 1}</span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                    {selectedGuide.warning ? (
+                      <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
+                        {selectedGuide.warning}
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="space-y-3">
+                    <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
+                      <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Gerekli bilgiler</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {selectedGuide.required.map((item) => (
+                          <Badge key={item} variant="secondary" className="rounded-full">{item}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
+                      <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Resmi bağlantılar</p>
+                      <div className="mt-3 grid gap-2">
+                        {selectedGuide.links.map((link) => (
+                          <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="inline-flex items-center justify-between rounded-2xl border px-3 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-50 dark:border-white/10 dark:text-cyan-300 dark:hover:bg-cyan-500/10">
+                            {link.label}
+                            <ExternalLink size={14} />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
               <Tabs defaultValue="connection" className="space-y-5">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="connection">Bağlantı</TabsTrigger>
@@ -270,6 +396,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                           onChange={(value) => updateCredential(field.key, value)}
                           placeholder={field.placeholder}
                           type={field.type === 'password' ? 'password' : 'text'}
+                          helpText={field.helpText}
                         />
                       ))}
                     </div>
@@ -297,11 +424,12 @@ function MiniFlag({ active, label }: { active: boolean; label: string }) {
   return <span className={`rounded-full px-2 py-1 text-center ${active ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'}`}>{label}</span>;
 }
 
-function LabeledInput({ label, value, onChange, placeholder, disabled, type = 'text' }: { label: string; value: string; onChange: (value: string) => void; placeholder?: string; disabled?: boolean; type?: string }) {
+function LabeledInput({ label, value, onChange, placeholder, disabled, type = 'text', helpText }: { label: string; value: string; onChange: (value: string) => void; placeholder?: string; disabled?: boolean; type?: string; helpText?: string }) {
   return (
     <div className="space-y-2">
       <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">{label}</label>
       <Input type={type} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} disabled={disabled} />
+      {helpText ? <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{helpText}</p> : null}
     </div>
   );
 }
