@@ -1,5 +1,6 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { BookOpenCheck, CheckCircle2, ExternalLink, KeyRound, Settings2, Store, TriangleAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -31,77 +32,46 @@ type ProviderFormState = {
   notes: string;
 };
 
-type ProviderGuide = {
-  title: string;
-  summary: string;
-  required: string[];
-  steps: string[];
+type ProviderGuideDefinition = {
+  requiredCount: number;
+  stepCount: number;
   links: Array<{ label: string; href: string }>;
-  warning?: string;
+  hasWarning?: boolean;
 };
 
-const providerGuides: Record<string, ProviderGuide> = {
+const providerGuides: Record<string, ProviderGuideDefinition> = {
   Trendyol: {
-    title: 'Trendyol bilgileri nereden alınır?',
-    summary: 'Trendyol entegrasyonu Basic Auth ile çalışır. Ürün, fiyat, stok ve sipariş servislerinde Supplier ID ile API Key/API Secret birlikte kullanılır.',
-    required: ['Supplier ID', 'API Key', 'API Secret', 'Varsa test/stage bilgileri', 'Mağaza operasyon yetkisi'],
-    steps: [
-      'Satıcı paneline master/yetkili kullanıcıyla girin.',
-      'Hesap Bilgilerim > Entegrasyon Bilgileri ekranından Supplier ID, API Key ve API Secret bilgilerini alın.',
-      'Bu ekranda Satıcı / Mağaza No alanına Supplier ID bilgisini, credential alanlarına API Key ve API Secret bilgisini girin.',
-      'Ürün, fiyat, stok ve sipariş operasyonlarından kullanmak istediklerinizi aktif bırakın.',
-    ],
+    requiredCount: 5,
+    stepCount: 4,
     links: [
-      { label: 'Yetkilendirme dokümanı', href: 'https://developers.trendyol.com/tr/docs/2-authorization' },
-      { label: 'Trendyol Developer', href: 'https://developers.trendyol.com/' },
+      { label: 'authorization', href: 'https://developers.trendyol.com/tr/docs/2-authorization' },
+      { label: 'developer', href: 'https://developers.trendyol.com/' },
     ],
   },
   Hepsiburada: {
-    title: 'Hepsiburada bilgileri nereden alınır?',
-    summary: 'Hepsiburada tarafında merchant/mağaza bilgisi ve API anahtarları gerekir. İşlemler genelde batch/transaction takip mantığıyla ilerler.',
-    required: ['Merchant ID', 'API Key veya Client ID', 'API Secret', 'Developer/merchant panel yetkisi', 'Yetkilendirilmiş entegratör izni'],
-    steps: [
-      'Hepsiburada developer hesabı ve merchant panel erişimini hazırlayın.',
-      'Merchant/mağaza ID bilgisini merchant panelden doğrulayın.',
-      'Developer portalda veya entegratör yetkilendirme ekranında API Key/API Secret bilgilerini oluşturun.',
-      'Bu ekranda Merchant ID bilgisini Satıcı / Mağaza No alanına, anahtarları Kimlik Bilgileri sekmesine girin.',
-    ],
+    requiredCount: 5,
+    stepCount: 4,
     links: [
-      { label: 'Başlangıç dokümanı', href: 'https://developers.hepsiburada.com/hepsiburada/docs/getting-started' },
-      { label: 'Hepsiburada Developer', href: 'https://developers.hepsiburada.com/' },
+      { label: 'gettingStarted', href: 'https://developers.hepsiburada.com/hepsiburada/docs/getting-started' },
+      { label: 'developer', href: 'https://developers.hepsiburada.com/' },
     ],
   },
   Amazon: {
-    title: 'Amazon SP-API bilgileri nereden alınır?',
-    summary: 'Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.',
-    required: ['Seller ID', 'Marketplace ID', 'LWA Client ID/Secret', 'Refresh Token', 'AWS Access Key/Secret', 'Region', 'Varsa Role ARN'],
-    steps: [
-      'Seller Central üzerinden developer profile ve SP-API uygulama kaydını tamamlayın.',
-      'Uygulama için Login with Amazon client id/secret bilgilerini alın.',
-      'Seller authorization akışından refresh token üretin.',
-      'AWS IAM/SigV4 bilgilerini ve gerekiyorsa Role ARN bilgisini hazırlayın.',
-      'Marketplace ID ve region bilgisini satış yapılan ülkeye göre seçin.',
-    ],
+    requiredCount: 7,
+    stepCount: 5,
     links: [
-      { label: 'SP-API kayıt süreci', href: 'https://developer-docs.amazon.com/sp-api/docs/sp-api-registration-overview' },
-      { label: 'Marketplace IDs', href: 'https://developer-docs.amazon.com/sp-api/docs/marketplace-ids' },
-      { label: 'SP-API endpoints', href: 'https://developer-docs.amazon.com/sp-api/docs/sp-api-endpoints' },
+      { label: 'registration', href: 'https://developer-docs.amazon.com/sp-api/docs/sp-api-registration-overview' },
+      { label: 'marketplaceIds', href: 'https://developer-docs.amazon.com/sp-api/docs/marketplace-ids' },
+      { label: 'endpoints', href: 'https://developer-docs.amazon.com/sp-api/docs/sp-api-endpoints' },
     ],
-    warning: 'Amazon bilgilerinde PROD/SANDBOX ve marketplace region ayrımı kritik. Yanlış region veya marketplace ID ile imza doğru olsa bile istekler başarısız olur.',
+    hasWarning: true,
   },
   Etsy: {
-    title: 'Etsy bilgileri nereden alınır?',
-    summary: 'Etsy Open API v3 OAuth tabanlıdır. App registration ile keystring/shared secret alınır, shop erişimi OAuth scopes ile yetkilendirilir.',
-    required: ['Shop ID', 'Client ID / API keystring', 'Client Secret / shared secret', 'Refresh Token', 'Gerekli OAuth scopes'],
-    steps: [
-      'Etsy Developer portalında uygulama oluşturun.',
-      'API keystring ve shared secret bilgilerini alın.',
-      'Shop adına OAuth authorization akışını tamamlayıp refresh token üretin.',
-      'Shop ID ve token bilgilerini bu ekranda kaydedin.',
-    ],
+    requiredCount: 5,
+    stepCount: 4,
     links: [
-      { label: 'Etsy Open API dokümanı', href: 'https://developers.etsy.com/documentation/' },
-      { label: 'OAuth rehberi', href: 'https://developers.etsy.com/documentation/essentials/authentication/' },
+      { label: 'openApi', href: 'https://developers.etsy.com/documentation/' },
+      { label: 'oauth', href: 'https://developers.etsy.com/documentation/essentials/authentication/' },
     ],
   },
 };
@@ -114,7 +84,7 @@ function createDefaultState(setting?: MarketplaceProviderSettingDto): ProviderFo
   return {
     channelId: channel?.id,
     code: channel?.code || `${provider}-ANA-MAGAZA`.toUpperCase(),
-    name: channel?.name || `${setting?.name || provider} Ana Mağaza`,
+    name: channel?.name || `${setting?.name || provider} Main Store`,
     sellerId: channel?.sellerId || '',
     apiBaseUrl: channel?.apiBaseUrl || '',
     authType: channel?.authType || setting?.defaultAuthType || 'Basic',
@@ -145,6 +115,7 @@ function buildCredentialJson(form: ProviderFormState): string | undefined {
 }
 
 export function B2bMarketplaceSettingsPage(): ReactElement {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedProvider, setSelectedProvider] = useState('Trendyol');
   const [form, setForm] = useState<ProviderFormState>(() => createDefaultState());
@@ -160,6 +131,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
     [selectedProvider, settings],
   );
   const selectedGuide = selectedSetting ? providerGuides[selectedSetting.providerKey] : undefined;
+  const selectedProviderKey = selectedSetting?.providerKey ?? selectedProvider;
 
   useEffect(() => {
     if (!selectedSetting) return;
@@ -169,7 +141,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedSetting) throw new Error('Provider ayarı bulunamadı.');
+      if (!selectedSetting) throw new Error(t('marketplaceSettings.errors.providerNotFound'));
       const credentialsJson = buildCredentialJson(form);
       const payload = {
         code: form.code,
@@ -192,7 +164,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
         : b2bApi.createMarketplaceChannel(payload);
     },
     onSuccess: async () => {
-      toast.success('Entegrasyon ayarları kaydedildi.');
+      toast.success(t('marketplaceSettings.toasts.saved'));
       setForm((current) => ({
         ...current,
         credentialValues: Object.fromEntries(Object.keys(current.credentialValues).map((key) => [key, ''])),
@@ -200,7 +172,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
       }));
       await queryClient.invalidateQueries({ queryKey: ['b2b-marketplaces'] });
     },
-    onError: (error: Error) => toast.error(error.message || 'Entegrasyon ayarları kaydedilemedi.'),
+    onError: (error: Error) => toast.error(error.message || t('marketplaceSettings.toasts.saveFailed')),
   });
 
   function update<K extends keyof ProviderFormState>(key: K, value: ProviderFormState[K]) {
@@ -215,21 +187,21 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
   }
 
   if (settingsQuery.isLoading) {
-    return <div className="rounded-3xl border bg-white p-6 text-sm dark:border-white/10 dark:bg-slate-950">Ayarlar yükleniyor...</div>;
+    return <div className="rounded-3xl border bg-white p-6 text-sm dark:border-white/10 dark:bg-slate-950">{t('marketplaceSettings.loading')}</div>;
   }
 
   return (
     <section className="space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <Badge variant="secondary" className="mb-3">Ayarlar</Badge>
-          <h1 className="text-3xl font-bold text-slate-950 dark:text-white">Pazar yeri entegrasyon ayarları</h1>
+          <Badge variant="secondary" className="mb-3">{t('marketplaceSettings.badge')}</Badge>
+          <h1 className="text-3xl font-bold text-slate-950 dark:text-white">{t('marketplaceSettings.title')}</h1>
           <p className="mt-2 max-w-3xl text-sm text-slate-600 dark:text-slate-300">
-            Her pazar yerini kendi gerektirdiği alanlarla yönetin. Trendyol/Hepsiburada daha sade, Amazon ise SP-API nedeniyle ayrı OAuth/AWS bilgileri ister.
+            {t('marketplaceSettings.subtitle')}
           </p>
         </div>
         <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending || !selectedSetting}>
-          Ayarları Kaydet
+          {saveMutation.isPending ? t('common.saving') : t('marketplaceSettings.saveButton')}
         </Button>
       </div>
 
@@ -251,16 +223,16 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                     </span>
                     <div>
                       <p className="font-semibold">{setting.name}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{setting.channel?.name || 'Kanal oluşturulmadı'}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{setting.channel?.name || t('marketplaceSettings.channelNotCreated')}</p>
                     </div>
                   </div>
                   {setting.channel?.isActive ? <CheckCircle2 className="text-emerald-500" size={20} /> : <TriangleAlert className="text-amber-500" size={20} />}
                 </div>
                 <div className="mt-4 grid grid-cols-4 gap-2 text-[11px] font-semibold">
-                  <MiniFlag active={setting.supportsProductCreate} label="Ürün" />
-                  <MiniFlag active={setting.supportsPriceUpdate} label="Fiyat" />
-                  <MiniFlag active={setting.supportsStockUpdate} label="Stok" />
-                  <MiniFlag active={setting.supportsOrderImport} label="Sipariş" />
+                  <MiniFlag active={setting.supportsProductCreate} label={t('marketplaceSettings.flags.product')} />
+                  <MiniFlag active={setting.supportsPriceUpdate} label={t('marketplaceSettings.flags.price')} />
+                  <MiniFlag active={setting.supportsStockUpdate} label={t('marketplaceSettings.flags.stock')} />
+                  <MiniFlag active={setting.supportsOrderImport} label={t('marketplaceSettings.flags.order')} />
                 </div>
               </button>
             );
@@ -273,16 +245,16 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
               <CardTitle className="flex flex-wrap items-center justify-between gap-3 text-xl">
                 <span className="flex items-center gap-2">
                   <KeyRound size={20} />
-                  {selectedSetting.name} ayarları
+                  {t('marketplaceSettings.providerSettingsTitle', { provider: selectedSetting.name })}
                 </span>
                 <a className="inline-flex items-center gap-2 text-sm font-semibold text-cyan-700 dark:text-cyan-300" href={selectedSetting.documentationUrl} target="_blank" rel="noreferrer">
-                  Resmi doküman <ExternalLink size={14} />
+                  {t('marketplaceSettings.officialDocument')} <ExternalLink size={14} />
                 </a>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="rounded-3xl border border-cyan-200 bg-cyan-50 p-4 text-sm text-cyan-950 dark:border-cyan-500/30 dark:bg-cyan-950/30 dark:text-cyan-100">
-                {selectedSetting.setupSummary}
+                {t(`marketplaceSettings.guides.${selectedProviderKey}.setupSummary`, { defaultValue: selectedSetting.setupSummary })}
               </div>
 
               {selectedGuide ? (
@@ -293,39 +265,41 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                         <BookOpenCheck size={18} />
                       </span>
                       <div>
-                        <h2 className="font-bold text-slate-950 dark:text-white">{selectedGuide.title}</h2>
-                        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{selectedGuide.summary}</p>
+                        <h2 className="font-bold text-slate-950 dark:text-white">{t(`marketplaceSettings.guides.${selectedProviderKey}.title`)}</h2>
+                        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{t(`marketplaceSettings.guides.${selectedProviderKey}.summary`)}</p>
                       </div>
                     </div>
                     <ol className="mt-4 space-y-2 text-sm text-slate-700 dark:text-slate-200">
-                      {selectedGuide.steps.map((step, index) => (
-                        <li key={step} className="flex gap-3">
+                      {Array.from({ length: selectedGuide.stepCount }, (_, index) => (
+                        <li key={`${selectedProviderKey}-step-${index + 1}`} className="flex gap-3">
                           <span className="grid size-6 shrink-0 place-items-center rounded-full bg-cyan-100 text-xs font-black text-cyan-800 dark:bg-cyan-500/15 dark:text-cyan-200">{index + 1}</span>
-                          <span>{step}</span>
+                          <span>{t(`marketplaceSettings.guides.${selectedProviderKey}.steps.${index}`)}</span>
                         </li>
                       ))}
                     </ol>
-                    {selectedGuide.warning ? (
+                    {selectedGuide.hasWarning ? (
                       <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
-                        {selectedGuide.warning}
+                        {t(`marketplaceSettings.guides.${selectedProviderKey}.warning`)}
                       </div>
                     ) : null}
                   </div>
                   <div className="space-y-3">
                     <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
-                      <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Gerekli bilgiler</p>
+                      <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('marketplaceSettings.requiredInfo')}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {selectedGuide.required.map((item) => (
-                          <Badge key={item} variant="secondary" className="rounded-full">{item}</Badge>
+                        {Array.from({ length: selectedGuide.requiredCount }, (_, index) => (
+                          <Badge key={`${selectedProviderKey}-required-${index + 1}`} variant="secondary" className="rounded-full">
+                            {t(`marketplaceSettings.guides.${selectedProviderKey}.required.${index}`)}
+                          </Badge>
                         ))}
                       </div>
                     </div>
                     <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
-                      <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Resmi bağlantılar</p>
+                      <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('marketplaceSettings.officialLinks')}</p>
                       <div className="mt-3 grid gap-2">
                         {selectedGuide.links.map((link) => (
                           <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="inline-flex items-center justify-between rounded-2xl border px-3 py-2 text-sm font-semibold text-cyan-700 transition hover:bg-cyan-50 dark:border-white/10 dark:text-cyan-300 dark:hover:bg-cyan-500/10">
-                            {link.label}
+                            {t(`marketplaceSettings.guides.${selectedProviderKey}.links.${link.label}`)}
                             <ExternalLink size={14} />
                           </a>
                         ))}
@@ -337,19 +311,19 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
 
               <Tabs defaultValue="connection" className="space-y-5">
                 <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="connection">Bağlantı</TabsTrigger>
-                  <TabsTrigger value="credentials">Kimlik Bilgileri</TabsTrigger>
-                  <TabsTrigger value="operations">Operasyonlar</TabsTrigger>
+                  <TabsTrigger value="connection">{t('marketplaceSettings.tabs.connection')}</TabsTrigger>
+                  <TabsTrigger value="credentials">{t('marketplaceSettings.tabs.credentials')}</TabsTrigger>
+                  <TabsTrigger value="operations">{t('marketplaceSettings.tabs.operations')}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="connection" className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
-                    <LabeledInput label="Kanal Kodu" value={form.code} onChange={(value) => update('code', value)} disabled={Boolean(form.channelId)} />
-                    <LabeledInput label="Kanal Adı" value={form.name} onChange={(value) => update('name', value)} />
-                    <LabeledInput label="Satıcı / Mağaza No" value={form.sellerId} onChange={(value) => update('sellerId', value)} />
-                    <LabeledInput label="API Adresi" value={form.apiBaseUrl} onChange={(value) => update('apiBaseUrl', value)} placeholder="Boşsa varsayılan kullanılır" />
+                    <LabeledInput label={t('marketplaceSettings.fields.channelCode')} value={form.code} onChange={(value) => update('code', value)} disabled={Boolean(form.channelId)} />
+                    <LabeledInput label={t('marketplaceSettings.fields.channelName')} value={form.name} onChange={(value) => update('name', value)} />
+                    <LabeledInput label={t('marketplaceSettings.fields.sellerNo')} value={form.sellerId} onChange={(value) => update('sellerId', value)} />
+                    <LabeledInput label={t('marketplaceSettings.fields.apiBaseUrl')} value={form.apiBaseUrl} onChange={(value) => update('apiBaseUrl', value)} placeholder={t('marketplaceSettings.placeholders.defaultApiBaseUrl')} />
                     <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Kimlik Doğrulama</label>
+                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('marketplaceSettings.fields.authType')}</label>
                       <Select value={form.authType} onValueChange={(value) => update('authType', value)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
@@ -359,22 +333,22 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                         </SelectContent>
                       </Select>
                     </div>
-                    <SwitchPanel label="Kanal Durumu" value={form.isActive} onChange={(value) => update('isActive', value)} activeLabel="Aktif" inactiveLabel="Pasif" />
+                    <SwitchPanel label={t('marketplaceSettings.fields.channelStatus')} value={form.isActive} onChange={(value) => update('isActive', value)} activeLabel={t('marketplaceSettings.status.active')} inactiveLabel={t('marketplaceSettings.status.passive')} />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Not</label>
-                    <Textarea value={form.notes} onChange={(event) => update('notes', event.target.value)} placeholder="Mağaza, kategori veya operasyon notları" />
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('marketplaceSettings.fields.notes')}</label>
+                    <Textarea value={form.notes} onChange={(event) => update('notes', event.target.value)} placeholder={t('marketplaceSettings.placeholders.notes')} />
                   </div>
                 </TabsContent>
 
                 <TabsContent value="credentials" className="space-y-4">
                   <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-950/30 dark:text-amber-100">
-                    Mevcut secret: {selectedSetting.channel?.credentialsMasked || '-'} Yeni değer girmezseniz mevcut credential korunur.
+                    {t('marketplaceSettings.currentSecret', { secret: selectedSetting.channel?.credentialsMasked || '-' })}
                   </div>
                   <div className="flex items-center justify-between rounded-2xl border p-4 dark:border-white/10">
                     <div>
-                      <p className="font-semibold text-slate-900 dark:text-white">Gelişmiş JSON modu</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Provider dokümanındaki credential JSON’unu birebir yapıştırmak için kullanın.</p>
+                      <p className="font-semibold text-slate-900 dark:text-white">{t('marketplaceSettings.advancedJson.title')}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">{t('marketplaceSettings.advancedJson.description')}</p>
                     </div>
                     <Switch checked={form.useAdvancedJson} onCheckedChange={(value) => update('useAdvancedJson', value)} />
                   </div>
@@ -396,7 +370,7 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
                           onChange={(value) => updateCredential(field.key, value)}
                           placeholder={field.placeholder}
                           type={field.type === 'password' ? 'password' : 'text'}
-                          helpText={field.helpText}
+                          helpText={t(`marketplaceSettings.guides.${selectedProviderKey}.credentialHelp.${field.key}`, { defaultValue: field.helpText ?? '' })}
                         />
                       ))}
                     </div>
@@ -405,10 +379,10 @@ export function B2bMarketplaceSettingsPage(): ReactElement {
 
                 <TabsContent value="operations" className="space-y-4">
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                    <OperationCard title="Ürün ekleme" description="Katalog ürününü pazaryerine açar." value={form.supportsProductCreate} onChange={(value) => update('supportsProductCreate', value)} />
-                    <OperationCard title="Fiyat güncelleme" description="ERP/B2B fiyat snapshotını gönderir." value={form.supportsPriceUpdate} onChange={(value) => update('supportsPriceUpdate', value)} />
-                    <OperationCard title="Stok güncelleme" description="Satılabilir stok bilgisini aktarır." value={form.supportsStockUpdate} onChange={(value) => update('supportsStockUpdate', value)} />
-                    <OperationCard title="Sipariş çekme" description="Pazaryeri siparişlerini içeri alır." value={form.supportsOrderImport} onChange={(value) => update('supportsOrderImport', value)} />
+                    <OperationCard title={t('marketplaceSettings.operations.product.title')} description={t('marketplaceSettings.operations.product.description')} value={form.supportsProductCreate} onChange={(value) => update('supportsProductCreate', value)} />
+                    <OperationCard title={t('marketplaceSettings.operations.price.title')} description={t('marketplaceSettings.operations.price.description')} value={form.supportsPriceUpdate} onChange={(value) => update('supportsPriceUpdate', value)} />
+                    <OperationCard title={t('marketplaceSettings.operations.stock.title')} description={t('marketplaceSettings.operations.stock.description')} value={form.supportsStockUpdate} onChange={(value) => update('supportsStockUpdate', value)} />
+                    <OperationCard title={t('marketplaceSettings.operations.order.title')} description={t('marketplaceSettings.operations.order.description')} value={form.supportsOrderImport} onChange={(value) => update('supportsOrderImport', value)} />
                   </div>
                 </TabsContent>
               </Tabs>

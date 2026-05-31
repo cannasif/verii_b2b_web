@@ -430,8 +430,6 @@
     "serviceAllocationReports": "Servis Raporları",
     "erpBarcodeDesignerList": "Template Listesi",
     "erpPrinterManagement": "Yazıcılar ve Baskı İşleri",
-    "accessControlManagementGroup": "Yetki ve Kullanıcı Yönetimi",
-    "accessControlSystemGroup": "Sistem Araçları",
     "serviceOperationsGroup": "Servis Operasyonları",
     "erpShelves": "Raf / Hucre Tanimlari",
     "erpWarehouseStockBalance": "Depo Stok Bakiyesi",
@@ -4812,5 +4810,197 @@
     "ar": "العربية",
     "es": "Español",
     "it": "Italiano"
+  },
+  "marketplaceSettings": {
+    "badge": "Ayarlar",
+    "title": "Pazar yeri entegrasyon ayarları",
+    "subtitle": "Her pazar yerini kendi gerektirdiği alanlarla yönetin. Trendyol/Hepsiburada daha sade, Amazon ise SP-API nedeniyle ayrı OAuth/AWS bilgileri ister.",
+    "loading": "Ayarlar yükleniyor...",
+    "saveButton": "Ayarları Kaydet",
+    "channelNotCreated": "Kanal oluşturulmadı",
+    "providerSettingsTitle": "{{provider}} ayarları",
+    "officialDocument": "Resmi doküman",
+    "requiredInfo": "Gerekli bilgiler",
+    "officialLinks": "Resmi bağlantılar",
+    "currentSecret": "Mevcut secret: {{secret}}. Yeni değer girmezseniz mevcut credential korunur.",
+    "tabs": {
+      "connection": "Bağlantı",
+      "credentials": "Kimlik Bilgileri",
+      "operations": "Operasyonlar"
+    },
+    "flags": {
+      "product": "Ürün",
+      "price": "Fiyat",
+      "stock": "Stok",
+      "order": "Sipariş"
+    },
+    "fields": {
+      "channelCode": "Kanal Kodu",
+      "channelName": "Kanal Adı",
+      "sellerNo": "Satıcı / Mağaza No",
+      "apiBaseUrl": "API Adresi",
+      "authType": "Kimlik Doğrulama",
+      "channelStatus": "Kanal Durumu",
+      "notes": "Not"
+    },
+    "placeholders": {
+      "defaultApiBaseUrl": "Boşsa varsayılan kullanılır",
+      "notes": "Mağaza, kategori veya operasyon notları"
+    },
+    "advancedJson": {
+      "title": "Gelişmiş JSON modu",
+      "description": "Provider dokümanındaki credential JSON’unu birebir yapıştırmak için kullanın."
+    },
+    "operations": {
+      "product": {
+        "title": "Ürün ekleme",
+        "description": "Katalog ürününü pazaryerine açar."
+      },
+      "price": {
+        "title": "Fiyat güncelleme",
+        "description": "ERP/B2B fiyat snapshotını gönderir."
+      },
+      "stock": {
+        "title": "Stok güncelleme",
+        "description": "Satılabilir stok bilgisini aktarır."
+      },
+      "order": {
+        "title": "Sipariş çekme",
+        "description": "Pazaryeri siparişlerini içeri alır."
+      }
+    },
+    "toasts": {
+      "saved": "Entegrasyon ayarları kaydedildi.",
+      "saveFailed": "Entegrasyon ayarları kaydedilemedi."
+    },
+    "errors": {
+      "providerNotFound": "Provider ayarı bulunamadı."
+    },
+    "guides": {
+      "Trendyol": {
+        "title": "Trendyol bilgileri nereden alınır?",
+        "summary": "Trendyol entegrasyonu Basic Auth ile çalışır. Ürün, fiyat, stok ve sipariş servislerinde Supplier ID ile API Key/API Secret birlikte kullanılır.",
+        "required": [
+          "Supplier ID",
+          "API Key",
+          "API Secret",
+          "Varsa test/stage bilgileri",
+          "Mağaza operasyon yetkisi"
+        ],
+        "steps": [
+          "Satıcı paneline master/yetkili kullanıcıyla girin.",
+          "Hesap Bilgilerim > Entegrasyon Bilgileri ekranından Supplier ID, API Key ve API Secret bilgilerini alın.",
+          "Bu ekranda Satıcı / Mağaza No alanına Supplier ID bilgisini, credential alanlarına API Key ve API Secret bilgisini girin.",
+          "Ürün, fiyat, stok ve sipariş operasyonlarından kullanmak istediklerinizi aktif bırakın."
+        ],
+        "links": {
+          "authorization": "Yetkilendirme dokümanı",
+          "developer": "Trendyol Developer"
+        },
+        "setupSummary": "Trendyol satıcı panelinde Hesap Bilgilerim > Entegrasyon Bilgileri alanından Supplier ID, API Key ve API Secret alınır. PROD/STAGE bilgileri ayrı olabilir.",
+        "credentialHelp": {
+          "supplierId": "Trendyol satıcı panelindeki Entegrasyon Bilgileri ekranında görünen tedarikçi/satıcı numarası.",
+          "apiKey": "Master kullanıcı ile görülebilen Trendyol API anahtarı.",
+          "apiSecret": "Basic Auth için API Key ile birlikte kullanılan gizli anahtar."
+        }
+      },
+      "Hepsiburada": {
+        "title": "Hepsiburada bilgileri nereden alınır?",
+        "summary": "Hepsiburada tarafında merchant/mağaza bilgisi ve API anahtarları gerekir. İşlemler genelde batch/transaction takip mantığıyla ilerler.",
+        "required": [
+          "Merchant ID",
+          "API Key veya Client ID",
+          "API Secret",
+          "Developer/merchant panel yetkisi",
+          "Yetkilendirilmiş entegratör izni"
+        ],
+        "steps": [
+          "Hepsiburada developer hesabı ve merchant panel erişimini hazırlayın.",
+          "Merchant/mağaza ID bilgisini merchant panelden doğrulayın.",
+          "Developer portalda veya entegratör yetkilendirme ekranında API Key/API Secret bilgilerini oluşturun.",
+          "Bu ekranda Merchant ID bilgisini Satıcı / Mağaza No alanına, anahtarları Kimlik Bilgileri sekmesine girin."
+        ],
+        "links": {
+          "gettingStarted": "Başlangıç dokümanı",
+          "developer": "Hepsiburada Developer"
+        },
+        "setupSummary": "Hepsiburada developer/merchant panelinden geliştirici hesabı, API anahtarları ve mağaza/merchant bilgileri hazırlanır. Entegratör yetkilendirmesi merchant panelde yapılır.",
+        "credentialHelp": {
+          "merchantId": "Hepsiburada merchant panelindeki mağaza/merchant unique id bilgisi.",
+          "apiKey": "Developer portal veya yetkilendirilmiş entegratör hesabındaki client/api key.",
+          "apiSecret": "Token almak veya Basic/Auth akışında kullanılan secret."
+        }
+      },
+      "Amazon": {
+        "title": "Amazon SP-API bilgileri nereden alınır?",
+        "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",
+        "required": [
+          "Seller ID",
+          "Marketplace ID",
+          "LWA Client ID/Secret",
+          "Refresh Token",
+          "AWS Access Key/Secret",
+          "Region",
+          "Varsa Role ARN"
+        ],
+        "steps": [
+          "Seller Central üzerinden developer profile ve SP-API uygulama kaydını tamamlayın.",
+          "Uygulama için Login with Amazon client id/secret bilgilerini alın.",
+          "Seller authorization akışından refresh token üretin.",
+          "AWS IAM/SigV4 bilgilerini ve gerekiyorsa Role ARN bilgisini hazırlayın.",
+          "Marketplace ID ve region bilgisini satış yapılan ülkeye göre seçin."
+        ],
+        "links": {
+          "registration": "SP-API kayıt süreci",
+          "marketplaceIds": "Marketplace IDs",
+          "endpoints": "SP-API endpoints"
+        },
+        "warning": "Amazon bilgilerinde PROD/SANDBOX ve marketplace region ayrımı kritik. Yanlış region veya marketplace ID ile imza doğru olsa bile istekler başarısız olur.",
+        "setupSummary": "Amazon SP-API için developer profile, uygulama kaydı, Seller Central authorization, LWA refresh token ve AWS SigV4 bilgileri birlikte gerekir.",
+        "credentialHelp": {
+          "sellerId": "Seller Central hesabının merchant/seller kimliği.",
+          "marketplaceId": "Satış yapılan Amazon marketplace kimliği; Amazon dokümanındaki Marketplace IDs listesinden doğrulanır.",
+          "region": "SP-API endpoint bölgesi. Türkiye/Avrupa için genellikle EU endpoint ailesi kullanılır.",
+          "lwaClientId": "Amazon application registration sonrası oluşan Login with Amazon client id.",
+          "lwaClientSecret": "LWA client secret; güvenli saklanmalıdır.",
+          "refreshToken": "Seller authorization sonrası alınan uzun ömürlü refresh token.",
+          "awsAccessKey": "SP-API imzalama için IAM access key.",
+          "awsSecretKey": "SP-API imzalama için IAM secret key.",
+          "roleArn": "IAM role ile çalışılıyorsa kullanılacak role ARN."
+        }
+      },
+      "Etsy": {
+        "title": "Etsy bilgileri nereden alınır?",
+        "summary": "Etsy Open API v3 OAuth tabanlıdır. App registration ile keystring/shared secret alınır, shop erişimi OAuth scopes ile yetkilendirilir.",
+        "required": [
+          "Shop ID",
+          "Client ID / API keystring",
+          "Client Secret / shared secret",
+          "Refresh Token",
+          "Gerekli OAuth scopes"
+        ],
+        "steps": [
+          "Etsy Developer portalında uygulama oluşturun.",
+          "API keystring ve shared secret bilgilerini alın.",
+          "Shop adına OAuth authorization akışını tamamlayıp refresh token üretin.",
+          "Shop ID ve token bilgilerini bu ekranda kaydedin."
+        ],
+        "links": {
+          "openApi": "Etsy Open API dokümanı",
+          "oauth": "OAuth rehberi"
+        },
+        "setupSummary": "Etsy app registration ile API keystring/shared secret alınır; shop erişimi OAuth token scopes üzerinden yetkilendirilir.",
+        "credentialHelp": {
+          "shopId": "Bağlanacak Etsy shop kimliği.",
+          "clientId": "Etsy app API key keystring.",
+          "clientSecret": "Etsy app shared secret.",
+          "refreshToken": "OAuth yetkilendirme sonrası alınan refresh token."
+        }
+      }
+    },
+    "status": {
+      "active": "Aktif",
+      "passive": "Pasif"
+    }
   }
 }

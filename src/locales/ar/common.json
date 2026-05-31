@@ -3641,5 +3641,197 @@
     "messages": {
       "groupNotFound": "Group not found"
     }
+  },
+  "marketplaceSettings": {
+    "badge": "Settings",
+    "title": "Marketplace integration settings",
+    "subtitle": "Manage each marketplace with the fields it requires. Trendyol and Hepsiburada are simpler, while Amazon SP-API needs OAuth and AWS credentials.",
+    "loading": "Loading settings...",
+    "saveButton": "Save Settings",
+    "channelNotCreated": "Channel not created",
+    "providerSettingsTitle": "{{provider}} settings",
+    "officialDocument": "Official documentation",
+    "requiredInfo": "Required information",
+    "officialLinks": "Official links",
+    "currentSecret": "Current secret: {{secret}}. Existing credentials are preserved if you do not enter a new value.",
+    "tabs": {
+      "connection": "Connection",
+      "credentials": "Credentials",
+      "operations": "Operations"
+    },
+    "flags": {
+      "product": "Product",
+      "price": "Price",
+      "stock": "Stock",
+      "order": "Order"
+    },
+    "fields": {
+      "channelCode": "Channel Code",
+      "channelName": "Channel Name",
+      "sellerNo": "Seller / Store No",
+      "apiBaseUrl": "API Base URL",
+      "authType": "Authentication",
+      "channelStatus": "Channel Status",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "defaultApiBaseUrl": "Default is used if empty",
+      "notes": "Store, category or operation notes"
+    },
+    "advancedJson": {
+      "title": "Advanced JSON mode",
+      "description": "Use this to paste the provider credential JSON exactly as documented."
+    },
+    "operations": {
+      "product": {
+        "title": "Product create",
+        "description": "Publishes catalog products to the marketplace."
+      },
+      "price": {
+        "title": "Price update",
+        "description": "Sends the ERP/B2B price snapshot."
+      },
+      "stock": {
+        "title": "Stock update",
+        "description": "Sends sellable stock availability."
+      },
+      "order": {
+        "title": "Order import",
+        "description": "Imports marketplace orders."
+      }
+    },
+    "toasts": {
+      "saved": "Integration settings saved.",
+      "saveFailed": "Integration settings could not be saved."
+    },
+    "errors": {
+      "providerNotFound": "Provider settings could not be found."
+    },
+    "guides": {
+      "Trendyol": {
+        "title": "Where do I get Trendyol credentials?",
+        "summary": "Trendyol uses Basic Auth. Supplier ID, API Key and API Secret are used for product, price, stock and order services.",
+        "required": [
+          "Supplier ID",
+          "API Key",
+          "API Secret",
+          "Optional test/stage credentials",
+          "Store operation permission"
+        ],
+        "steps": [
+          "Sign in to Seller Panel with a master or authorized user.",
+          "Open Account Information > Integration Information and copy Supplier ID, API Key and API Secret.",
+          "Enter Supplier ID in Seller / Store No and enter API Key/API Secret in the credential fields.",
+          "Keep the product, price, stock and order operations enabled as needed."
+        ],
+        "links": {
+          "authorization": "Authorization documentation",
+          "developer": "Trendyol Developer"
+        },
+        "setupSummary": "Supplier ID, API Key and API Secret are available in the Trendyol seller panel under Account Information > Integration Information. PROD/STAGE credentials may differ.",
+        "credentialHelp": {
+          "supplierId": "The supplier/seller number shown in Trendyol Integration Information.",
+          "apiKey": "Trendyol API key visible to the master/authorized user.",
+          "apiSecret": "Secret key used together with API Key for Basic Auth."
+        }
+      },
+      "Hepsiburada": {
+        "title": "Where do I get Hepsiburada credentials?",
+        "summary": "Hepsiburada requires merchant/store information and API keys. Operations usually run with batch or transaction tracking.",
+        "required": [
+          "Merchant ID",
+          "API Key or Client ID",
+          "API Secret",
+          "Developer/merchant panel access",
+          "Authorized integrator permission"
+        ],
+        "steps": [
+          "Prepare Hepsiburada developer account and merchant panel access.",
+          "Confirm the merchant/store ID in merchant panel.",
+          "Create API Key/API Secret from the developer portal or integrator authorization screen.",
+          "Enter Merchant ID in Seller / Store No and keys in the Credentials tab."
+        ],
+        "links": {
+          "gettingStarted": "Getting started",
+          "developer": "Hepsiburada Developer"
+        },
+        "setupSummary": "Developer account, API keys and merchant/store information are prepared from the Hepsiburada developer/merchant panel. Integrator authorization is managed in the merchant panel.",
+        "credentialHelp": {
+          "merchantId": "Unique merchant/store id from Hepsiburada merchant panel.",
+          "apiKey": "Client/API key from developer portal or authorized integrator account.",
+          "apiSecret": "Secret used for token generation or Basic/Auth flow."
+        }
+      },
+      "Amazon": {
+        "title": "Where do I get Amazon SP-API credentials?",
+        "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",
+        "required": [
+          "Seller ID",
+          "Marketplace ID",
+          "LWA Client ID/Secret",
+          "Refresh Token",
+          "AWS Access Key/Secret",
+          "Region",
+          "Optional Role ARN"
+        ],
+        "steps": [
+          "Complete developer profile and SP-API app registration in Seller Central.",
+          "Get Login with Amazon client id and secret for the app.",
+          "Generate a refresh token from seller authorization.",
+          "Prepare AWS IAM/SigV4 credentials and Role ARN if needed.",
+          "Choose Marketplace ID and region according to the target country."
+        ],
+        "links": {
+          "registration": "SP-API registration",
+          "marketplaceIds": "Marketplace IDs",
+          "endpoints": "SP-API endpoints"
+        },
+        "warning": "PROD/SANDBOX and marketplace region selection are critical for Amazon. Requests can fail even with a valid signature if region or marketplace ID is wrong.",
+        "setupSummary": "Amazon SP-API requires developer profile, app registration, Seller Central authorization, LWA refresh token and AWS SigV4 credentials together.",
+        "credentialHelp": {
+          "sellerId": "Merchant/seller identifier of the Seller Central account.",
+          "marketplaceId": "Amazon marketplace identifier for the target country; verify from Amazon Marketplace IDs documentation.",
+          "region": "SP-API endpoint region. Turkey/Europe typically uses the EU endpoint family.",
+          "lwaClientId": "Login with Amazon client id created after app registration.",
+          "lwaClientSecret": "LWA client secret; store securely.",
+          "refreshToken": "Long-lived refresh token received after seller authorization.",
+          "awsAccessKey": "IAM access key used for SP-API request signing.",
+          "awsSecretKey": "IAM secret key used for SP-API request signing.",
+          "roleArn": "Role ARN if IAM role based access is used."
+        }
+      },
+      "Etsy": {
+        "title": "Where do I get Etsy credentials?",
+        "summary": "Etsy Open API v3 uses OAuth. App registration provides keystring/shared secret and shop access is authorized through OAuth scopes.",
+        "required": [
+          "Shop ID",
+          "Client ID / API keystring",
+          "Client Secret / shared secret",
+          "Refresh Token",
+          "Required OAuth scopes"
+        ],
+        "steps": [
+          "Create an app in Etsy Developer portal.",
+          "Copy API keystring and shared secret.",
+          "Complete OAuth authorization for the shop and generate a refresh token.",
+          "Save Shop ID and token values in this screen."
+        ],
+        "links": {
+          "openApi": "Etsy Open API documentation",
+          "oauth": "OAuth guide"
+        },
+        "setupSummary": "Etsy app registration provides API keystring/shared secret; shop access is authorized through OAuth token scopes.",
+        "credentialHelp": {
+          "shopId": "Etsy shop id to connect.",
+          "clientId": "Etsy app API key keystring.",
+          "clientSecret": "Etsy app shared secret.",
+          "refreshToken": "Refresh token received after OAuth authorization."
+        }
+      }
+    },
+    "status": {
+      "active": "Active",
+      "passive": "Passive"
+    }
   }
 }
