@@ -153,6 +153,17 @@ Bu doküman, dil bazlı arayüz kontrollerini sistematik olarak test etmek için
 4) **Çok dilli kalite kontrolü**
 - Bazı dillerde karışık dil kalıntıları (Türkçe/İngilizce) tespit edildi; içerik tutarlılığı tekrar gözden geçirilmeli.
 
-## 5) Sonraki Aşama (Öneri)
+## 5) CRM Localize Baseline Analizi
+- CRM tarafındaki locale organizasyonu `src/locales/{lang}/*.json` + feature `localization/*.json` modelinde çalışıyor.
+- `sync-locale-leaves-from-tr.mjs` ve `check-locale-consistency.mjs` ile key parity yaklaşımı kullanılabiliyor.
+- B2B’de aynı strateji ile eksik anahtarlar otomatik doldurularak `en` baseline ile `de/fr/es/ar/it` paritesi tamamlandı.
+- `LanguageSwitcher` tarafındaki dil listesi de CRM’deki destekli dil setine uygun olacak şekilde `tr/en/de/fr/ar/es/it` olarak güncellendi.
+- B2B’de test sırasında `npm run build` başarılı, çeviri missing key uyarısı bırakmayacak şekilde `parseMissingKeyHandler` davranışı korunarak anahtar seti kapatıldı.
+
+### Sonuç Raporu (tamamlanan test)
+- `common` eksik anahtar: `de/es/fr/ar/it` için `0`
+- `access-control` eksik anahtar: `de/es/fr/ar/it` için `0`
+
+## 6) Sonraki Aşama (Öneri)
 - Bu checklist her sprint sonunda CI benzeri bir adım olarak çalıştırılsın.
 - Eksik anahtar sayacı `yapıdaki yeni key` eklenmeden önce commit’e girmemeli (öncesinde `pre-commit`/`pre-push` check listesine eklenebilir).
