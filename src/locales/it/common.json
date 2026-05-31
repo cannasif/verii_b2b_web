@@ -3945,6 +3945,34 @@
           "locationId": "Shopify location id used for stock updates."
         }
       },
+      "WooCommerce": {
+        "title": "Where do I get WooCommerce credentials?",
+        "summary": "WooCommerce REST API uses Consumer Key/Secret for product create, price update and stock update operations through the products endpoint.",
+        "required": [
+          "Store URL",
+          "Consumer Key",
+          "Consumer Secret",
+          "API Version"
+        ],
+        "steps": [
+          "Open WooCommerce > Settings > Advanced > REST API in WordPress admin.",
+          "Create Read/Write Consumer Key and Consumer Secret credentials.",
+          "Save Store URL with the HTTPS site address.",
+          "Save Store URL, Consumer Key, Consumer Secret and API Version on this screen."
+        ],
+        "links": {
+          "restApi": "REST API",
+          "authentication": "Authentication"
+        },
+        "warning": "WooCommerce price and stock updates use product id. For variable products, store variation id mapping inside the listing id.",
+        "setupSummary": "WooCommerce REST API uses Consumer Key/Secret for product create, price update and stock update operations through the products endpoint.",
+        "credentialHelp": {
+          "storeUrl": "WooCommerce store base URL. Example: https://store.com.",
+          "consumerKey": "WooCommerce REST API Consumer Key.",
+          "consumerSecret": "WooCommerce REST API Consumer Secret.",
+          "apiVersion": "REST API version to use. Example: wc/v3."
+        }
+      },
       "Amazon": {
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",

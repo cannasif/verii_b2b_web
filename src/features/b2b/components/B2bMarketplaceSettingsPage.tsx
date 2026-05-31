@@ -116,6 +116,15 @@ const providerGuides: Record<string, ProviderGuideDefinition> = {
     ],
     hasWarning: true,
   },
+  WooCommerce: {
+    requiredCount: 4,
+    stepCount: 4,
+    links: [
+      { label: 'restApi', href: 'https://woocommerce.github.io/woocommerce-rest-api-docs/' },
+      { label: 'authentication', href: 'https://woocommerce.github.io/woocommerce-rest-api-docs/#authentication' },
+    ],
+    hasWarning: true,
+  },
   Amazon: {
     requiredCount: 7,
     stepCount: 5,

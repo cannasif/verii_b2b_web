@@ -5114,6 +5114,34 @@
           "locationId": "Stok güncellemesinde kullanılacak Shopify location id."
         }
       },
+      "WooCommerce": {
+        "title": "WooCommerce bilgileri nereden alınır?",
+        "summary": "WooCommerce REST API Consumer Key/Secret ile ürün oluşturma, fiyat ve stok güncelleme işlemleri products endpointi üzerinden yapılır.",
+        "required": [
+          "Store URL",
+          "Consumer Key",
+          "Consumer Secret",
+          "API Version"
+        ],
+        "steps": [
+          "WordPress yönetiminde WooCommerce > Ayarlar > Gelişmiş > REST API ekranını açın.",
+          "Read/Write yetkili Consumer Key ve Consumer Secret oluşturun.",
+          "Store URL bilgisini HTTPS site adresiyle kaydedin.",
+          "Bu ekranda Store URL, Consumer Key, Consumer Secret ve API Version bilgilerini kaydedin."
+        ],
+        "links": {
+          "restApi": "REST API",
+          "authentication": "Authentication"
+        },
+        "warning": "WooCommerce fiyat ve stok güncellemesi ürün id üzerinden çalışır. Varyasyonlu ürünlerde listing id içine variation id eşleşmesi eklenmelidir.",
+        "setupSummary": "WooCommerce REST API Consumer Key/Secret ile ürün oluşturma, fiyat ve stok güncelleme işlemleri products endpointi üzerinden yapılır.",
+        "credentialHelp": {
+          "storeUrl": "WooCommerce mağaza ana adresi. Örn. https://magaza.com.",
+          "consumerKey": "WooCommerce REST API Consumer Key.",
+          "consumerSecret": "WooCommerce REST API Consumer Secret.",
+          "apiVersion": "Kullanılacak REST API versiyonu. Örn. wc/v3."
+        }
+      },
       "Amazon": {
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",
