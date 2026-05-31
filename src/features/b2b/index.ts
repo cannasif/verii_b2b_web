@@ -7,6 +7,10 @@ export {
 } from './components/B2bMarketplaceSettingsPage';
 
 export {
+  B2bMarketplaceListingsPage,
+} from './components/B2bMarketplaceListingsWorkbenchPage';
+
+export {
   B2bApprovalRulesPage,
   B2bBuyersPage,
   B2bCatalogPage,
@@ -17,7 +21,6 @@ export {
   B2bInventoryPage,
   B2bMarketplaceChannelsPage,
   B2bMarketplaceEventsPage,
-  B2bMarketplaceListingsPage,
   B2bOrdersPage,
   B2bPaymentOperationsPage,
   B2bPaymentsPage,

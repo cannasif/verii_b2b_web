@@ -3833,5 +3833,87 @@
       "active": "Active",
       "passive": "Passive"
     }
+  },
+  "marketplaceWorkbench": {
+    "badge": "Marketplace Operations",
+    "title": "Marketplace product operations",
+    "subtitle": "After integration is completed, view products by channel, update price/stock, or queue the same product for another marketplace.",
+    "configureIntegrations": "Go to Integration Settings",
+    "metrics": {
+      "products": "Matched Products",
+      "channels": "Active Channels",
+      "pending": "Pending Jobs",
+      "missingPrice": "Needs Review"
+    },
+    "filters": {
+      "channel": "Channel",
+      "allChannels": "All channels",
+      "searchPlaceholder": "Search SKU, product, channel or marketplace id",
+      "selectedChannel": "Showing products for {{channel}}",
+      "allChannelsHelp": "Products from all marketplace channels are listed."
+    },
+    "flow": {
+      "view": {
+        "title": "View products by channel",
+        "description": "Filter Amazon, Trendyol, Hepsiburada and Etsy mappings in one screen."
+      },
+      "update": {
+        "title": "Send price and stock",
+        "description": "Queue a price or sellable stock update for the selected product."
+      },
+      "publish": {
+        "title": "Publish to another channel",
+        "description": "Queue an Amazon product for Trendyol or Hepsiburada publication."
+      }
+    },
+    "card": {
+      "sku": "SKU",
+      "barcode": "Barcode",
+      "lastPrice": "Last price",
+      "stock": "Last stock",
+      "marketplaceProductId": "Product ID",
+      "marketplaceListingId": "Listing ID"
+    },
+    "actions": {
+      "title": "Quick action",
+      "updatePrice": "Update price",
+      "updateStock": "Update stock",
+      "publishSameChannel": "Send product to this channel",
+      "publishAnotherChannel": "Add to another channel"
+    },
+    "empty": {
+      "title": "No marketplace products yet",
+      "description": "Complete integration settings and store channel first. Then map B2B catalog products to marketplace channels and manage product, price and stock operations here."
+    },
+    "dialog": {
+      "price-update": {
+        "title": "Queue price update"
+      },
+      "stock-update": {
+        "title": "Queue stock update"
+      },
+      "product-create": {
+        "title": "Queue product publish"
+      },
+      "clone-to-channel": {
+        "title": "Add product to another channel"
+      },
+      "price": "New price",
+      "quantity": "New stock",
+      "currency": "Currency",
+      "targetChannel": "Target channel",
+      "targetChannelPlaceholder": "Select target marketplace channel",
+      "productCreateHelp": "This queues a product publish job for the selected marketplace channel. The job sends it to the provider API when it runs.",
+      "queue": "Queue"
+    },
+    "toasts": {
+      "queued": "Operation queued.",
+      "queueFailed": "Operation could not be queued."
+    },
+    "errors": {
+      "noAction": "No action selected.",
+      "providerMissing": "Marketplace provider could not be resolved.",
+      "targetChannelRequired": "Please select a target channel."
+    }
   }
 }

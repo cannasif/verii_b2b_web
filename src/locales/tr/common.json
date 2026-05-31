@@ -5002,5 +5002,87 @@
       "active": "Aktif",
       "passive": "Pasif"
     }
+  },
+  "marketplaceWorkbench": {
+    "badge": "Marketplace Operasyon",
+    "title": "Pazar yeri ürün operasyonları",
+    "subtitle": "Entegrasyon tamamlandıktan sonra ürünlerinizi kanala göre görün, fiyat/stok güncelleyin veya aynı ürünü başka pazaryerine yayın kuyruğuna alın.",
+    "configureIntegrations": "Entegrasyon Ayarlarına Git",
+    "metrics": {
+      "products": "Eşleşen Ürün",
+      "channels": "Aktif Kanal",
+      "pending": "Bekleyen İş",
+      "missingPrice": "Kontrol Gereken"
+    },
+    "filters": {
+      "channel": "Kanal",
+      "allChannels": "Tüm kanallar",
+      "searchPlaceholder": "SKU, ürün, kanal veya pazar yeri ürün no ara",
+      "selectedChannel": "{{channel}} ürünleri gösteriliyor",
+      "allChannelsHelp": "Tüm pazaryeri kanallarındaki ürünler listeleniyor."
+    },
+    "flow": {
+      "view": {
+        "title": "Ürünleri kanala göre gör",
+        "description": "Amazon, Trendyol, Hepsiburada ve Etsy eşleşmelerini aynı ekranda filtreleyin."
+      },
+      "update": {
+        "title": "Fiyat ve stok gönder",
+        "description": "Seçili ürün için fiyat veya satılabilir stok güncellemesini kuyruğa alın."
+      },
+      "publish": {
+        "title": "Başka kanala yayınla",
+        "description": "Amazon’daki bir ürünü Trendyol veya Hepsiburada kanalına yayın kuyruğuna taşıyın."
+      }
+    },
+    "card": {
+      "sku": "SKU",
+      "barcode": "Barkod",
+      "lastPrice": "Son fiyat",
+      "stock": "Son stok",
+      "marketplaceProductId": "Ürün No",
+      "marketplaceListingId": "Listing No"
+    },
+    "actions": {
+      "title": "Hızlı işlem",
+      "updatePrice": "Fiyat güncelle",
+      "updateStock": "Stok güncelle",
+      "publishSameChannel": "Bu kanala ürün gönder",
+      "publishAnotherChannel": "Başka kanala da ekle"
+    },
+    "empty": {
+      "title": "Henüz pazaryeri ürünü yok",
+      "description": "Önce entegrasyon ayarlarını ve mağaza kanalını tamamlayın. Sonra B2B katalog ürünlerini ilgili pazaryeri kanalına eşleyip ürün, fiyat ve stok aktarımını buradan yönetin."
+    },
+    "dialog": {
+      "price-update": {
+        "title": "Fiyat güncellemesini kuyruğa al"
+      },
+      "stock-update": {
+        "title": "Stok güncellemesini kuyruğa al"
+      },
+      "product-create": {
+        "title": "Ürün yayınını kuyruğa al"
+      },
+      "clone-to-channel": {
+        "title": "Ürünü başka kanala ekle"
+      },
+      "price": "Yeni fiyat",
+      "quantity": "Yeni stok",
+      "currency": "Para birimi",
+      "targetChannel": "Hedef kanal",
+      "targetChannelPlaceholder": "Hedef pazaryeri kanalını seç",
+      "productCreateHelp": "Bu işlem seçili ürünün bağlı olduğu pazaryeri kanalına ürün yayın işini kuyruğa alır. Job çalışınca provider API’ye gönderilir.",
+      "queue": "Kuyruğa Al"
+    },
+    "toasts": {
+      "queued": "İşlem kuyruğa alındı.",
+      "queueFailed": "İşlem kuyruğa alınamadı."
+    },
+    "errors": {
+      "noAction": "İşlem seçilmedi.",
+      "providerMissing": "Pazaryeri sağlayıcısı bulunamadı.",
+      "targetChannelRequired": "Hedef kanal seçmelisiniz."
+    }
   }
 }
