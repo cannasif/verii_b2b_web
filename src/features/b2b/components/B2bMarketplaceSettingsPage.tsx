@@ -89,6 +89,15 @@ const providerGuides: Record<string, ProviderGuideDefinition> = {
       { label: 'priceStock', href: 'https://developer.idefix.com/api/urun-entegrasyonu/stok-ve-fiyat-gonderim' },
     ],
   },
+  Ciceksepeti: {
+    requiredCount: 3,
+    stepCount: 4,
+    links: [
+      { label: 'sellerPanel', href: 'https://www.ciceksepeti.com/satici-basvuru' },
+      { label: 'integration', href: 'https://www.ciceksepeti.com/' },
+    ],
+    hasWarning: true,
+  },
   Amazon: {
     requiredCount: 7,
     stepCount: 5,

@@ -3863,6 +3863,32 @@
           "apiSecret": "Secret key used together with API Key for Basic/Auth flow."
         }
       },
+      "Ciceksepeti": {
+        "title": "Where do I get Çiçeksepeti credentials?",
+        "summary": "Çiçeksepeti marketplace API credentials are obtained from the seller panel or integration team. Product, price, stock and order operations are managed with channel path settings.",
+        "required": [
+          "Seller ID",
+          "API Key",
+          "Optional Token"
+        ],
+        "steps": [
+          "Complete Çiçeksepeti seller application and marketplace integration authorization.",
+          "Get API Key and optional Token from the seller panel or integration team.",
+          "Enter Seller ID in Seller / Store No and API Key/Token in credential fields.",
+          "Track product, price and stock submission results from the job monitoring screen."
+        ],
+        "links": {
+          "sellerPanel": "Seller application",
+          "integration": "Çiçeksepeti"
+        },
+        "warning": "Çiçeksepeti public documentation is limited. Confirm live endpoint paths from the seller panel and update provider options before production.",
+        "setupSummary": "Çiçeksepeti marketplace API credentials are obtained from the seller panel or integration team. Product, price, stock and order operations are managed with provider path settings.",
+        "credentialHelp": {
+          "sellerId": "Çiçeksepeti store/seller id.",
+          "apiKey": "API key obtained from Çiçeksepeti seller panel or integration team.",
+          "token": "Optional access value if the channel requires Bearer token."
+        }
+      },
       "Amazon": {
         "title": "Where do I get Amazon SP-API credentials?",
         "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",

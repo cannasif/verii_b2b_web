@@ -5032,6 +5032,32 @@
           "apiSecret": "Basic/Auth akışında API Key ile birlikte kullanılan gizli anahtar."
         }
       },
+      "Ciceksepeti": {
+        "title": "Çiçeksepeti bilgileri nereden alınır?",
+        "summary": "Çiçeksepeti pazaryeri API bilgileri satıcı paneli veya entegrasyon ekibinden alınır. Ürün, fiyat, stok ve sipariş operasyonları kanal path ayarlarıyla yönetilir.",
+        "required": [
+          "Seller ID",
+          "API Key",
+          "Varsa Token"
+        ],
+        "steps": [
+          "Çiçeksepeti satıcı başvurusu ve pazaryeri entegrasyon yetkisini tamamlayın.",
+          "Satıcı paneli veya entegrasyon ekibinden API Key ve varsa Token bilgisini alın.",
+          "Bu ekranda Satıcı / Mağaza No alanına Seller ID bilgisini, credential alanlarına API Key ve gerekiyorsa Token bilgisini girin.",
+          "Ürün/fiyat/stok gönderimleri sonrası job takip ekranından aktarım sonucunu izleyin."
+        ],
+        "links": {
+          "sellerPanel": "Satıcı başvuru",
+          "integration": "Çiçeksepeti"
+        },
+        "warning": "Çiçeksepeti public dokümanları sınırlı olduğu için canlı endpoint path bilgileri satıcı panelinden doğrulanmalı ve provider options ile güncellenmelidir.",
+        "setupSummary": "Çiçeksepeti pazaryeri API bilgileri satıcı paneli veya entegrasyon ekibinden alınır. Ürün, fiyat, stok ve sipariş operasyonları provider path ayarlarıyla yönetilir.",
+        "credentialHelp": {
+          "sellerId": "Çiçeksepeti mağaza/satıcı kimliği.",
+          "apiKey": "Çiçeksepeti satıcı paneli veya entegrasyon ekibinden alınan API anahtarı.",
+          "token": "Kanal Bearer token istiyorsa kullanılacak opsiyonel erişim bilgisi."
+        }
+      },
       "Amazon": {
         "title": "Amazon SP-API bilgileri nereden alınır?",
         "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",
