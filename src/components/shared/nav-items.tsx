@@ -174,6 +174,7 @@ export const B2B_NAV_ITEMS: NavItem[] = [
         titleFallback: 'Entegrasyon Ayarları',
         children: [
           { title: 'sidebar.b2bMarketplaceSettings', titleFallback: 'Pazar Yeri Bağlantı Ayarları', href: '/b2b/marketplace-settings' },
+          { title: 'sidebar.b2bPaymentSettings', titleFallback: 'Ödeme Bağlantı Ayarları', href: '/b2b/payment-settings' },
           { title: 'sidebar.b2bMarketplaceChannels', titleFallback: 'Pazar Yeri Mağaza Kanalları', href: '/b2b/marketplace-channels' },
           { title: 'sidebar.b2bMarketplaceListings', titleFallback: 'Pazar Yeri Ürün Eşleştirme', href: '/b2b/marketplace-listings' },
           { title: 'sidebar.b2bMarketplaceEvents', titleFallback: 'Pazar Yeri Aktarım Kayıtları', href: '/b2b/marketplace-events' },

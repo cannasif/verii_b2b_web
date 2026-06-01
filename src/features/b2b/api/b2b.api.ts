@@ -34,6 +34,7 @@ import type {
   PaymentInstallmentOptionsDto,
   PaymentInstallmentOptionsRequestDto,
   PaymentOrderDto,
+  PaymentSettingDto,
   CreatePaymentOrderDto,
   GeneratePaymentOrderLinkDto,
   PaymentMethodOptionDto,
@@ -43,6 +44,7 @@ import type {
   PaymentProviderOperationDto,
   ResolvePaymentMethodsDto,
   SelectPaymentProviderInstallmentDto,
+  UpsertPaymentSettingDto,
   CreatePaytrIframeTokenDto,
   PaytrIframeTokenDto,
   PurchaseApprovalRuleDto,
@@ -513,6 +515,16 @@ export const b2bApi = {
 
   async getMarketplaceCapabilities(): Promise<MarketplaceCapabilityDto[]> {
     const response = await api.get<ApiResponse<MarketplaceCapabilityDto[]>>('/api/b2b/marketplaces/capabilities');
+    return extractData(response);
+  },
+
+  async getPaymentSettings(): Promise<PaymentSettingDto[]> {
+    const response = await api.get<ApiResponse<PaymentSettingDto[]>>('/api/b2b/payment-settings');
+    return extractData(response);
+  },
+
+  async updatePaymentSetting(providerKey: string, payload: UpsertPaymentSettingDto): Promise<PaymentSettingDto> {
+    const response = await api.put<ApiResponse<PaymentSettingDto>>(`/api/b2b/payment-settings/${providerKey}`, payload);
     return extractData(response);
   },
 

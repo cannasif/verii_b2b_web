@@ -7,6 +7,10 @@ export {
 } from './components/B2bMarketplaceSettingsPage';
 
 export {
+  B2bPaymentSettingsPage,
+} from './components/B2bPaymentSettingsPage';
+
+export {
   B2bMarketplaceListingsPage,
 } from './components/B2bMarketplaceListingsWorkbenchPage';
 

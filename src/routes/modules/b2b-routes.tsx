@@ -18,6 +18,7 @@ const B2bMarketplaceChannelsPage = lazyNamed(() => import('@/features/b2b'), 'B2
 const B2bMarketplaceListingsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceListingsPage');
 const B2bMarketplaceEventsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceEventsPage');
 const B2bMarketplaceSettingsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceSettingsPage');
+const B2bPaymentSettingsPage = lazyNamed(() => import('@/features/b2b'), 'B2bPaymentSettingsPage');
 const B2bIntegrationsPage = lazyNamed(() => import('@/features/b2b'), 'B2bIntegrationsPage');
 const B2bInsightsPage = lazyNamed(() => import('@/features/b2b'), 'B2bInsightsPage');
 const B2bRecordDetailPage = lazyNamed(() => import('@/features/b2b'), 'B2bRecordDetailPage');
@@ -46,6 +47,7 @@ export const b2bChildRoutes: RouteObject[] = [
       { path: 'marketplace-listings', element: withRoute(B2bMarketplaceListingsPage, { routeName: 'b2b-marketplace-listings' }) },
       { path: 'marketplace-events', element: withRoute(B2bMarketplaceEventsPage, { routeName: 'b2b-marketplace-events' }) },
       { path: 'marketplace-settings', element: withRoute(B2bMarketplaceSettingsPage, { routeName: 'b2b-marketplace-settings' }) },
+      { path: 'payment-settings', element: withRoute(B2bPaymentSettingsPage, { routeName: 'b2b-payment-settings' }) },
       { path: 'integrations', element: withRoute(B2bIntegrationsPage, { routeName: 'b2b-integrations' }) },
       { path: ':workspaceKind/create', element: withRoute(B2bRecordCreatePage, { routeName: 'b2b-record-create' }) },
       { path: 'catalog/:id/edit', element: withRoute(B2bRecordEditPage, { routeName: 'b2b-catalog-edit' }) },
