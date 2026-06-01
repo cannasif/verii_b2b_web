@@ -1,13 +1,12 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, Box, CheckCircle2, Clock3, Copy, FileText, GitBranchPlus, Image as ImageIcon, Info, Layers, Link2, Mail, PackageSearch, RefreshCw, ShoppingCart, Tag, TriangleAlert } from 'lucide-react';
+import { ArrowDown, ArrowUp, Box, CheckCircle2, Clock3, FileText, GitBranchPlus, Image as ImageIcon, Info, Layers, PackageSearch, RefreshCw, ShoppingCart, Tag, TriangleAlert } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DataTableActionBar, DetailPageShell, FormPageShell, PagedDataGrid, PagedLookupDialog, type PagedDataGridColumn } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -43,13 +42,12 @@ import type {
   MarketplaceListingDto,
   MarketplaceSyncEventDto,
   OrderDto,
-  PaymentOrderDto,
-  PaymentProviderOperationDto,
-  PaymentTransactionDto,
   PurchaseApprovalRuleDto,
   QuoteRequestDto,
   ShoppingListDto,
 } from '../types/b2b.types';
+
+type B2bWorkspacePageKind = Exclude<B2bWorkspaceKind, 'payments' | 'payment-operations'>;
 
 interface WorkspaceConfig {
   title: string;
@@ -70,9 +68,6 @@ type WorkspaceRow =
   | PurchaseApprovalRuleDto
   | QuoteRequestDto
   | OrderDto
-  | PaymentOrderDto
-  | PaymentTransactionDto
-  | PaymentProviderOperationDto
   | MarketplaceChannelDto
   | MarketplaceListingDto
   | MarketplaceSyncEventDto
@@ -80,14 +75,6 @@ type WorkspaceRow =
 
 type WorkspaceColumnKey = 'primary' | 'secondary' | 'scope' | 'status' | 'amount' | 'date';
 
-type PaymentLinkDraft = {
-  paymentOrder: PaymentOrderDto;
-  providerKey: string;
-  customerEmail: string;
-  shareChannel: string;
-  expiresAt: string;
-  regenerateToken: boolean;
-};
 type B2bLookupKind = 'company' | 'buyer' | 'customer' | 'user' | 'stock' | 'catalogProduct' | 'warehouse' | 'order' | 'paymentTransaction' | 'marketplaceChannel';
 
 interface WorkspaceTableConfig {
@@ -98,7 +85,7 @@ interface WorkspaceTableConfig {
   filterColumns: readonly FilterColumnConfig[];
 }
 
-const configs: Record<B2bWorkspaceKind, WorkspaceConfig> = {
+const configs: Record<B2bWorkspacePageKind, WorkspaceConfig> = {
   insights: {
     title: 'B2B Hazırlık Paneli',
     description: 'Katalog, fiyat, stok, eşleştirme, ödeme ve ERP kuyruğunu tek ekranda ölçen v1 canlıya hazırlık görünümü.',
@@ -171,18 +158,6 @@ const configs: Record<B2bWorkspaceKind, WorkspaceConfig> = {
     breadcrumb: 'Siparişler',
     emptyState: 'Henüz B2B siparişi oluşmadı.',
   },
-  payments: {
-    title: 'Ödeme Altyapısı',
-    description: 'Cari bazlı ödeme emri, vade, taksit, ödeme linki ve sağlayıcı durumunu tek akışta yönetin.',
-    breadcrumb: 'Ödemeler',
-    emptyState: 'Henüz ödeme işlem kaydı yok.',
-  },
-  'payment-operations': {
-    title: 'Ödeme Operasyonları',
-    description: 'İade, iptal, kısmi ödeme ve mutabakat işlemlerini sağlayıcı ve ERP aktarım durumuyla izleyin.',
-    breadcrumb: 'Ödeme Operasyonları',
-    emptyState: 'Henüz ödeme operasyonu yok.',
-  },
   'marketplace-channels': {
     title: 'Pazar Yeri Kanalları',
     description: 'Trendyol, Hepsiburada, Amazon ve Etsy mağaza bağlantılarını ayrı kanal olarak yönetin.',
@@ -209,7 +184,7 @@ const configs: Record<B2bWorkspaceKind, WorkspaceConfig> = {
   },
 };
 
-const routeSlugByKind: Record<B2bWorkspaceKind, string> = {
+const routeSlugByKind: Record<B2bWorkspacePageKind, string> = {
   insights: 'insights',
   companies: 'companies',
   buyers: 'buyers',
@@ -222,8 +197,6 @@ const routeSlugByKind: Record<B2bWorkspaceKind, string> = {
   'approval-rules': 'approval-rules',
   quotes: 'quotes',
   orders: 'orders',
-  payments: 'payments',
-  'payment-operations': 'payment-operations',
   'marketplace-channels': 'marketplace-channels',
   'marketplace-listings': 'marketplace-listings',
   'marketplace-events': 'marketplace-events',
@@ -232,9 +205,9 @@ const routeSlugByKind: Record<B2bWorkspaceKind, string> = {
 
 const kindByRouteSlug = Object.fromEntries(
   Object.entries(routeSlugByKind).map(([kind, slug]) => [slug, kind]),
-) as Record<string, B2bWorkspaceKind>;
+) as Record<string, B2bWorkspacePageKind>;
 
-const editSupportedKinds = new Set<B2bWorkspaceKind>(['catalog']);
+const editSupportedKinds = new Set<B2bWorkspacePageKind>(['catalog']);
 
 type B2bFormField = {
   name: string;
@@ -248,36 +221,6 @@ type B2bFormField = {
   hidden?: boolean;
   colSpan?: 'full';
 };
-
-const paymentInstallmentOptions = [
-  { label: 'Tek çekim', value: '1' },
-  { label: '2 taksit', value: '2' },
-  { label: '3 taksit', value: '3' },
-  { label: '4 taksit', value: '4' },
-  { label: '5 taksit', value: '5' },
-  { label: '6 taksit', value: '6' },
-  { label: '7 taksit', value: '7' },
-  { label: '8 taksit', value: '8' },
-  { label: '9 taksit', value: '9' },
-  { label: '10 taksit', value: '10' },
-  { label: '11 taksit', value: '11' },
-  { label: '12 taksit', value: '12' },
-];
-
-const paymentProviderOptions = [
-  { label: 'PayTR', value: 'PAYTR' },
-  { label: 'iyzico', value: 'IYZICO' },
-  { label: 'Açık Hesap', value: 'ACCOUNT' },
-];
-
-function getPaymentInstallmentOptions(providerKey: string | boolean | undefined): Array<{ label: string; value: string }> {
-  const normalizedProvider = typeof providerKey === 'string' ? providerKey.toUpperCase() : 'PAYTR';
-  if (normalizedProvider === 'ACCOUNT') return paymentInstallmentOptions.filter((option) => option.value === '1');
-  if (normalizedProvider === 'IYZICO') {
-    return paymentInstallmentOptions.filter((option) => ['1', '2', '3', '6', '9', '12'].includes(option.value));
-  }
-  return paymentInstallmentOptions;
-}
 
 type B2bFormConfig = {
   fields: B2bFormField[];
@@ -372,7 +315,7 @@ function buildQuotePayload(values: Record<string, string | boolean>, quoteLines:
   };
 }
 
-const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
+const b2bFormConfigs: Partial<Record<B2bWorkspacePageKind, B2bFormConfig>> = {
   companies: {
     defaults: { companyCode: '', companyName: '', customerId: '', parentCompanyId: '', customerGroupCode: '', creditLimit: '', currencyCode: 'TRY' },
     fields: [
@@ -633,65 +576,6 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
     }),
     submit: b2bApi.createQuote,
   },
-  payments: {
-    defaults: { customerId: '', amount: '', currencyCode: 'TRY', orderId: '', providerKey: 'PAYTR', paymentMethod: 'CARD', paymentTermDays: '', dueDate: '', installmentCount: '1', notes: '' },
-    fields: [
-      { name: 'customerId', label: 'Cari', type: 'lookup', lookupKind: 'customer', required: true },
-      { name: 'amount', label: 'Tahsilat Tutarı', type: 'number', required: true },
-      { name: 'currencyCode', label: 'Para Birimi', type: 'currency', required: true },
-      { name: 'orderId', label: 'Sipariş Referansı', type: 'lookup', lookupKind: 'order', helpText: 'Zorunlu değildir; tahsilat doğrudan cariye açılır.' },
-      { name: 'providerKey', label: 'Sağlayıcı', type: 'select', options: paymentProviderOptions },
-      { name: 'paymentMethod', label: 'Ödeme Yöntemi' },
-      { name: 'paymentTermDays', label: 'Vade Günü', type: 'number' },
-      { name: 'dueDate', label: 'Son Ödeme Tarihi', type: 'date' },
-      { name: 'installmentCount', label: 'Taksit Sayısı', type: 'select', required: true, options: paymentInstallmentOptions, helpText: 'Seçenekler sağlayıcıya göre filtrelenir; açık hesapta yalnızca tek çekim kullanılabilir.' },
-      { name: 'notes', label: 'Not', type: 'textarea', colSpan: 'full' },
-    ],
-    transform: (values) => ({
-      orderId: toOptionalNumber(values.orderId),
-      customerId: toRequiredNumber(values.customerId),
-      amount: toRequiredNumber(values.amount),
-      currencyCode: trimOptional(values.currencyCode) ?? 'TRY',
-      providerKey: trimOptional(values.providerKey),
-      paymentMethod: trimOptional(values.paymentMethod),
-      paymentTermDays: toOptionalNumber(values.paymentTermDays),
-      dueDate: trimOptional(values.dueDate),
-      installmentCount: toRequiredNumber(values.installmentCount),
-      notes: trimOptional(values.notes),
-    }),
-    submit: (payload) => b2bApi.createPaymentOrder(payload as unknown as Parameters<typeof b2bApi.createPaymentOrder>[0]),
-  },
-  'payment-operations': {
-    defaults: { paymentTransactionId: '', operationType: 'REFUND', amount: '', currencyCode: 'TRY', idempotencyKey: '', reason: '' },
-    fields: [
-      { name: 'paymentTransactionId', label: 'Ödeme İşlemi', type: 'lookup', lookupKind: 'paymentTransaction', required: true },
-      {
-        name: 'operationType',
-        label: 'Operasyon',
-        type: 'select',
-        required: true,
-        options: [
-          { label: 'İade', value: 'REFUND' },
-          { label: 'İptal', value: 'CANCEL' },
-          { label: 'Kısmi Ödeme', value: 'PARTIAL_PAYMENT' },
-          { label: 'Mutabakat', value: 'RECONCILIATION' },
-        ],
-      },
-      { name: 'amount', label: 'Tutar', type: 'number', required: true },
-      { name: 'currencyCode', label: 'Para Birimi', type: 'currency', required: true },
-      { name: 'idempotencyKey', label: 'Tekrar Koruma Anahtarı' },
-      { name: 'reason', label: 'Açıklama', type: 'textarea' },
-    ],
-    transform: (values) => ({
-      paymentTransactionId: toRequiredNumber(values.paymentTransactionId),
-      operationType: trimOptional(values.operationType) ?? 'REFUND',
-      amount: toRequiredNumber(values.amount),
-      currencyCode: trimOptional(values.currencyCode) ?? 'TRY',
-      idempotencyKey: trimOptional(values.idempotencyKey),
-      reason: trimOptional(values.reason),
-    }),
-    submit: (payload) => b2bApi.createPaymentProviderOperation(payload as unknown as Parameters<typeof b2bApi.createPaymentProviderOperation>[0]),
-  },
   'marketplace-channels': {
     defaults: {
       providerKey: 'Trendyol',
@@ -788,11 +672,11 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
   },
 };
 
-function resolveRouteKind(slug?: string): B2bWorkspaceKind {
+function resolveRouteKind(slug?: string): B2bWorkspacePageKind {
   return slug ? kindByRouteSlug[slug] ?? 'companies' : 'companies';
 }
 
-function isCreateEnabled(kind: B2bWorkspaceKind): boolean {
+function isCreateEnabled(kind: B2bWorkspacePageKind): boolean {
   return Boolean(b2bFormConfigs[kind]);
 }
 
@@ -808,10 +692,6 @@ function isCatalogProduct(row: unknown): row is CatalogProductDto {
   return typeof row === 'object' && row !== null && 'sku' in row && 'name' in row && 'isPublished' in row;
 }
 
-function isPaymentProviderOperation(row: unknown): row is PaymentProviderOperationDto {
-  return typeof row === 'object' && row !== null && 'operationType' in row && 'paymentTransactionId' in row && 'providerKey' in row;
-}
-
 function formatMoney(value: number, currency: string): string {
   return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(value || 0);
 }
@@ -821,17 +701,6 @@ function formatDate(value?: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '-';
   return date.toLocaleString('tr-TR');
-}
-
-function defaultPaymentLinkExpiry(): string {
-  const date = new Date();
-  date.setDate(date.getDate() + 7);
-  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-  return date.toISOString().slice(0, 16);
-}
-
-function canGeneratePaymentLink(paymentOrder: PaymentOrderDto): boolean {
-  return !['Completed', 'Cancelled'].includes(paymentOrder.status) && (paymentOrder.remainingAmount || paymentOrder.amount) > 0;
 }
 
 function formatNumber(value?: number): string {
@@ -862,8 +731,8 @@ const workspaceFilterColumns: readonly FilterColumnConfig[] = [
   { value: 'status', type: 'string', labelKey: 'Durum', label: 'Durum' },
 ];
 
-function getWorkspaceTableConfig(kind: B2bWorkspaceKind): WorkspaceTableConfig {
-  const commercialColumns: Partial<Record<B2bWorkspaceKind, PagedDataGridColumn<WorkspaceColumnKey>[]>> = {
+function getWorkspaceTableConfig(kind: B2bWorkspacePageKind): WorkspaceTableConfig {
+  const commercialColumns: Partial<Record<B2bWorkspacePageKind, PagedDataGridColumn<WorkspaceColumnKey>[]>> = {
     quotes: [
       { key: 'primary', label: 'Talep / Teklif No' },
       { key: 'secondary', label: 'Revizyon / Tip' },
@@ -882,7 +751,7 @@ function getWorkspaceTableConfig(kind: B2bWorkspaceKind): WorkspaceTableConfig {
     ],
   };
 
-  const commercialFilterColumns: Partial<Record<B2bWorkspaceKind, readonly FilterColumnConfig[]>> = {
+  const commercialFilterColumns: Partial<Record<B2bWorkspacePageKind, readonly FilterColumnConfig[]>> = {
     quotes: [
       { value: 'primary', type: 'string', labelKey: 'Talep / Teklif No', label: 'Talep / Teklif No' },
       { value: 'secondary', type: 'string', labelKey: 'Revizyon / Tip', label: 'Revizyon / Tip' },
@@ -897,7 +766,7 @@ function getWorkspaceTableConfig(kind: B2bWorkspaceKind): WorkspaceTableConfig {
     ],
   };
 
-  const sortMaps: Record<B2bWorkspaceKind, Partial<Record<WorkspaceColumnKey, string>>> = {
+  const sortMaps: Record<B2bWorkspacePageKind, Partial<Record<WorkspaceColumnKey, string>>> = {
     insights: {},
     companies: { primary: 'CompanyName', secondary: 'CompanyCode', scope: 'CustomerId', status: 'Status', amount: 'CreditLimit' },
     buyers: { primary: 'FullName', secondary: 'Email', scope: 'CompanyId', status: 'IsActive', amount: 'OrderLimit' },
@@ -910,8 +779,6 @@ function getWorkspaceTableConfig(kind: B2bWorkspaceKind): WorkspaceTableConfig {
     'approval-rules': { primary: 'RuleName', secondary: 'ApproverRoleCode', scope: 'CompanyId', status: 'IsActive', amount: 'MinOrderAmount' },
     quotes: { primary: 'QuoteNumber', scope: 'CustomerId', status: 'Status', amount: 'EstimatedTotal', date: 'SubmittedDate' },
     orders: { primary: 'OrderNumber', scope: 'CustomerId', status: 'Status', amount: 'GrandTotal', date: 'SubmittedDate' },
-    payments: { primary: 'PaymentOrderNumber', secondary: 'PaymentLinkStatus', scope: 'CustomerId', status: 'Status', amount: 'RemainingAmount', date: 'DueDate' },
-    'payment-operations': { primary: 'OperationType', secondary: 'ExternalOperationId', scope: 'PaymentTransactionId', status: 'Status', amount: 'Amount', date: 'RequestedDate' },
     'marketplace-channels': { primary: 'Name', secondary: 'Code', scope: 'ProviderKey', status: 'IsActive', date: 'LastSyncDate' },
     'marketplace-listings': { primary: 'Sku', secondary: 'MarketplaceListingId', scope: 'ChannelId', status: 'Status', amount: 'LastPushedPrice', date: 'LastPriceSyncDate' },
     'marketplace-events': { primary: 'OperationType', secondary: 'ExternalBatchId', scope: 'ChannelId', status: 'Status', date: 'RequestedDate' },
@@ -934,7 +801,7 @@ function renderStatusBadge(label: string, active?: boolean): ReactElement {
   return <Badge variant={statusBadgeVariant(label)}>{label || '-'}</Badge>;
 }
 
-function isCommercialWorkspace(kind: B2bWorkspaceKind): boolean {
+function isCommercialWorkspace(kind: B2bWorkspacePageKind): boolean {
   return kind === 'quotes' || kind === 'orders';
 }
 
@@ -954,7 +821,7 @@ function isRiskCommercialStatus(status?: string): boolean {
   return ['Failed', 'Rejected', 'Cancelled', 'Blocked'].includes(normalizeCommercialStatus(status));
 }
 
-function getCommercialMetrics(kind: B2bWorkspaceKind, rows: WorkspaceRow[]) {
+function getCommercialMetrics(kind: B2bWorkspacePageKind, rows: WorkspaceRow[]) {
   const commercialRows = rows.filter((row) => kind === 'quotes' ? isQuote(row) : isOrder(row));
   const waitingCount = commercialRows.filter((row) => {
     const status = isQuote(row) ? row.status : isOrder(row) ? row.status : '';
@@ -1077,7 +944,7 @@ function linkLinesToJson(value: string, mode: 'media' | 'document'): string | un
   return items.length > 0 ? JSON.stringify(items) : undefined;
 }
 
-function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKey: WorkspaceColumnKey): ReactElement | string {
+function renderWorkspaceCell(kind: B2bWorkspacePageKind, row: WorkspaceRow, columnKey: WorkspaceColumnKey): ReactElement | string {
   if (kind === 'companies') {
     const item = row as B2bCompanyDto;
     const values = {
@@ -1210,30 +1077,6 @@ function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKe
     };
     return values[columnKey];
   }
-  if (kind === 'payments') {
-    const item = row as PaymentOrderDto;
-    const values = {
-      primary: <span className="font-mono text-sm">{item.paymentOrderNumber}</span>,
-      secondary: item.paymentLinkUrl ? 'Link hazır' : item.providerKey || item.paymentMethod || '-',
-      scope: item.orderId ? `Sipariş #${item.orderId}` : 'Cari tahsilat',
-      status: renderStatusBadge(item.status),
-      amount: formatMoney(item.remainingAmount || item.amount, item.currencyCode),
-      date: item.paymentLinkExpiresAt ? `Link: ${formatDate(item.paymentLinkExpiresAt)}` : formatDate(item.dueDate),
-    };
-    return values[columnKey];
-  }
-  if (kind === 'payment-operations') {
-    const item = row as PaymentProviderOperationDto;
-    const values = {
-      primary: item.operationType,
-      secondary: item.externalOperationId || item.idempotencyKey || '-',
-      scope: `İşlem #${item.paymentTransactionId}`,
-      status: renderStatusBadge(item.status),
-      amount: formatMoney(item.amount, item.currencyCode),
-      date: formatDate(item.processedDate || item.requestedDate),
-    };
-    return values[columnKey];
-  }
   if (kind === 'marketplace-channels') {
     const item = row as MarketplaceChannelDto;
     const capabilities = [
@@ -1291,7 +1134,7 @@ function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKe
   return '-';
 }
 
-function workspaceExportRow(kind: B2bWorkspaceKind, row: WorkspaceRow): Record<string, unknown> {
+function workspaceExportRow(kind: B2bWorkspacePageKind, row: WorkspaceRow): Record<string, unknown> {
   if (kind === 'companies') {
     const item = row as B2bCompanyDto;
     return { primary: item.companyName, secondary: item.companyCode, scope: item.customerId, status: item.status, amount: item.creditLimit, date: '' };
@@ -1335,14 +1178,6 @@ function workspaceExportRow(kind: B2bWorkspaceKind, row: WorkspaceRow): Record<s
   if (kind === 'orders') {
     const item = row as OrderDto;
     return { primary: item.offerNo || item.orderNumber, secondary: item.externalErpOrderNumber || item.revisionNo, scope: item.erpProjectCode || item.customerId, status: item.status, amount: item.grandTotal, date: formatDate(item.offerDate || item.submittedDate) };
-  }
-  if (kind === 'payments') {
-    const item = row as PaymentTransactionDto;
-    return { primary: item.providerKey, secondary: item.externalTransactionId, scope: item.orderId, status: item.status, amount: item.amount, date: formatDate(item.completedDate || item.requestedDate) };
-  }
-  if (kind === 'payment-operations') {
-    const item = row as PaymentProviderOperationDto;
-    return { primary: item.operationType, secondary: item.externalOperationId || item.idempotencyKey, scope: item.paymentTransactionId, status: item.status, amount: item.amount, date: formatDate(item.processedDate || item.requestedDate) };
   }
   if (kind === 'marketplace-channels') {
     const item = row as MarketplaceChannelDto;
@@ -1513,7 +1348,7 @@ export function B2bInsightsPage(): ReactElement {
   );
 }
 
-export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactElement {
+export function B2bWorkspacePage({ kind }: { kind: B2bWorkspacePageKind }): ReactElement {
   const { setPageTitle } = useUIStore();
   const navigate = useNavigate();
   const config = configs[kind];
@@ -1538,7 +1373,6 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
   const [portalSummary, setPortalSummary] = useState<CustomerPortalSummaryDto | null>(null);
   const [customerLookupTarget, setCustomerLookupTarget] = useState<'quick' | 'portal' | null>(null);
   const [selectedCatalogIds, setSelectedCatalogIds] = useState<number[]>([]);
-  const [paymentLinkDraft, setPaymentLinkDraft] = useState<PaymentLinkDraft | null>(null);
   const { userId, columnOrder, visibleColumns, orderedVisibleColumns, setColumnOrder, setVisibleColumns } = useColumnPreferences({
     pageKey: tableConfig.pageKey,
     columns: tableConfig.columns.map(({ key, label }) => ({ key, label })),
@@ -1599,23 +1433,6 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
     } finally {
       setIsActionBusy(false);
     }
-  }
-
-  async function createPaymentLinkFromDraft() {
-    if (!paymentLinkDraft) return;
-    const result = await b2bApi.generatePaymentOrderLink(paymentLinkDraft.paymentOrder.id, {
-      portalBaseUrl: window.location.origin,
-      providerKey: paymentLinkDraft.providerKey,
-      customerEmail: paymentLinkDraft.customerEmail || undefined,
-      shareChannel: paymentLinkDraft.shareChannel,
-      expiresAt: new Date(paymentLinkDraft.expiresAt).toISOString(),
-      regenerateToken: paymentLinkDraft.regenerateToken,
-    });
-    if (result.paymentLinkUrl && navigator.clipboard) {
-      await navigator.clipboard.writeText(result.paymentLinkUrl);
-    }
-    setPaymentLinkDraft(null);
-    return `${result.paymentOrderNumber} ödeme linki hazırlandı${result.paymentLinkUrl ? ' ve kopyalandı' : ''}.`;
   }
 
   return (
@@ -2179,54 +1996,6 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
                   </div>
                 );
               }
-              if (isPaymentProviderOperation(row)) {
-                return (
-                  <div className="flex justify-end gap-1">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      disabled={isActionBusy || !['Pending', 'Failed'].includes(row.status) || !['REFUND', 'CANCEL'].includes(row.operationType)}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        void runAction(async () => {
-                          const result = await b2bApi.executePaymentProviderOperation(row.id);
-                          return `${result.operationType} operasyonu sağlayıcıya gönderildi. Durum: ${result.status}.`;
-                        });
-                      }}
-                    >
-                      Sağlayıcıya Gönder
-                    </Button>
-                  </div>
-                );
-              }
-              if (kind === 'payments') {
-                const paymentOrder = row as PaymentOrderDto;
-                return (
-                  <div className="flex justify-end gap-1">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      disabled={isActionBusy || !canGeneratePaymentLink(paymentOrder)}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setPaymentLinkDraft({
-                          paymentOrder,
-                          providerKey: paymentOrder.paymentLinkProvider || paymentOrder.providerKey || 'PORTAL',
-                          customerEmail: paymentOrder.paymentLinkCustomerEmail || '',
-                          shareChannel: paymentOrder.paymentLinkShareChannel || 'COPY',
-                          expiresAt: paymentOrder.paymentLinkExpiresAt ? paymentOrder.paymentLinkExpiresAt.slice(0, 16) : defaultPaymentLinkExpiry(),
-                          regenerateToken: false,
-                        });
-                      }}
-                    >
-                      <Link2 className="mr-2 h-4 w-4" />
-                      Link Hazırla
-                    </Button>
-                  </div>
-                );
-              }
               return (
                 <div className="flex justify-end gap-1">
                   {detailAction}
@@ -2273,130 +2042,6 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
         </CardContent>
       </Card>
 
-      <Dialog open={Boolean(paymentLinkDraft)} onOpenChange={(open) => !open && setPaymentLinkDraft(null)}>
-        <DialogContent className="sm:max-w-[560px]">
-          <DialogHeader>
-            <DialogTitle>Ödeme linki hazırla</DialogTitle>
-            <DialogDescription>
-              Link oluşturulmadan önce tahsilat bilgilerini kontrol edin. Oluşturulan link müşterinin ödeme portalını açar ve otomatik panoya kopyalanır.
-            </DialogDescription>
-          </DialogHeader>
-
-          {paymentLinkDraft ? (
-            <form
-              className="space-y-5"
-              onSubmit={(event) => {
-                event.preventDefault();
-                void runAction(async () => (await createPaymentLinkFromDraft()) ?? 'Ödeme linki hazırlandı.');
-              }}
-            >
-              <div className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm dark:border-white/10 dark:bg-white/5">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-semibold text-slate-600 dark:text-slate-300">Ödeme emri</span>
-                  <span className="font-mono font-bold text-slate-950 dark:text-white">{paymentLinkDraft.paymentOrder.paymentOrderNumber}</span>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-semibold text-slate-600 dark:text-slate-300">Kalan tutar</span>
-                  <span className="font-bold text-slate-950 dark:text-white">
-                    {formatMoney(paymentLinkDraft.paymentOrder.remainingAmount || paymentLinkDraft.paymentOrder.amount, paymentLinkDraft.paymentOrder.currencyCode)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-semibold text-slate-600 dark:text-slate-300">Durum</span>
-                  {renderStatusBadge(paymentLinkDraft.paymentOrder.status)}
-                </div>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="space-y-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                  Sağlayıcı
-                  <Select
-                    value={paymentLinkDraft.providerKey}
-                    onValueChange={(value) => setPaymentLinkDraft((current) => current ? { ...current, providerKey: value } : current)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PORTAL">Portal</SelectItem>
-                      <SelectItem value="PAYTR">PayTR</SelectItem>
-                      <SelectItem value="IYZICO">iyzico</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </label>
-
-                <label className="space-y-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                  Paylaşım kanalı
-                  <Select
-                    value={paymentLinkDraft.shareChannel}
-                    onValueChange={(value) => setPaymentLinkDraft((current) => current ? { ...current, shareChannel: value } : current)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="COPY">Kopyala</SelectItem>
-                      <SelectItem value="EMAIL">E-posta</SelectItem>
-                      <SelectItem value="SMS">SMS</SelectItem>
-                      <SelectItem value="WHATSAPP">WhatsApp</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </label>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="space-y-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                  Müşteri e-postası
-                  <Input
-                    type="email"
-                    value={paymentLinkDraft.customerEmail}
-                    onChange={(event) => setPaymentLinkDraft((current) => current ? { ...current, customerEmail: event.target.value } : current)}
-                    placeholder="musteri@firma.com"
-                  />
-                </label>
-
-                <label className="space-y-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                  Geçerlilik tarihi
-                  <Input
-                    type="datetime-local"
-                    value={paymentLinkDraft.expiresAt}
-                    min={new Date(Date.now() + 10 * 60 * 1000).toISOString().slice(0, 16)}
-                    onChange={(event) => setPaymentLinkDraft((current) => current ? { ...current, expiresAt: event.target.value } : current)}
-                    required
-                  />
-                </label>
-              </div>
-
-              <label className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 p-3 text-sm font-semibold text-slate-700 dark:border-white/10 dark:text-slate-200">
-                <span>Yeni güvenli token üret</span>
-                <Switch
-                  checked={paymentLinkDraft.regenerateToken}
-                  onCheckedChange={(checked) => setPaymentLinkDraft((current) => current ? { ...current, regenerateToken: checked } : current)}
-                />
-              </label>
-
-              {paymentLinkDraft.paymentOrder.paymentLinkUrl ? (
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold text-emerald-900 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200">
-                  Bu ödeme emrinde aktif link var. Token yenilemezseniz aynı linkin süresi ve paylaşım bilgisi güncellenir.
-                </div>
-              ) : null}
-
-              <DialogFooter className="gap-2 sm:gap-0">
-                <Button type="button" variant="outline" onClick={() => setPaymentLinkDraft(null)}>
-                  Vazgeç
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isActionBusy || (paymentLinkDraft.shareChannel === 'EMAIL' && !paymentLinkDraft.customerEmail.trim())}
-                >
-                  {paymentLinkDraft.shareChannel === 'EMAIL' ? <Mail className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
-                  Link Oluştur
-                </Button>
-              </DialogFooter>
-            </form>
-          ) : null}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
@@ -2485,18 +2130,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
 
   function updateValue(name: string, value: string | boolean): void {
     setFormError(null);
-    setValues((current) => {
-      if (kind === 'payments' && name === 'providerKey') {
-        const installmentOptions = getPaymentInstallmentOptions(value);
-        const currentInstallment = String(current.installmentCount || '1');
-        return {
-          ...current,
-          [name]: value,
-          installmentCount: installmentOptions.some((option) => option.value === currentInstallment) ? currentInstallment : '1',
-        };
-      }
-      return { ...current, [name]: value };
-    });
+    setValues((current) => ({ ...current, [name]: value }));
   }
 
   function setLookupValue(name: string, value: number | string, label: string, extraValues?: Record<string, string | boolean>): void {
@@ -2674,33 +2308,8 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
           getKey={(item) => String(item.id)}
           getLabel={(item) => `${item.orderNumber} - ${formatMoney(item.grandTotal, item.currencyCode)}`}
           onSelect={(item) => {
-            const extraValues = kind === 'payments'
-              ? {
-                  customerId: String(item.customerId),
-                  amount: String(item.grandTotal),
-                  currencyCode: item.currencyCode || 'TRY',
-                }
-              : undefined;
-            setLookupValue(field.name, item.id, `${item.orderNumber} - ${formatMoney(item.grandTotal, item.currencyCode)}`, extraValues);
+            setLookupValue(field.name, item.id, `${item.orderNumber} - ${formatMoney(item.grandTotal, item.currencyCode)}`);
           }}
-        />
-      );
-    }
-
-    if (field.lookupKind === 'paymentTransaction') {
-      return (
-        <PagedLookupDialog<PaymentTransactionDto>
-          {...commonProps}
-          title="Ödeme İşlemi Seç"
-          description="Sağlayıcı, işlem numarası veya siparişe göre ödeme hareketi arayın."
-          emptyText="Ödeme işlemi bulunamadı."
-          fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getPayments({ pageNumber, pageSize, search })}
-          getKey={(item) => String(item.id)}
-          getLabel={(item) => `${item.providerKey} - ${item.externalTransactionId || item.id} - ${formatMoney(item.amount, item.currencyCode)}`}
-          onSelect={(item) => setLookupValue(field.name, item.id, `${item.providerKey} - ${item.externalTransactionId || item.id} - ${formatMoney(item.amount, item.currencyCode)}`, {
-            amount: String(item.amount),
-            currencyCode: item.currencyCode,
-          })}
         />
       );
     }
@@ -2770,9 +2379,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
       );
     }
     if (field.type === 'select') {
-      const options = kind === 'payments' && field.name === 'installmentCount'
-        ? getPaymentInstallmentOptions(values.providerKey)
-        : field.options ?? [];
+      const options = field.options ?? [];
       return (
         <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
           <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
@@ -3385,13 +2992,6 @@ export function B2bOrdersPage(): ReactElement {
   return <B2bWorkspacePage kind="orders" />;
 }
 
-export function B2bPaymentsPage(): ReactElement {
-  return <B2bWorkspacePage kind="payments" />;
-}
-
-export function B2bPaymentOperationsPage(): ReactElement {
-  return <B2bWorkspacePage kind="payment-operations" />;
-}
 
 export function B2bMarketplaceChannelsPage(): ReactElement {
   return <B2bWorkspacePage kind="marketplace-channels" />;

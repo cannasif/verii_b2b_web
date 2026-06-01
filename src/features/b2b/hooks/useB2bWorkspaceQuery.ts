@@ -15,12 +15,12 @@ import type {
   MarketplaceListingDto,
   MarketplaceSyncEventDto,
   OrderDto,
-  PaymentProviderOperationDto,
-  PaymentTransactionDto,
   PurchaseApprovalRuleDto,
   QuoteRequestDto,
   ShoppingListDto,
 } from '../types/b2b.types';
+
+export type B2bWorkspaceQueryKind = Exclude<B2bWorkspaceKind, 'payments' | 'payment-operations'>;
 
 type WorkspaceRow =
   | B2bCompanyDto
@@ -34,14 +34,12 @@ type WorkspaceRow =
   | PurchaseApprovalRuleDto
   | QuoteRequestDto
   | OrderDto
-  | PaymentTransactionDto
-  | PaymentProviderOperationDto
   | MarketplaceChannelDto
   | MarketplaceListingDto
   | MarketplaceSyncEventDto
   | B2bIntegrationEventDto;
 
-export function useB2bWorkspaceQuery(kind: B2bWorkspaceKind, params: PagedParams = {}) {
+export function useB2bWorkspaceQuery(kind: B2bWorkspaceQueryKind, params: PagedParams = {}) {
   return useQuery<PagedResponse<WorkspaceRow>>({
     queryKey: ['b2b-workspace', kind, params],
     queryFn: async () => {
@@ -78,10 +76,6 @@ export function useB2bWorkspaceQuery(kind: B2bWorkspaceKind, params: PagedParams
           return b2bApi.getApprovalRules(params) as Promise<PagedResponse<WorkspaceRow>>;
         case 'orders':
           return b2bApi.getOrders(params) as Promise<PagedResponse<WorkspaceRow>>;
-        case 'payments':
-          return b2bApi.getPaymentOrders(params) as Promise<PagedResponse<WorkspaceRow>>;
-        case 'payment-operations':
-          return b2bApi.getPaymentProviderOperations(params) as Promise<PagedResponse<WorkspaceRow>>;
         case 'marketplace-channels':
           return b2bApi.getMarketplaceChannels(params) as Promise<PagedResponse<WorkspaceRow>>;
         case 'marketplace-listings':
