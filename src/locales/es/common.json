@@ -1966,7 +1966,7 @@
     "loading": "Cargando...",
     "disconnected": "Conexión desconectada",
     "notifications": "Notificaciones",
-    "connectionDisconnected": "Connection disconnected"
+    "connectionDisconnected": "Conexión desconectada"
   },
   "userDetail": {
     "title": "Detalles del usuario",

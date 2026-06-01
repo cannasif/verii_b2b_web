@@ -1966,7 +1966,7 @@
     "loading": "جاري التحميل...",
     "disconnected": "انقطع الاتصال",
     "notifications": "إشعارات",
-    "connectionDisconnected": "Connection disconnected"
+    "connectionDisconnected": "انقطع الاتصال"
   },
   "userDetail": {
     "title": "تفاصيل المستخدم",
