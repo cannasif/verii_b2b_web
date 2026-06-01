@@ -436,7 +436,7 @@
     "erpWarehouseSerialBalance": "Depo Seri Bakiyesi"
   },
   "erpReference": {
-    "badge": "ERP Mirror",
+    "badge": "ERP Senkronizasyonu",
     "columns": {
       "code": "Kod",
       "name": "Ad",
@@ -449,20 +449,20 @@
       "lastSyncDate": "Son Sync"
     },
     "customer": {
-      "title": "Cari Mirror",
-      "description": "ERP tarafindan senkronlanan cari kayıtlarını görüntüleyin."
+      "title": "Cari Senkronizasyonu",
+      "description": "ERP ile senkronize edilen cari kayıtlarını görüntüleyin."
     },
     "stock": {
-      "title": "Stok Mirror",
-      "description": "ERP tarafindan senkronlanan stok kartlarını görüntüleyin."
+      "title": "Stok Senkronizasyonu",
+      "description": "ERP ile senkronize edilen stok kartlarını görüntüleyin."
     },
     "warehouse": {
-      "title": "Depo Mirror",
-      "description": "ERP tarafindan senkronlanan depo kayıtlarını görüntüleyin."
+      "title": "Depo Senkronizasyonu",
+      "description": "ERP ile senkronize edilen depo kayıtlarını görüntüleyin."
     },
     "yapkod": {
-      "title": "YapKod Mirror",
-      "description": "ERP tarafindan senkronlanan yapı kodlarını görüntüleyin."
+      "title": "Yapı Kodu Senkronizasyonu",
+      "description": "ERP ile senkronize edilen yapı kodlarını görüntüleyin."
     }
   },
   "barcodeManagement": {

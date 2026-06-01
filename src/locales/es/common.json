@@ -3499,34 +3499,34 @@
     "erpFallbackHelp": "Pattern tek başına çözemezse WMS mirror stok ve yapı kodu alanlarında arama yapar."
   },
   "erpReference": {
-    "customer": {
-      "title": "Cari Mirror",
-      "description": "ERP tarafindan senkronlanan cari kayıtlarını izleyin."
-    },
+    "badge": "Sincronización ERP",
     "columns": {
-      "code": "Kod",
-      "name": "Ad",
-      "branch": "Şube",
-      "city": "Şehir",
-      "phone": "Telefon",
-      "lastSyncDate": "Son Sync",
-      "unit": "Birim",
-      "group": "Grup",
-      "linkedStock": "Bağlı Stok"
+      "code": "Código",
+      "name": "Nombre",
+      "branch": "Sucursal",
+      "city": "Ciudad",
+      "phone": "Teléfono",
+      "unit": "Unidad",
+      "group": "Grupo",
+      "linkedStock": "Stock vinculado",
+      "lastSyncDate": "Última sincronización"
+    },
+    "customer": {
+      "title": "Sincronización de clientes",
+      "description": "Ver registros de clientes sincronizados desde ERP."
     },
     "stock": {
-      "title": "Stok Mirror",
-      "description": "ERP tarafindan senkronlanan stok kartlarını izleyin."
+      "title": "Sincronización de stock",
+      "description": "Ver tarjetas de stock sincronizadas desde ERP."
     },
     "warehouse": {
-      "title": "Depo Mirror",
-      "description": "ERP tarafindan senkronlanan depo kayıtlarını izleyin."
+      "title": "Sincronización de almacenes",
+      "description": "Ver registros de almacenes sincronizados desde ERP."
     },
     "yapkod": {
-      "title": "YapKod Mirror",
-      "description": "ERP tarafindan senkronlanan yapı kodlarını izleyin."
-    },
-    "badge": "ERP Mirror"
+      "title": "Sincronización de código de estructura",
+      "description": "Ver códigos de estructura sincronizados desde ERP."
+    }
   },
   "permissionGroups": {
     "permissionsPanel": {
