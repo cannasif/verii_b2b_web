@@ -18,7 +18,7 @@ const B2bMarketplaceChannelsPage = lazyNamed(() => import('@/features/b2b'), 'B2
 const B2bMarketplaceListingsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceListingsPage');
 const B2bMarketplaceEventsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceEventsPage');
 const B2bMarketplaceSettingsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceSettingsPage');
-const B2bPaymentSettingsPage = lazyNamed(() => import('@/features/b2b'), 'B2bPaymentSettingsPage');
+const B2bPaymentSettingsPage = lazyNamed(() => import('@/features/b2b-payments'), 'B2bPaymentSettingsPage');
 const B2bIntegrationsPage = lazyNamed(() => import('@/features/b2b'), 'B2bIntegrationsPage');
 const B2bInsightsPage = lazyNamed(() => import('@/features/b2b'), 'B2bInsightsPage');
 const B2bRecordDetailPage = lazyNamed(() => import('@/features/b2b'), 'B2bRecordDetailPage');

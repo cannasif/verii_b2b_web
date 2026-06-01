@@ -12,8 +12,8 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useUIStore } from '@/stores/ui-store';
-import { b2bApi } from '../api/b2b.api';
-import type { PaymentSettingDto, UpsertPaymentSettingDto } from '../types/b2b.types';
+import { paymentSettingsApi } from '../api/payment-settings.api';
+import type { PaymentSettingDto, UpsertPaymentSettingDto } from '../types/payment-settings.types';
 
 type PaymentSettingFormState = UpsertPaymentSettingDto;
 
@@ -81,7 +81,7 @@ export function B2bPaymentSettingsPage(): ReactElement {
 
   const settingsQuery = useQuery({
     queryKey: ['b2b-payment-settings'],
-    queryFn: b2bApi.getPaymentSettings,
+    queryFn: paymentSettingsApi.get,
   });
 
   const settings = useMemo(() => {
@@ -107,7 +107,7 @@ export function B2bPaymentSettingsPage(): ReactElement {
   }, [selectedSetting]);
 
   const saveMutation = useMutation({
-    mutationFn: async () => b2bApi.updatePaymentSetting(form.providerKey, normalizeForSave(form)),
+    mutationFn: async () => paymentSettingsApi.update(form.providerKey, normalizeForSave(form)),
     onSuccess: async () => {
       toast.success('Ödeme ayarları kaydedildi.');
       await queryClient.invalidateQueries({ queryKey: ['b2b-payment-settings'] });
