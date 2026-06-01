@@ -12,8 +12,9 @@ import { useCurrencyOptions } from '@/services/hooks/useCurrencyOptions';
 import { lookupApi } from '@/services/lookup-api';
 import type { CustomerLookup } from '@/services/lookup-types';
 import { b2bApi } from '@/features/b2b/api/b2b.api';
-import type { OrderDto, PaymentTransactionDto } from '@/features/b2b/types/b2b.types';
+import type { OrderDto } from '@/features/b2b/types/b2b.types';
 import { paymentApi } from '../api/payment.api';
+import type { PaymentTransactionDto } from '../types/payment.types';
 
 interface PaymentOrderFormState {
   customerId: string;

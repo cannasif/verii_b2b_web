@@ -15,8 +15,8 @@ import { PagedDataGrid, type PagedDataGridColumn } from '@/components/shared';
 import { usePagedDataGrid } from '@/hooks/usePagedDataGrid';
 import { getPagedRange } from '@/lib/paged';
 import { useUIStore } from '@/stores/ui-store';
-import type { PaymentOrderDto, PaymentProviderOperationDto } from '@/features/b2b/types/b2b.types';
 import { paymentApi } from '../api/payment.api';
+import type { PaymentOrderDto, PaymentProviderOperationDto } from '../types/payment.types';
 
 type PaymentColumnKey = 'primary' | 'secondary' | 'scope' | 'status' | 'amount' | 'date';
 type OperationColumnKey = 'primary' | 'secondary' | 'scope' | 'status' | 'amount' | 'date';

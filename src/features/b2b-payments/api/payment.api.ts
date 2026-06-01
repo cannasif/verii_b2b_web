@@ -19,7 +19,7 @@ import type {
   PaytrIframeTokenDto,
   ResolvePaymentMethodsDto,
   SelectPaymentProviderInstallmentDto,
-} from '@/features/b2b/types/b2b.types';
+} from '../types/payment.types';
 
 function extractData<T>(response: ApiResponse<T>): T {
   if (!response.success) {
