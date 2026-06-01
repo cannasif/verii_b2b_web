@@ -4198,7 +4198,7 @@
         ],
         "links": {
           "authorization": "Autorisierungsdokumentation",
-          "developer": "Trendyol Developer"
+          "developer": "Trendyol-Entwicklerbereich"
         },
         "setupSummary": "Supplier ID, API Key und API Secret stehen im Trendyol Seller Panel unter Kontoinformationen > Integrationsinformationen. PROD/STAGE-Zugangsdaten können abweichen.",
         "credentialHelp": {
@@ -4232,7 +4232,7 @@
         ],
         "links": {
           "gettingStarted": "Erste Schritte",
-          "developer": "Hepsiburada Developer"
+          "developer": "Hepsiburada-Entwicklerbereich"
         },
         "setupSummary": "Developer-Konto, API-Schlüssel und Merchant-/Shop-Informationen werden im Hepsiburada Developer-/Merchant-Panel vorbereitet. Die Integrator-Freigabe wird im Merchant Panel verwaltet.",
         "credentialHelp": {
@@ -4313,7 +4313,7 @@
         ],
         "links": {
           "productUpsert": "Dokumentation Produkt-Upsert",
-          "developer": "PTT AVM Developer"
+          "developer": "PTT AVM-Entwicklerbereich"
         },
         "warning": "Im PTT AVM-Upsert-Ablauf können fehlende Varianten oder Felder bestehende Produktdaten beeinflussen. Katalog-Mapping-Felder vor Produktion testen.",
         "setupSummary": "Die PTT AVM-Katalogintegration arbeitet mit products/upsert. Produkt-, Preis- und Bestandsübermittlungen werden über trackingid verfolgt.",
@@ -4364,7 +4364,7 @@
         ],
         "links": {
           "sellerPanel": "Verkäuferantrag",
-          "integration": "Çiçeksepeti"
+          "integration": "Çiçeksepeti-Integration"
         },
         "warning": "Die öffentliche Çiçeksepeti-Dokumentation ist begrenzt. Live-Endpunktpfade vor Produktion im Seller Panel bestätigen und Anbieteroptionen aktualisieren.",
         "setupSummary": "Çiçeksepeti Marketplace API-Zugangsdaten werden aus dem Seller Panel oder vom Integrationsteam bereitgestellt. Produkt-, Preis-, Bestands- und Bestelloperationen werden über Anbieterpfade gesteuert.",
@@ -4390,7 +4390,7 @@
           "Seller ID, Marketplace ID und Access Token auf diesem Bildschirm speichern."
         ],
         "links": {
-          "inventoryApi": "Sell Inventory API",
+          "inventoryApi": "Sell-Inventory-API",
           "bulkPriceQuantity": "Bulk Preis/Menge"
         },
         "warning": "eBay-Produktveröffentlichung benötigt Kategorie, Merchant Location Key und Listing-Policy-Werte. Die API lehnt Produktanlage ab, wenn diese Werte fehlen.",
@@ -4425,8 +4425,8 @@
           "Shop-Domain, Admin Access Token, API-Version und Location ID auf diesem Bildschirm speichern."
         ],
         "links": {
-          "adminApi": "Admin API",
-          "inventoryLevels": "Inventory Levels"
+          "adminApi": "Admin-API",
+          "inventoryLevels": "Lagerbestandsstände"
         },
         "warning": "Shopify-Bestandsupdates nutzen inventory item id und location id, nicht variant id. Diese Zuordnung wird nach Produktanlage gespeichert.",
         "setupSummary": "Die Shopify Admin API arbeitet mit Produktanlage, Variantenpreis-Update und inventory_levels/set für Bestandsupdates.",
@@ -4453,15 +4453,15 @@
           "Store-URL, Consumer Key, Consumer Secret und API-Version auf diesem Bildschirm speichern."
         ],
         "links": {
-          "restApi": "REST API",
+          "restApi": "REST-API",
           "authentication": "Authentifizierung"
         },
         "warning": "WooCommerce-Preis- und Bestandsupdates nutzen product id. Bei variablen Produkten die variation id-Zuordnung in der Listing-ID speichern.",
         "setupSummary": "Die WooCommerce REST API nutzt Consumer Key/Secret für Produktanlage, Preisupdate und Bestandsupdate über den products-Endpunkt.",
         "credentialHelp": {
           "storeUrl": "WooCommerce Store-Basis-URL. Beispiel: https://store.com.",
-          "consumerKey": "WooCommerce REST API Consumer Key.",
-          "consumerSecret": "WooCommerce REST API Consumer Secret.",
+          "consumerKey": "WooCommerce REST API Consumer Key (Verbraucherschlüssel).",
+          "consumerSecret": "WooCommerce REST API Consumer Secret (Geheimschlüssel).",
           "apiVersion": "Zu verwendende REST API-Version. Beispiel: wc/v3."
         }
       },
@@ -4482,7 +4482,7 @@
           "Base URL, Access Token, Store Code und Source Code auf diesem Bildschirm speichern."
         ],
         "links": {
-          "restApi": "REST API",
+          "restApi": "REST-API",
           "inventoryApi": "Inventar-API"
         },
         "warning": "Adobe Commerce-Bestandsupdates nutzen MSI Source Items. Bei mehreren Lagern/Sources sollte sourceCode über ERP-Lagerzuordnung verwaltet werden.",
@@ -4515,14 +4515,14 @@
         ],
         "links": {
           "registration": "SP-API-Registrierung",
-          "marketplaceIds": "Marketplace IDs",
+          "marketplaceIds": "Marketplace-IDs",
           "endpoints": "SP-API-Endpunkte"
         },
         "warning": "Amazon SP-API benötigt korrekte Region, Marketplace ID, LWA Refresh Token und AWS SigV4-Signatur. Kleine Abweichungen führen zu Authentifizierungsfehlern.",
         "setupSummary": "Amazon SP-API benötigt Seller Central App-Registrierung, LWA OAuth, Refresh Token und AWS SigV4-Zugangsdaten. Marketplace ID und Region müssen zusammenpassen.",
         "credentialHelp": {
           "sellerId": "Amazon Seller ID aus Seller Central.",
-          "marketplaceId": "Amazon Marketplace ID der Zielregion. Beispiel Türkei: A33AVAJ2PDY3EV.",
+          "marketplaceId": "Amazon-Marketplace-ID der Zielregion. Siehe Amazon-Dokumentation zu Marketplace-IDs.",
           "lwaClientId": "Login with Amazon Client ID aus der SP-API-App.",
           "lwaClientSecret": "Login with Amazon Client Secret aus der SP-API-App.",
           "refreshToken": "OAuth Refresh Token, erzeugt durch Verkäuferautorisierung.",
@@ -4531,13 +4531,13 @@
           "region": "SP-API-Endpunktregion. Türkei/Europa verwendet typischerweise die EU-Endpunktfamilie.",
           "roleArn": "Role ARN, falls IAM-Rollen-basierter Zugriff verwendet wird."
         },
-        "connectionModeHelp": "Amazon SP-API requires LWA OAuth + AWS Signature Version 4 together. Seller ID and region must match the target marketplace before sending requests.",
+          "connectionModeHelp": "Amazon SP-API erfordert die Kombination aus LWA OAuth und AWS Signature Version 4. Verkäufer-ID und Region müssen zum Zielmarktplatz passen, bevor Anfragen gesendet werden.",
         "connectionChecklist": [
-          "Create SP-API application and get LWA client credentials in Seller Central.",
-          "Complete seller authorization flow and obtain refresh token.",
-          "Validate AWS IAM access keys and Signature V4 region pairing.",
-          "Confirm marketplace IDs and endpoint region for each sales destination.",
-          "Validate listing payload fields (prices, quantities, units) before production."
+          "SP-API-Anwendung in Seller Central erstellen und LWA-Client-Anmeldeinformationen abrufen.",
+          "Verkäuferautorisierung abschließen und Refresh Token erhalten.",
+          "AWS-IAM-Zugriffsschlüssel und die Signature-Version-4-Region prüfen.",
+          "Marketplace-IDs und Endpunktregion für jedes Vertriebsland bestätigen.",
+          "Listing-Payload-Felder (Preise, Mengen, Einheiten) vor dem Produktiveinsatz prüfen."
         ]
       },
       "Etsy": {
@@ -4564,7 +4564,6 @@
         "credentialHelp": {
           "shopId": "Etsy Shop ID des Verkäuferkontos.",
           "clientId": "Etsy App Client ID oder Keystring.",
-          "refreshToken": "OAuth Refresh Token zur Token-Erneuerung.",
           "clientSecret": "Etsy App Shared Secret."
         }
       }
@@ -4594,114 +4593,114 @@
     "noProvidersFound": "Keine passende Integration gefunden."
   },
   "marketplaceWorkbench": {
-    "badge": "Marketplace Operations",
-    "title": "Marketplace product operations",
-    "subtitle": "After integration is completed, view products by channel, update price/stock, or queue the same product for another marketplace.",
-    "configureIntegrations": "Go to Integration Settings",
+    "badge": "Marktplatz-Operationen",
+    "title": "Marktplatz-Produktvorgänge",
+    "subtitle": "Nach dem Abschluss der Integration können Sie Produkte nach Kanal anzeigen, Preis/Bestand aktualisieren oder dasselbe Produkt für einen anderen Marktplatz in die Warteschlange setzen.",
+    "configureIntegrations": "Zu Integrations-Einstellungen gehen",
     "metrics": {
-      "products": "Matched Products",
-      "channels": "Active Channels",
-      "pending": "Pending Jobs",
-      "missingPrice": "Needs Review"
+      "products": "Passende Produkte",
+      "channels": "Aktive Kanäle",
+      "pending": "Ausstehende Jobs",
+      "missingPrice": "Überprüfung nötig"
     },
     "filters": {
-      "channel": "Channel",
-      "allChannels": "All channels",
-      "all": "All",
-      "published": "Published",
-      "pending": "Pending",
-      "failed": "Failed",
-      "needsAction": "Needs Action",
-      "searchPlaceholder": "Search SKU, product, channel or marketplace id",
-      "selectedChannel": "Showing products for {{channel}}",
-      "allChannelsHelp": "Products from all marketplace channels are listed."
+      "channel": "Kanal",
+      "allChannels": "Alle Kanäle",
+      "all": "Alle",
+      "published": "Veröffentlicht",
+      "pending": "Ausstehend",
+      "failed": "Fehlgeschlagen",
+      "needsAction": "Maßnahme erforderlich",
+      "searchPlaceholder": "Nach SKU, Produkt, Kanal oder Marktplatz-ID suchen",
+      "selectedChannel": "Produkte für {{channel}} werden angezeigt",
+      "allChannelsHelp": "Alle Produkte aller Marktplatz-Kanäle sind aufgelistet."
     },
     "flow": {
       "view": {
-        "title": "View products by channel",
-        "description": "Filter Amazon, Trendyol, Hepsiburada and Etsy mappings in one screen."
+        "title": "Produkte nach Kanal anzeigen",
+        "description": "Filtern Sie Amazon-, Trendyol-, Hepsiburada- und Etsy-Zuordnungen in einem Bildschirm."
       },
       "update": {
-        "title": "Send price and stock",
-        "description": "Queue a price or sellable stock update for the selected product."
+        "title": "Preis und Bestand senden",
+        "description": "Eine Preis- oder verkäufliche Bestandsaktualisierung für das ausgewählte Produkt in die Warteschlange stellen."
       },
       "publish": {
-        "title": "Publish to another channel",
-        "description": "Queue an Amazon product for Trendyol or Hepsiburada publication."
+        "title": "In anderen Kanal veröffentlichen",
+        "description": "Ein Amazon-Produkt für die Veröffentlichung auf Trendyol oder Hepsiburada in die Warteschlange stellen."
       }
     },
     "card": {
       "sku": "SKU",
       "barcode": "Barcode",
-      "lastPrice": "Last price",
-      "stock": "Last stock",
-      "marketplaceProductId": "Product ID",
-      "marketplaceListingId": "Listing ID"
+      "lastPrice": "Letzter Preis",
+      "stock": "Letzter Bestand",
+      "marketplaceProductId": "Produkt-ID",
+      "marketplaceListingId": "Listing-ID"
     },
     "actions": {
-      "title": "Quick action",
-      "updatePrice": "Update price",
-      "updateStock": "Update stock",
-      "publishSameChannel": "Send product to this channel",
-      "publishAnotherChannel": "Add to another channel",
-      "removeFromSale": "Remove from sale",
-      "bulkUpdateStockPrice": "Alle Preise dieses Bestands aktualisieren"
+      "title": "Schnellaktion",
+      "updatePrice": "Preis aktualisieren",
+      "updateStock": "Bestand aktualisieren",
+      "publishSameChannel": "Produkt an diesen Kanal senden",
+      "publishAnotherChannel": "Zu anderem Kanal hinzufügen",
+      "removeFromSale": "Vom Verkauf entfernen",
+      "bulkUpdateStockPrice": "Alle Preise für diesen Bestand aktualisieren"
     },
     "quick": {
-      "price": "Quick price",
-      "quantity": "Quick stock",
-      "currency": "Currency",
-      "queuePrice": "Queue price",
-      "queueStock": "Queue stock"
+      "price": "Schnellpreis",
+      "quantity": "Schnellbestand",
+      "currency": "Währung",
+      "queuePrice": "Preis in Warteschlange",
+      "queueStock": "Bestand in Warteschlange"
     },
     "events": {
-      "title": "Latest sync tracking",
-      "empty": "No sync activity yet."
+      "title": "Letzter Sync-Verlauf",
+      "empty": "Noch keine Synchronisierungsaktivität."
     },
     "empty": {
-      "title": "No marketplace products yet",
-      "description": "Complete integration settings and store channel first. Then map B2B catalog products to marketplace channels and manage product, price and stock operations here."
+      "title": "Noch keine Marktplatzprodukte",
+      "description": "Vervollständigen Sie zuerst Integrationseinstellungen und Shop-Kanal. Weisen Sie dann B2B-Katalogprodukte den Marktplatzkanälen zu und verwalten Sie Produkt-, Preis- und Bestandsvorgänge hier."
     },
     "dialog": {
       "price-update": {
-        "title": "Queue price update"
+        "title": "Preisaktualisierung in Warteschlange"
       },
       "stock-update": {
-        "title": "Queue stock update"
+        "title": "Bestandsaktualisierung in Warteschlange"
       },
       "product-create": {
-        "title": "Queue product publish"
+        "title": "Produktveröffentlichung in Warteschlange"
       },
       "clone-to-channel": {
-        "title": "Add product to another channel"
+        "title": "Produkt zu anderem Kanal hinzufügen"
       },
-      "price": "New price",
-      "quantity": "New stock",
-      "currency": "Currency",
-      "targetChannel": "Target channel",
-      "targetChannelPlaceholder": "Select target marketplace channel",
-      "productCreateHelp": "This queues a product publish job for the selected marketplace channel. The job sends it to the provider API when it runs.",
-      "queue": "Queue",
+      "price": "Neuer Preis",
+      "quantity": "Neuer Bestand",
+      "currency": "Währung",
+      "targetChannel": "Zielkanal",
+      "targetChannelPlaceholder": "Ziel-Marktplatzkanal auswählen",
+      "productCreateHelp": "Damit wird die Produktveröffentlichung für den ausgewählten Marktplatzkanal in die Warteschlange gestellt. Der Job sendet es beim Ausführen an die Anbieter-API.",
+      "queue": "In Warteschlange",
       "bulk-price-update": {
-        "title": "Bestandsbasierte Sammel-Preisaktualisierung einreihen"
+        "title": "Massenpreisänderung nach Bestand in Warteschlange"
       },
-      "bulkPriceHelp": "Diese Aktion stellt für alle aktiven Marktplatz-Listings mit derselben ERP-Bestandskarte eine Preisaktualisierung in die Queue. Kanäle mit fehlgeschlagenem Verbindungstest oder deaktivierter Preisaktualisierung werden übersprungen."
+      "bulkPriceHelp": "Diese Aktion stellt eine Preisänderung für alle aktiven Marktplatz-Listings ein, die mit derselben ERP-Bestandskarte verknüpft sind. Kanäle mit fehlgeschlagenem Verbindungstest oder deaktivierter Preisaktualisierung werden übersprungen."
     },
     "toasts": {
-      "queued": "Operation queued.",
-      "queueFailed": "Operation could not be queued."
+      "queued": "Vorgang in Warteschlange gestellt.",
+      "queueFailed": "Vorgang konnte nicht in Warteschlange gestellt werden."
     },
     "errors": {
-      "noAction": "No action selected.",
-      "providerMissing": "Marketplace provider could not be resolved.",
-      "targetChannelRequired": "Please select a target channel.",
-      "channelRequired": "A channel must be selected before queueing this operation.",
-      "connectionTestFailed": "Marketplace connection test failed. Please verify integration settings first.",
-      "stockMissing": "Dieses Listing ist keiner ERP-Bestandskarte zugeordnet.",
-      "priceRequired": "Geben Sie einen gültigen Preis ein."
+      "noAction": "Keine Aktion ausgewählt.",
+      "providerMissing": "Marktplatzanbieter konnte nicht aufgelöst werden.",
+      "targetChannelRequired": "Bitte wählen Sie einen Zielkanal.",
+      "channelRequired": "Vor dem Einreihen dieses Vorgangs muss ein Kanal ausgewählt werden.",
+      "connectionTestFailed": "Marktplatz-Verbindungstest fehlgeschlagen. Überprüfen Sie zuerst die Integrationseinstellungen.",
+      "stockMissing": "Dieses Listing ist keinem ERP-Bestandskartensatz zugeordnet.",
+      "priceRequired": "Bitte geben Sie einen gültigen Preis ein."
     },
     "messages": {
-      "connectionBlocked": "Connection test failed for this channel. Run Test Connection first, then retry the operation."
+      "connectionBlocked": "Der Verbindungstest für diesen Kanal ist fehlgeschlagen. Führen Sie zuerst den Verbindungscheck aus, dann wiederholen Sie den Vorgang."
     }
   },
   "mailSettings": {

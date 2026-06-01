@@ -4112,77 +4112,77 @@
     }
   },
   "marketplaceSettings": {
-    "badge": "Settings",
-    "title": "Marketplace integration settings",
-    "subtitle": "Manage each marketplace with the fields it requires. Trendyol and Hepsiburada are simpler, while Amazon SP-API needs OAuth and AWS credentials.",
-    "loading": "Loading settings...",
-    "saveButton": "Save Settings",
-    "channelNotCreated": "Channel not created",
-    "providerSettingsTitle": "{{provider}} settings",
-    "officialDocument": "Official documentation",
-    "requiredInfo": "Required information",
-    "officialLinks": "Official links",
-    "currentSecret": "Current secret: {{secret}}. Existing credentials are preserved if you do not enter a new value.",
+    "badge": "Ayarlar",
+    "title": "Pazar yeri entegrasyon ayarları",
+    "subtitle": "Her pazar yerini kendi gerektirdiği alanlarla yönetin. Trendyol/Hepsiburada daha sade, Amazon ise SP-API nedeniyle ayrı OAuth/AWS bilgileri ister.",
+    "loading": "Ayarlar yükleniyor...",
+    "saveButton": "Ayarları Kaydet",
+    "channelNotCreated": "Kanal oluşturulmadı",
+    "providerSettingsTitle": "{{provider}} ayarları",
+    "officialDocument": "Resmi doküman",
+    "requiredInfo": "Gerekli bilgiler",
+    "officialLinks": "Resmi bağlantılar",
+    "currentSecret": "Mevcut secret: {{secret}}. Yeni değer girmezseniz mevcut credential korunur.",
     "tabs": {
-      "connection": "Connection",
-      "credentials": "Credentials",
-      "operations": "Operations"
+      "connection": "Bağlantı",
+      "credentials": "Kimlik Bilgileri",
+      "operations": "Operasyonlar"
     },
     "flags": {
-      "product": "Product",
-      "price": "Price",
-      "stock": "Stock",
-      "order": "Order"
+      "product": "Ürün",
+      "price": "Fiyat",
+      "stock": "Stok",
+      "order": "Sipariş"
     },
     "fields": {
-      "channelCode": "Channel Code",
-      "channelName": "Channel Name",
-      "sellerNo": "Seller / Store No",
-      "apiBaseUrl": "API Base URL",
-      "authType": "Authentication",
-      "channelStatus": "Channel Status",
-      "notes": "Notes"
+      "channelCode": "Kanal Kodu",
+      "channelName": "Kanal Adı",
+      "sellerNo": "Satıcı / Mağaza No",
+      "apiBaseUrl": "API Adresi",
+      "authType": "Kimlik Doğrulama",
+      "channelStatus": "Kanal Durumu",
+      "notes": "Not"
     },
     "placeholders": {
-      "defaultApiBaseUrl": "Default is used if empty",
-      "notes": "Store, category or operation notes"
+      "defaultApiBaseUrl": "Boşsa varsayılan kullanılır",
+      "notes": "Mağaza, kategori veya operasyon notları"
     },
     "advancedJson": {
-      "title": "Advanced JSON mode",
-      "description": "Use this to paste the provider credential JSON exactly as documented.",
+      "title": "Gelişmiş JSON modu",
+      "description": "Provider dokümanındaki credential JSON’unu birebir yapıştırmak için kullanın.",
       "placeholder": "{\"apiKey\":\"...\",\"apiSecret\":\"...\"}"
     },
     "operations": {
       "product": {
-        "title": "Product create",
-        "description": "Publishes catalog products to the marketplace."
+        "title": "Ürün ekleme",
+        "description": "Katalog ürününü pazaryerine açar."
       },
       "price": {
-        "title": "Price update",
-        "description": "Sends the ERP/B2B price snapshot."
+        "title": "Fiyat güncelleme",
+        "description": "ERP/B2B fiyat snapshotını gönderir."
       },
       "stock": {
-        "title": "Stock update",
-        "description": "Sends sellable stock availability."
+        "title": "Stok güncelleme",
+        "description": "Satılabilir stok bilgisini aktarır."
       },
       "order": {
-        "title": "Order import",
-        "description": "Imports marketplace orders."
+        "title": "Sipariş çekme",
+        "description": "Pazaryeri siparişlerini içeri alır."
       }
     },
     "toasts": {
-      "saved": "Integration settings saved.",
-      "saveFailed": "Integration settings could not be saved.",
-      "connectionTestSuccess": "Connection test succeeded.",
-      "connectionTestFailed": "Connection test failed."
+      "saved": "Entegrasyon ayarları kaydedildi.",
+      "saveFailed": "Entegrasyon ayarları kaydedilemedi.",
+      "connectionTestSuccess": "Bağlantı testi başarılı.",
+      "connectionTestFailed": "Bağlantı testi başarısız oldu."
     },
     "errors": {
-      "providerNotFound": "Provider settings could not be found."
+      "providerNotFound": "Provider ayarı bulunamadı."
     },
     "guides": {
       "Trendyol": {
-        "title": "Where do I get Trendyol credentials?",
-        "summary": "Trendyol uses Basic Auth. Supplier ID, API Key and API Secret are used for product, price, stock and order services.",
+        "title": "Trendyol bilgileri nereden alınır?",
+        "summary": "Trendyol entegrasyonu Basic Auth ile çalışır. Ürün, fiyat, stok ve sipariş servislerinde Supplier ID ile API Key/API Secret birlikte kullanılır.",
         "required": [
           "Supplier ID",
           "API Key",
@@ -4197,16 +4197,16 @@
           "Keep the product, price, stock and order operations enabled as needed."
         ],
         "links": {
-          "authorization": "Authorization documentation",
-          "developer": "Trendyol Developer"
+          "authorization": "Yetkilendirme dokümanı",
+          "developer": "Trendyol Geliştirici"
         },
-        "setupSummary": "Supplier ID, API Key and API Secret are available in the Trendyol seller panel under Account Information > Integration Information. PROD/STAGE credentials may differ.",
+        "setupSummary": "Trendyol satıcı panelinde Hesap Bilgilerim > Entegrasyon Bilgileri alanından Supplier ID, API Key ve API Secret alınır. PROD/STAGE bilgileri ayrı olabilir.",
         "credentialHelp": {
-          "supplierId": "The supplier/seller number shown in Trendyol Integration Information.",
-          "apiKey": "Trendyol API key visible to the master/authorized user.",
-          "apiSecret": "Secret key used together with API Key for Basic Auth."
+          "supplierId": "Trendyol satıcı panelindeki Entegrasyon Bilgileri ekranında görünen tedarikçi/satıcı numarası.",
+          "apiKey": "Master kullanıcı ile görülebilen Trendyol API anahtarı.",
+          "apiSecret": "Basic Auth için API Key ile birlikte kullanılan gizli anahtar."
         },
-        "connectionModeHelp": "Trendyol uses Basic Auth in this integration; Supplier ID and API Key/API Secret must be filled together or authentication fails.",
+        "connectionModeHelp": "Trendyol için bu alanda Basic Auth kullanılır; Supplier ID ve API Key/API Secret birlikte girilmezse kimlik doğrulama tamamlanmaz.",
         "connectionChecklist": [
           "Get Supplier ID, API Key and API Secret from Trendyol seller integration settings.",
           "Separate production and sandbox environments to avoid URL and token confusion.",
@@ -4215,8 +4215,8 @@
         ]
       },
       "Hepsiburada": {
-        "title": "Where do I get Hepsiburada credentials?",
-        "summary": "Hepsiburada requires merchant/store information and API keys. Operations usually run with batch or transaction tracking.",
+        "title": "Hepsiburada bilgileri nereden alınır?",
+        "summary": "Hepsiburada tarafında merchant/mağaza bilgisi ve API anahtarları gerekir. İşlemler genelde batch/transaction takip mantığıyla ilerler.",
         "required": [
           "Merchant ID",
           "API Key or Client ID",
@@ -4231,14 +4231,14 @@
           "Enter Merchant ID in Seller / Store No and keys in the Credentials tab."
         ],
         "links": {
-          "gettingStarted": "Getting started",
-          "developer": "Hepsiburada Developer"
+          "gettingStarted": "Başlangıç dokümanı",
+          "developer": "Hepsiburada Geliştirici"
         },
-        "setupSummary": "Developer account, API keys and merchant/store information are prepared from the Hepsiburada developer/merchant panel. Integrator authorization is managed in the merchant panel.",
+        "setupSummary": "Hepsiburada developer/merchant panelinden geliştirici hesabı, API anahtarları ve mağaza/merchant bilgileri hazırlanır. Entegratör yetkilendirmesi merchant panelde yapılır.",
         "credentialHelp": {
-          "merchantId": "Unique merchant/store id from Hepsiburada merchant panel.",
-          "apiKey": "Client/API key from developer portal or authorized integrator account.",
-          "apiSecret": "Secret used for token generation or Basic/Auth flow."
+          "merchantId": "Hepsiburada merchant panelindeki mağaza/merchant unique id bilgisi.",
+          "apiKey": "Developer portal veya yetkilendirilmiş entegratör hesabındaki client/api key.",
+          "apiSecret": "Token almak veya Basic/Auth akışında kullanılan secret."
         },
         "connectionChecklist": [
           "Verify developer account and merchant panel access with required API scopes.",
@@ -4248,8 +4248,8 @@
         ]
       },
       "N11": {
-        "title": "Where do I get n11 credentials?",
-        "summary": "n11 REST API works with appKey/appSecret. Price and stock updates create a taskId; results are tracked by the sync job.",
+        "title": "n11 bilgileri nereden alınır?",
+        "summary": "n11 REST API appKey/appSecret ile çalışır. Fiyat ve stok güncellemeleri taskId üretir; sonuçlar job tarafından takip edilir.",
         "required": [
           "Seller ID",
           "App Key",
@@ -4262,19 +4262,19 @@
           "Track task results after price or stock updates."
         ],
         "links": {
-          "priceStock": "Price-stock update documentation",
-          "sellerSupport": "n11 seller support"
+          "priceStock": "Fiyat-stok güncelleme dokümanı",
+          "sellerSupport": "n11 mağaza destek"
         },
-        "setupSummary": "AppKey/appSecret values are obtained from the n11 seller panel. Price-stock updates create a taskId and the result is tracked by the Hangfire job.",
+        "setupSummary": "n11 satıcı panelinden appKey/appSecret bilgileri alınır. Fiyat-stok güncelleme taskId üretir; task sonucu Hangfire job tarafından takip edilir.",
         "credentialHelp": {
-          "sellerId": "n11 store/seller id. Used as the store identifier in channel mapping.",
-          "appKey": "Application key obtained from n11 seller panel for REST API access.",
-          "appSecret": "Secret key used together with appKey for n11 REST API access."
+          "sellerId": "n11 mağaza/satıcı kimliği. Kanal eşlemesinde mağaza kodu olarak kullanılır.",
+          "appKey": "n11 REST API erişimi için satıcı panelinden alınan uygulama anahtarı.",
+          "appSecret": "n11 REST API erişimi için appKey ile birlikte kullanılan gizli anahtar."
         }
       },
       "Pazarama": {
-        "title": "Where do I get Pazarama credentials?",
-        "summary": "Pazarama integration obtains a token with clientId/clientSecret. Product, price-stock and order services run in the seller channel context.",
+        "title": "Pazarama bilgileri nereden alınır?",
+        "summary": "Pazarama entegrasyonu clientId/clientSecret ile token alır. Ürün, fiyat-stok ve sipariş servisleri satıcı kanalına göre yürütülür.",
         "required": [
           "Seller ID",
           "Client ID",
@@ -4287,19 +4287,19 @@
           "Queue product, price and stock operations and track results from the job screen."
         ],
         "links": {
-          "apiPdf": "API integration documentation",
-          "sellerPanel": "Seller application"
+          "apiPdf": "API entegrasyon dokümanı",
+          "sellerPanel": "Satıcı başvuru"
         },
-        "setupSummary": "Pazarama integration obtains a token with clientId/clientSecret; product, price-stock and order operations run by seller channel.",
+        "setupSummary": "Pazarama entegrasyonu clientId/clientSecret ile token alır; ürün, fiyat-stok ve sipariş işlemleri satıcı kanalına göre yürütülür.",
         "credentialHelp": {
-          "sellerId": "Pazarama seller/store id. Used as store context in channel and token requests.",
-          "clientId": "Client id provided after Pazarama integration application.",
-          "clientSecret": "Secret key used in the Pazarama token flow."
+          "sellerId": "Pazarama satıcı/mağaza kimliği. Kanal ve token isteklerinde mağaza bağlamı için kullanılır.",
+          "clientId": "Pazarama entegrasyon başvurusu sonrası verilen client id.",
+          "clientSecret": "Pazarama token alma akışında kullanılan gizli anahtar."
         }
       },
       "PttAvm": {
-        "title": "Where do I get PTT AVM credentials?",
-        "summary": "PTT AVM catalog integration works with products/upsert. Product, price and stock submissions are tracked with trackingid.",
+        "title": "PTT AVM bilgileri nereden alınır?",
+        "summary": "PTT AVM katalog entegrasyonu products/upsert mantığıyla çalışır. Ürün, fiyat ve stok gönderimleri trackingid ile takip edilir.",
         "required": [
           "Seller ID",
           "API Key",
@@ -4312,20 +4312,20 @@
           "Track the trackingid result from the Hangfire monitoring screen after product, price or stock submission."
         ],
         "links": {
-          "productUpsert": "Product upsert documentation",
-          "developer": "PTT AVM Developer"
+          "productUpsert": "Ürün ekleme/güncelleme dokümanı",
+          "developer": "PTT AVM Geliştirici"
         },
-        "warning": "In the PTT AVM upsert flow, missing variants or missing fields can affect existing product data. Test catalog mapper fields before production.",
-        "setupSummary": "PTT AVM catalog integration works with products/upsert. Product, price and stock submissions are tracked with trackingid.",
+        "warning": "PTT AVM upsert akışında eksik varyant veya eksik alan gönderimi mevcut ürün verisini etkileyebilir. Bu yüzden katalog mapper alanları canlıya geçmeden önce test edilmelidir.",
+        "setupSummary": "PTT AVM katalog entegrasyonu products/upsert mantığıyla çalışır. Ürün, fiyat ve stok gönderimleri trackingid ile takip edilir.",
         "credentialHelp": {
-          "sellerId": "PTT AVM store/seller id.",
-          "apiKey": "API key obtained from the PTT AVM developer/integration panel.",
-          "token": "Access value used as Bearer token in PTT AVM API requests."
+          "sellerId": "PTT AVM mağaza/satıcı kimliği.",
+          "apiKey": "PTT AVM developer/entegrasyon panelinden alınan API anahtarı.",
+          "token": "PTT AVM API isteklerinde Bearer token olarak kullanılan erişim bilgisi."
         }
       },
       "Idefix": {
-        "title": "Where do I get İdefix credentials?",
-        "summary": "İdefix product integration works with vendorId, API key and secret. Product creation and stock/price submissions are tracked through batch results.",
+        "title": "İdefix bilgileri nereden alınır?",
+        "summary": "İdefix ürün entegrasyonu vendorId, API key ve secret ile çalışır. Ürün oluşturma ve stok/fiyat gönderimleri batch sonucu üzerinden takip edilir.",
         "required": [
           "Vendor ID",
           "API Key",
@@ -4338,19 +4338,19 @@
           "Track batch results after product creation and stock/price submissions."
         ],
         "links": {
-          "productIntegration": "Product integration",
-          "priceStock": "Stock and price submission"
+          "productIntegration": "Ürün entegrasyonu",
+          "priceStock": "Stok ve fiyat gönderimi"
         },
-        "setupSummary": "İdefix product integration works with vendorId, API key and secret. Product creation and stock/price submissions are tracked through batch results.",
+        "setupSummary": "İdefix ürün entegrasyonu vendorId, API key ve secret ile çalışır. Ürün oluşturma ve stok/fiyat gönderimleri batch sonucu üzerinden takip edilir.",
         "credentialHelp": {
-          "vendorId": "İdefix seller/vendor id. Used as path parameter in product and inventory endpoints.",
-          "apiKey": "API key obtained from the İdefix developer panel.",
-          "apiSecret": "Secret key used together with API Key for Basic/Auth flow."
+          "vendorId": "İdefix satıcı/vendor kimliği. Ürün ve envanter endpointlerinde path parametresi olarak kullanılır.",
+          "apiKey": "İdefix developer panelinden alınan API anahtarı.",
+          "apiSecret": "Basic/Auth akışında API Key ile birlikte kullanılan gizli anahtar."
         }
       },
       "Ciceksepeti": {
-        "title": "Where do I get Çiçeksepeti credentials?",
-        "summary": "Çiçeksepeti marketplace API credentials are obtained from the seller panel or integration team. Product, price, stock and order operations are managed with channel path settings.",
+        "title": "Çiçeksepeti bilgileri nereden alınır?",
+        "summary": "Çiçeksepeti pazaryeri API bilgileri satıcı paneli veya entegrasyon ekibinden alınır. Ürün, fiyat, stok ve sipariş operasyonları kanal path ayarlarıyla yönetilir.",
         "required": [
           "Seller ID",
           "API Key",
@@ -4363,20 +4363,20 @@
           "Track product, price and stock submission results from the job monitoring screen."
         ],
         "links": {
-          "sellerPanel": "Seller application",
+          "sellerPanel": "Satıcı başvuru",
           "integration": "Çiçeksepeti"
         },
-        "warning": "Çiçeksepeti public documentation is limited. Confirm live endpoint paths from the seller panel and update provider options before production.",
-        "setupSummary": "Çiçeksepeti marketplace API credentials are obtained from the seller panel or integration team. Product, price, stock and order operations are managed with provider path settings.",
+        "warning": "Çiçeksepeti public dokümanları sınırlı olduğu için canlı endpoint path bilgileri satıcı panelinden doğrulanmalı ve provider options ile güncellenmelidir.",
+        "setupSummary": "Çiçeksepeti pazaryeri API bilgileri satıcı paneli veya entegrasyon ekibinden alınır. Ürün, fiyat, stok ve sipariş operasyonları provider path ayarlarıyla yönetilir.",
         "credentialHelp": {
-          "sellerId": "Çiçeksepeti store/seller id.",
-          "apiKey": "API key obtained from Çiçeksepeti seller panel or integration team.",
-          "token": "Optional access value if the channel requires Bearer token."
+          "sellerId": "Çiçeksepeti mağaza/satıcı kimliği.",
+          "apiKey": "Çiçeksepeti satıcı paneli veya entegrasyon ekibinden alınan API anahtarı.",
+          "token": "Kanal Bearer token istiyorsa kullanılacak opsiyonel erişim bilgisi."
         }
       },
       "Ebay": {
-        "title": "Where do I get eBay credentials?",
-        "summary": "eBay Sell Inventory API publishes products through inventory item, offer and publish steps. Price and stock use the bulk update price quantity endpoint.",
+        "title": "eBay bilgileri nereden alınır?",
+        "summary": "eBay Sell Inventory API ürünleri inventory item, offer ve publish adımlarıyla yayınlar. Fiyat ve stok için bulk update price quantity endpointi kullanılır.",
         "required": [
           "Seller ID",
           "Marketplace ID",
@@ -4390,17 +4390,17 @@
           "Save Seller ID, Marketplace ID and Access Token on this screen."
         ],
         "links": {
-          "inventoryApi": "Sell Inventory API",
-          "bulkPriceQuantity": "Bulk price/quantity"
+          "inventoryApi": "Satış Envanteri API",
+          "bulkPriceQuantity": "Toplu fiyat/miktar"
         },
-        "warning": "eBay product publish requires category, merchant location key and listing policy values. The API rejects product creation when these values are missing.",
-        "setupSummary": "eBay Sell Inventory API publishes products through inventory item, offer and publish steps. Price and stock use the bulk update price quantity endpoint.",
+        "warning": "eBay ürün yayınında kategori, merchant location key ve listing policy bilgileri zorunludur. Bu değerler eksikse ürün açma API tarafından reddedilir.",
+        "setupSummary": "eBay Sell Inventory API ürünleri inventory item, offer ve publish adımlarıyla yayınlar. Fiyat ve stok için bulk update price quantity endpointi kullanılır.",
         "credentialHelp": {
-          "sellerId": "eBay seller account id.",
-          "marketplaceId": "eBay marketplace code for the target country. Examples: EBAY_US, EBAY_GB, EBAY_DE.",
-          "accessToken": "OAuth access token generated with Sell Inventory API scopes."
+          "sellerId": "eBay seller account kimliği.",
+          "marketplaceId": "Satış yapılacak eBay marketplace kodu. Örn. EBAY_US, EBAY_GB, EBAY_DE.",
+          "accessToken": "Sell Inventory API scope'larıyla üretilmiş OAuth access token."
         },
-        "connectionModeHelp": "Most eBay flows require an OAuth access token with Inventory scope; seller and marketplace context should be sent if the listing uses country-specific marketplaces.",
+        "connectionModeHelp": "eBay çoğu işlemde OAuth scope token’ı ile çalışır, gerekirse provider tarafına seller/marketplace bağlamı ayrı gönderilir.",
         "connectionChecklist": [
           "Complete OAuth token flow in eBay Developer Console for Inventory scope.",
           "Confirm marketplace and seller context for each publish request.",
@@ -4409,8 +4409,8 @@
         ]
       },
       "Shopify": {
-        "title": "Where do I get Shopify credentials?",
-        "summary": "Shopify Admin API works with product create, variant price update and inventory_levels/set stock update flows.",
+        "title": "Shopify bilgileri nereden alınır?",
+        "summary": "Shopify Admin API ürün oluşturma, varyant fiyatı ve inventory_levels/set stok güncelleme akışlarıyla çalışır.",
         "required": [
           "Shop Domain",
           "Admin Access Token",
@@ -4425,21 +4425,21 @@
           "Save Shop Domain, Admin Access Token, API Version and Location ID on this screen."
         ],
         "links": {
-          "adminApi": "Admin API",
-          "inventoryLevels": "Inventory levels"
+          "adminApi": "Yönetici API",
+          "inventoryLevels": "Envanter seviyeleri"
         },
-        "warning": "Shopify stock updates use inventory item id and location id, not variant id. This mapping is stored after product creation.",
-        "setupSummary": "Shopify Admin API works with product create, variant price update and inventory_levels/set stock update flows.",
+        "warning": "Shopify stok güncellemesi varyant id ile değil inventory item id ve location id ile çalışır. Ürün oluşturma sonrası bu eşleşme sistemde saklanır.",
+        "setupSummary": "Shopify Admin API ürün oluşturma, varyant fiyatı ve inventory_levels/set stok güncelleme akışlarıyla çalışır.",
         "credentialHelp": {
-          "shopDomain": "Shopify store domain. Example: store.myshopify.com.",
-          "accessToken": "Admin API access token with Products and Inventory permissions.",
-          "apiVersion": "Shopify Admin API version to use. Example: 2026-01.",
-          "locationId": "Shopify location id used for stock updates."
+          "shopDomain": "Shopify mağaza domaini. Örn. magaza.myshopify.com.",
+          "accessToken": "Products ve Inventory izinleri olan Admin API access token.",
+          "apiVersion": "Kullanılacak Shopify Admin API versiyonu. Örn. 2026-01.",
+          "locationId": "Stok güncellemesinde kullanılacak Shopify location id."
         }
       },
       "WooCommerce": {
-        "title": "Where do I get WooCommerce credentials?",
-        "summary": "WooCommerce REST API uses Consumer Key/Secret for product create, price update and stock update operations through the products endpoint.",
+        "title": "WooCommerce bilgileri nereden alınır?",
+        "summary": "WooCommerce REST API Consumer Key/Secret ile ürün oluşturma, fiyat ve stok güncelleme işlemleri products endpointi üzerinden yapılır.",
         "required": [
           "Store URL",
           "Consumer Key",
@@ -4454,20 +4454,20 @@
         ],
         "links": {
           "restApi": "REST API",
-          "authentication": "Authentication"
+          "authentication": "Kimlik doğrulama"
         },
-        "warning": "WooCommerce price and stock updates use product id. For variable products, store variation id mapping inside the listing id.",
-        "setupSummary": "WooCommerce REST API uses Consumer Key/Secret for product create, price update and stock update operations through the products endpoint.",
+        "warning": "WooCommerce fiyat ve stok güncellemesi ürün id üzerinden çalışır. Varyasyonlu ürünlerde listing id içine variation id eşleşmesi eklenmelidir.",
+        "setupSummary": "WooCommerce REST API Consumer Key/Secret ile ürün oluşturma, fiyat ve stok güncelleme işlemleri products endpointi üzerinden yapılır.",
         "credentialHelp": {
-          "storeUrl": "WooCommerce store base URL. Example: https://store.com.",
-          "consumerKey": "WooCommerce REST API Consumer Key.",
-          "consumerSecret": "WooCommerce REST API Consumer Secret.",
-          "apiVersion": "REST API version to use. Example: wc/v3."
+          "storeUrl": "WooCommerce mağaza ana adresi. Örn. https://magaza.com.",
+          "consumerKey": "WooCommerce REST API tüketici anahtarı.",
+          "consumerSecret": "WooCommerce REST API gizli anahtarı.",
+          "apiVersion": "Kullanılacak REST API versiyonu. Örn. wc/v3."
         }
       },
       "AdobeCommerce": {
-        "title": "Where do I get Adobe Commerce credentials?",
-        "summary": "Adobe Commerce/Magento REST API uses an access token for product create, price update and MSI source item stock sync.",
+        "title": "Adobe Commerce bilgileri nereden alınır?",
+        "summary": "Adobe Commerce/Magento REST API access token ile ürün oluşturma, fiyat güncelleme ve MSI source item stok aktarımı yapılır.",
         "required": [
           "Base URL",
           "Access Token",
@@ -4483,20 +4483,20 @@
         ],
         "links": {
           "restApi": "REST API",
-          "inventoryApi": "Inventory API"
+          "inventoryApi": "Envanter API"
         },
-        "warning": "Adobe Commerce stock update uses MSI source items. In multi-warehouse/source setups, sourceCode should be managed with ERP warehouse mapping.",
-        "setupSummary": "Adobe Commerce/Magento REST API uses an access token for product create, price update and MSI source item stock sync.",
+        "warning": "Adobe Commerce stok güncellemesi MSI source item yapısıyla çalışır. Çoklu depo/source kullanan firmalarda sourceCode ERP depo eşleşmesiyle yönetilmelidir.",
+        "setupSummary": "Adobe Commerce/Magento REST API access token ile ürün oluşturma, fiyat güncelleme ve MSI source item stok aktarımı yapılır.",
         "credentialHelp": {
-          "baseUrl": "Adobe Commerce/Magento store base URL. Example: https://store.com.",
-          "accessToken": "Bearer token obtained from Integration or admin token flow.",
-          "storeCode": "Store code used inside REST path. Example: default.",
-          "sourceCode": "MSI source code used for stock sync. Example: default."
+          "baseUrl": "Adobe Commerce/Magento mağaza ana adresi. Örn. https://magaza.com.",
+          "accessToken": "Integration veya admin token üzerinden alınan Bearer token.",
+          "storeCode": "REST path içinde kullanılacak store code. Örn. default.",
+          "sourceCode": "MSI stok aktarımında kullanılacak source code. Örn. default."
         }
       },
       "Amazon": {
-        "title": "Where do I get Amazon SP-API credentials?",
-        "summary": "Amazon is the most comprehensive flow. Seller Central developer profile, app registration, LWA OAuth and AWS SigV4 credentials are required together.",
+        "title": "Amazon SP-API bilgileri nereden alınır?",
+        "summary": "Amazon en kapsamlı akıştır. Seller Central developer profile, app registration, LWA OAuth ve AWS SigV4 bilgileri birlikte gerekir.",
         "required": [
           "Seller ID",
           "Marketplace ID",
@@ -4514,24 +4514,24 @@
           "Choose Marketplace ID and region according to the target country."
         ],
         "links": {
-          "registration": "SP-API registration",
-          "marketplaceIds": "Marketplace IDs",
-          "endpoints": "SP-API endpoints"
+          "registration": "SP-API kayıt süreci",
+          "marketplaceIds": "Pazar yeri kimlikleri",
+          "endpoints": "SP-API uç noktaları"
         },
-        "warning": "PROD/SANDBOX and marketplace region selection are critical for Amazon. Requests can fail even with a valid signature if region or marketplace ID is wrong.",
-        "setupSummary": "Amazon SP-API requires developer profile, app registration, Seller Central authorization, LWA refresh token and AWS SigV4 credentials together.",
+        "warning": "Amazon bilgilerinde PROD/SANDBOX ve marketplace region ayrımı kritik. Yanlış region veya marketplace ID ile imza doğru olsa bile istekler başarısız olur.",
+        "setupSummary": "Amazon SP-API için developer profile, uygulama kaydı, Seller Central authorization, LWA refresh token ve AWS SigV4 bilgileri birlikte gerekir.",
         "credentialHelp": {
-          "sellerId": "Merchant/seller identifier of the Seller Central account.",
-          "marketplaceId": "Amazon marketplace identifier for the target country; verify from Amazon Marketplace IDs documentation.",
-          "region": "SP-API endpoint region. Turkey/Europe typically uses the EU endpoint family.",
-          "lwaClientId": "Login with Amazon client id created after app registration.",
-          "lwaClientSecret": "LWA client secret; store securely.",
-          "refreshToken": "Long-lived refresh token received after seller authorization.",
-          "awsAccessKey": "IAM access key used for SP-API request signing.",
-          "awsSecretKey": "IAM secret key used for SP-API request signing.",
-          "roleArn": "Role ARN if IAM role based access is used."
+          "sellerId": "Seller Central hesabının merchant/seller kimliği.",
+          "marketplaceId": "Satış yapılan Amazon marketplace kimliği; Amazon dokümanındaki Marketplace IDs listesinden doğrulanır.",
+          "region": "SP-API endpoint bölgesi. Türkiye/Avrupa için genellikle EU endpoint ailesi kullanılır.",
+          "lwaClientId": "Amazon application registration sonrası oluşan Login with Amazon client id.",
+          "lwaClientSecret": "LWA client secret; güvenli saklanmalıdır.",
+          "refreshToken": "Seller authorization sonrası alınan uzun ömürlü refresh token.",
+          "awsAccessKey": "SP-API imzalama için IAM access key.",
+          "awsSecretKey": "SP-API imzalama için IAM secret key.",
+          "roleArn": "IAM role ile çalışılıyorsa kullanılacak role ARN."
         },
-        "connectionModeHelp": "Amazon SP-API requires LWA OAuth + AWS Signature Version 4 together. Seller ID and region must match the target marketplace before sending requests.",
+        "connectionModeHelp": "Amazon’da OAuth akışı (LWA) + AWS Signature v4 birlikte çalışır; Seller ID ve Region bilgisi olmadan istek reddedilir.",
         "connectionChecklist": [
           "Create SP-API application and get LWA client credentials in Seller Central.",
           "Complete seller authorization flow and obtain refresh token.",
@@ -4541,8 +4541,8 @@
         ]
       },
       "Etsy": {
-        "title": "Where do I get Etsy credentials?",
-        "summary": "Etsy Open API v3 uses OAuth. App registration provides keystring/shared secret and shop access is authorized through OAuth scopes.",
+        "title": "Etsy bilgileri nereden alınır?",
+        "summary": "Etsy Open API v3 OAuth tabanlıdır. App registration ile keystring/shared secret alınır, shop erişimi OAuth scopes ile yetkilendirilir.",
         "required": [
           "Shop ID",
           "Client ID / API keystring",
@@ -4557,151 +4557,151 @@
           "Save Shop ID and token values in this screen."
         ],
         "links": {
-          "openApi": "Etsy Open API documentation",
-          "oauth": "OAuth guide"
+          "openApi": "Etsy Open API dokümanı",
+          "oauth": "OAuth rehberi"
         },
-        "setupSummary": "Etsy app registration provides API keystring/shared secret; shop access is authorized through OAuth token scopes.",
+        "setupSummary": "Etsy app registration ile API keystring/shared secret alınır; shop erişimi OAuth token scopes üzerinden yetkilendirilir.",
         "credentialHelp": {
-          "shopId": "Etsy shop id to connect.",
-          "clientId": "Etsy app API key keystring.",
-          "clientSecret": "Etsy app shared secret.",
-          "refreshToken": "Refresh token received after OAuth authorization."
+          "shopId": "Bağlanacak Etsy shop kimliği.",
+          "clientId": "Etsy uygulama API anahtar dizisi.",
+          "clientSecret": "Etsy uygulama paylaşılan gizli anahtarı.",
+          "refreshToken": "OAuth yetkilendirme sonrası alınan refresh token."
         }
       }
     },
     "status": {
-      "active": "Active",
-      "passive": "Passive"
+      "active": "Aktif",
+      "passive": "Pasif"
     },
-    "connectionChecklist": "Connection readiness checklist",
-    "connectionModes": "Supported connection methods",
-    "lastConnection": "Last connection",
-    "requiredField": "Field {{index}}",
-    "defaultStep": "Step {{index}}",
-    "defaultWarning": "Production integration should be carefully validated because extra configuration requirements can be provider-specific.",
+    "connectionChecklist": "Bağlantı kontrol listesi",
+    "connectionModes": "Desteklenen bağlantı metodları",
+    "lastConnection": "Son bağlantı",
+    "requiredField": "Alan {{index}}",
+    "defaultStep": "Adım {{index}}",
+    "defaultWarning": "Ek ayar gereksinimleri nedeniyle üretim bağlantısı dikkatle doğrulanmalıdır.",
     "actions": {
-      "testConnection": "Test connection"
+      "testConnection": "Bağlantıyı Test Et"
     },
     "connectionStatus": {
-      "unknown": "Status unknown",
-      "not-tested": "Not tested yet",
-      "testing": "Testing",
-      "success": "Connection successful",
-      "failed": "Connection failed"
+      "unknown": "Durum bilinmiyor",
+      "not-tested": "Henüz test edilmedi",
+      "testing": "Test yapılıyor",
+      "success": "Bağlantı başarılı",
+      "failed": "Bağlantı başarısız"
     },
     "channels": "Canali",
     "searchProviders": "Cerca integrazione...",
     "noProvidersFound": "Nessuna integrazione corrisponde alla ricerca."
   },
   "marketplaceWorkbench": {
-    "badge": "Marketplace Operations",
-    "title": "Marketplace product operations",
-    "subtitle": "After integration is completed, view products by channel, update price/stock, or queue the same product for another marketplace.",
-    "configureIntegrations": "Go to Integration Settings",
+    "badge": "Operazioni marketplace",
+    "title": "Operazioni prodotti marketplace",
+    "subtitle": "Dopo l'integrazione, visualizza i prodotti per canale, aggiorna prezzo/stock o inserisci lo stesso prodotto in coda per un altro marketplace.",
+    "configureIntegrations": "Vai alle impostazioni di integrazione",
     "metrics": {
-      "products": "Matched Products",
-      "channels": "Active Channels",
-      "pending": "Pending Jobs",
-      "missingPrice": "Needs Review"
+      "products": "Prodotti associati",
+      "channels": "Canali attivi",
+      "pending": "Lavori in sospeso",
+      "missingPrice": "Richiede revisione"
     },
     "filters": {
-      "channel": "Channel",
-      "allChannels": "All channels",
-      "all": "All",
-      "published": "Published",
-      "pending": "Pending",
-      "failed": "Failed",
-      "needsAction": "Needs Action",
-      "searchPlaceholder": "Search SKU, product, channel or marketplace id",
-      "selectedChannel": "Showing products for {{channel}}",
-      "allChannelsHelp": "Products from all marketplace channels are listed."
+      "channel": "Canale",
+      "allChannels": "Tutti i canali",
+      "all": "Tutti",
+      "published": "Pubblicato",
+      "pending": "In sospeso",
+      "failed": "Fallito",
+      "needsAction": "Richiede azione",
+      "searchPlaceholder": "Cerca SKU, prodotto, canale o ID marketplace",
+      "selectedChannel": "Mostrando prodotti per {{channel}}",
+      "allChannelsHelp": "Sono elencati i prodotti di tutti i canali marketplace."
     },
     "flow": {
       "view": {
-        "title": "View products by channel",
-        "description": "Filter Amazon, Trendyol, Hepsiburada and Etsy mappings in one screen."
+        "title": "Visualizza prodotti per canale",
+        "description": "Filtra le mappe di Amazon, Trendyol, Hepsiburada ed Etsy in un'unica schermata."
       },
       "update": {
-        "title": "Send price and stock",
-        "description": "Queue a price or sellable stock update for the selected product."
+        "title": "Invia prezzo e stock",
+        "description": "Metti in coda l'aggiornamento di prezzo o stock vendibile per il prodotto selezionato."
       },
       "publish": {
-        "title": "Publish to another channel",
-        "description": "Queue an Amazon product for Trendyol or Hepsiburada publication."
+        "title": "Pubblica su un altro canale",
+        "description": "Inserisci in coda un prodotto Amazon per la pubblicazione su Trendyol o Hepsiburada."
       }
     },
     "card": {
       "sku": "SKU",
-      "barcode": "Barcode",
-      "lastPrice": "Last price",
-      "stock": "Last stock",
-      "marketplaceProductId": "Product ID",
-      "marketplaceListingId": "Listing ID"
+      "barcode": "Codice a barre",
+      "lastPrice": "Ultimo prezzo",
+      "stock": "Ultimo stock",
+      "marketplaceProductId": "ID prodotto",
+      "marketplaceListingId": "ID listing"
     },
     "actions": {
-      "title": "Quick action",
-      "updatePrice": "Update price",
-      "updateStock": "Update stock",
-      "publishSameChannel": "Send product to this channel",
-      "publishAnotherChannel": "Add to another channel",
-      "removeFromSale": "Remove from sale",
+      "title": "Azione rapida",
+      "updatePrice": "Aggiorna prezzo",
+      "updateStock": "Aggiorna stock",
+      "publishSameChannel": "Invia prodotto in questo canale",
+      "publishAnotherChannel": "Aggiungi a un altro canale",
+      "removeFromSale": "Rimuovi dalla vendita",
       "bulkUpdateStockPrice": "Aggiorna tutti i prezzi di questo stock"
     },
     "quick": {
-      "price": "Quick price",
-      "quantity": "Quick stock",
-      "currency": "Currency",
-      "queuePrice": "Queue price",
-      "queueStock": "Queue stock"
+      "price": "Prezzo rapido",
+      "quantity": "Stock rapido",
+      "currency": "Valuta",
+      "queuePrice": "Metti in coda prezzo",
+      "queueStock": "Metti in coda stock"
     },
     "events": {
-      "title": "Latest sync tracking",
-      "empty": "No sync activity yet."
+      "title": "Ultimo monitoraggio sync",
+      "empty": "Nessuna attività di sincronizzazione."
     },
     "empty": {
-      "title": "No marketplace products yet",
-      "description": "Complete integration settings and store channel first. Then map B2B catalog products to marketplace channels and manage product, price and stock operations here."
+      "title": "Nessun prodotto marketplace",
+      "description": "Completa prima le impostazioni di integrazione e il canale negozio. Poi mappa i prodotti del catalogo B2B sui canali marketplace e gestisci qui prodotto, prezzo e stock."
     },
     "dialog": {
       "price-update": {
-        "title": "Queue price update"
+        "title": "Metti in coda aggiornamento prezzo"
       },
       "stock-update": {
-        "title": "Queue stock update"
+        "title": "Metti in coda aggiornamento stock"
       },
       "product-create": {
-        "title": "Queue product publish"
+        "title": "Metti in coda pubblicazione prodotto"
       },
       "clone-to-channel": {
-        "title": "Add product to another channel"
+        "title": "Aggiungi prodotto a un altro canale"
       },
-      "price": "New price",
-      "quantity": "New stock",
-      "currency": "Currency",
-      "targetChannel": "Target channel",
-      "targetChannelPlaceholder": "Select target marketplace channel",
-      "productCreateHelp": "This queues a product publish job for the selected marketplace channel. The job sends it to the provider API when it runs.",
-      "queue": "Queue",
+      "price": "Nuovo prezzo",
+      "quantity": "Nuovo stock",
+      "currency": "Valuta",
+      "targetChannel": "Canale obiettivo",
+      "targetChannelPlaceholder": "Seleziona canale marketplace obiettivo",
+      "productCreateHelp": "Questa azione mette in coda la pubblicazione del prodotto per il canale marketplace selezionato. Il job viene inviato alle API del provider quando viene eseguito.",
+      "queue": "Metti in coda",
       "bulk-price-update": {
-        "title": "Accoda aggiornamento prezzo massivo per stock"
+        "title": "Accoda aggiornamento prezzi massivo per stock"
       },
-      "bulkPriceHelp": "Questa operazione accoda un aggiornamento prezzo per tutti i listing marketplace attivi collegati allo stesso stock ERP. I canali con test connessione fallito o aggiornamento prezzo disabilitato vengono saltati."
+      "bulkPriceHelp": "Questa azione mette in coda un aggiornamento prezzi per tutti i listing marketplace attivi collegati allo stesso stock ERP. Sono ignorati i canali con test connessione fallito o aggiornamento prezzo disattivato."
     },
     "toasts": {
-      "queued": "Operation queued.",
-      "queueFailed": "Operation could not be queued."
+      "queued": "Operazione messa in coda.",
+      "queueFailed": "Impossibile mettere in coda l'operazione."
     },
     "errors": {
-      "noAction": "No action selected.",
-      "providerMissing": "Marketplace provider could not be resolved.",
-      "targetChannelRequired": "Please select a target channel.",
-      "channelRequired": "A channel must be selected before queueing this operation.",
-      "connectionTestFailed": "Marketplace connection test failed. Please verify integration settings first.",
+      "noAction": "Nessuna azione selezionata.",
+      "providerMissing": "Impossibile risolvere il provider marketplace.",
+      "targetChannelRequired": "Seleziona un canale obiettivo.",
+      "channelRequired": "Per inserire questa operazione in coda devi prima scegliere un canale.",
+      "connectionTestFailed": "Il test di connessione marketplace non è riuscito. Verifica prima le impostazioni di integrazione.",
       "stockMissing": "Questo listing non è collegato a uno stock ERP.",
       "priceRequired": "Inserisci un prezzo valido."
     },
     "messages": {
-      "connectionBlocked": "Connection test failed for this channel. Run Test Connection first, then retry the operation."
+      "connectionBlocked": "Il test di connessione per questo canale non è riuscito. Esegui prima \"Test Connessione\" e poi ripeti l'operazione."
     }
   },
   "mailSettings": {
