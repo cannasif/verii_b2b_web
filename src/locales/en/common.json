@@ -2018,7 +2018,7 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} WMS. All rights reserved."
+    "copyright": "© {{year}} VERII B2B. All rights reserved."
   },
   "theme": {
     "toggle": "Toggle theme",
@@ -3980,26 +3980,26 @@
   },
   "routeError": {
     "title": "An unexpected error occurred",
-    "description": "The app may have moved to a newer version. Refresh the page and try again.",
+    "description": "The application may have been updated to a newer version. Refresh the page and try again.",
     "refresh": "Refresh page",
     "home": "Home"
   },
   "permissionGroups": {
     "permissionsPanel": {
-      "introTitle": "Bu grup hangi işlemleri yapabilir?",
-      "introBody": "Aşağıda bu grubun hangi modülleri görebileceğini, kayıt açabileceğini, güncelleyebileceğini veya silebileceğini seçersiniz. Bu gruba atanan tüm kullanıcılar aynı yetki setini alır.",
-      "selectionSummaryTitle": "Seçili CRUD özeti",
-      "selectionSummaryBody": "Bu özet, grubun şu an hangi işlem tiplerinde yetki aldığını hızlıca görmenizi sağlar.",
-      "searchPlaceholder": "Modül, işlem veya izin adı ara...",
-      "selectActionGroup": "Tüm {{action}} izinlerini seç"
+      "introTitle": "What actions can this group perform?",
+      "introBody": "Select which modules this group can view, create, update, or delete. All users assigned to this group inherit the same permission set.",
+      "selectionSummaryTitle": "Selected action summary",
+      "selectionSummaryBody": "This summary shows at a glance which action types this group currently has permission for.",
+      "searchPlaceholder": "Search module, action or permission...",
+      "selectActionGroup": "Select all {{action}} permissions"
     }
   },
   "userGroupAssignments": {
-    "noUserSelected": "Henüz kullanıcı seçilmedi",
-    "statusLabel": "Durum",
-    "statusPending": "Kaydedilmedi",
-    "statusCurrent": "Güncel",
-    "readOnlyInfo": "Bu ekrani goruntuleyebilirsiniz ancak grup atamalarini guncellemek icin update yetkisi gerekir."
+    "noUserSelected": "No user selected yet",
+    "statusLabel": "Status",
+    "statusPending": "Not saved",
+    "statusCurrent": "Current",
+    "readOnlyInfo": "You can view this screen, but updating group assignments requires update permission."
   },
   "paged": {
     "search": "Search",

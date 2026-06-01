@@ -1502,7 +1502,7 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} CRM. Alle Rechte vorbehalten."
+    "copyright": "© {{year}} VERII B2B. Alle Rechte vorbehalten."
   },
   "theme": {
     "toggle": "Design wechseln",
@@ -2580,10 +2580,10 @@
     "emptyTitle": "No data"
   },
   "routeError": {
-    "title": "An unexpected error occurred",
-    "description": "The app may have moved to a newer version. Refresh the page and try again.",
-    "refresh": "Refresh page",
-    "home": "Home"
+    "title": "Ein unerwarteter Fehler ist aufgetreten",
+    "description": "Die Anwendung wurde möglicherweise auf eine neuere Version aktualisiert. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.",
+    "refresh": "Seite neu laden",
+    "home": "Startseite"
   },
   "productionTransfer": {
     "detail": {
@@ -3530,20 +3530,20 @@
   },
   "permissionGroups": {
     "permissionsPanel": {
-      "introTitle": "Bu grup hangi işlemleri yapabilir?",
-      "introBody": "Aşağıda bu grubun hangi modülleri görebileceğini, kayıt açabileceğini, güncelleyebileceğini veya silebileceğini seçersiniz. Bu gruba atanan tüm kullanıcılar aynı yetki setini alır.",
-      "selectionSummaryTitle": "Seçili CRUD özeti",
-      "selectionSummaryBody": "Bu özet, grubun şu an hangi işlem tiplerinde yetki aldığını hızlıca görmenizi sağlar.",
-      "searchPlaceholder": "Modül, işlem veya izin adı ara...",
-      "selectActionGroup": "Tüm {{action}} izinlerini seç"
+      "introTitle": "Welche Aktionen kann diese Gruppe ausführen?",
+      "introBody": "Wählen Sie hier aus, welche Module diese Gruppe sehen, erstellen, aktualisieren oder löschen kann. Alle dieser Gruppe zugewiesenen Benutzer erhalten denselben Berechtigungssatz.",
+      "selectionSummaryTitle": "Ausgewählte Aktionen",
+      "selectionSummaryBody": "Diese Übersicht zeigt auf einen Blick, für welche Aktionstypen die Gruppe derzeit Berechtigungen hat.",
+      "searchPlaceholder": "Modul, Aktion oder Berechtigung suchen...",
+      "selectActionGroup": "Alle {{action}}-Berechtigungen auswählen"
     }
   },
   "userGroupAssignments": {
-    "noUserSelected": "Henüz kullanıcı seçilmedi",
-    "statusLabel": "Durum",
-    "statusPending": "Kaydedilmedi",
-    "statusCurrent": "Güncel",
-    "readOnlyInfo": "Bu ekrani goruntuleyebilirsiniz ancak grup atamalarini guncellemek icin update yetkisi gerekir."
+    "noUserSelected": "Noch kein Benutzer ausgewählt",
+    "statusLabel": "Status",
+    "statusPending": "Nicht gespeichert",
+    "statusCurrent": "Aktuell",
+    "readOnlyInfo": "Sie können diesen Bildschirm anzeigen, aber für die Aktualisierung von Gruppen-Zuweisungen ist eine Update-Berechtigung erforderlich."
   },
   "barcodeFormat": "Aktives Barcode-Format: {{format}}",
   "paged": {

@@ -1502,7 +1502,7 @@
     }
   },
   "footer": {
-    "copyright": "© {{year}} WMS. جميع الحقوق محفوظة."
+    "copyright": "© {{year}} VERII B2B. جميع الحقوق محفوظة."
   },
   "theme": {
     "toggle": "تبديل المظهر",
@@ -2580,10 +2580,10 @@
     "emptyTitle": "No data"
   },
   "routeError": {
-    "title": "An unexpected error occurred",
-    "description": "The app may have moved to a newer version. Refresh the page and try again.",
-    "refresh": "Refresh page",
-    "home": "Home"
+    "title": "حدث خطأ غير متوقع",
+    "description": "قد يكون التطبيق قد تم تحديثه إلى إصدار أحدث. يرجى تحديث الصفحة والمحاولة مرة أخرى.",
+    "refresh": "تحديث الصفحة",
+    "home": "الرئيسية"
   },
   "productionTransfer": {
     "detail": {
@@ -3530,20 +3530,20 @@
   },
   "permissionGroups": {
     "permissionsPanel": {
-      "introTitle": "Bu grup hangi işlemleri yapabilir?",
-      "introBody": "Aşağıda bu grubun hangi modülleri görebileceğini, kayıt açabileceğini, güncelleyebileceğini veya silebileceğini seçersiniz. Bu gruba atanan tüm kullanıcılar aynı yetki setini alır.",
-      "selectionSummaryTitle": "Seçili CRUD özeti",
-      "selectionSummaryBody": "Bu özet, grubun şu an hangi işlem tiplerinde yetki aldığını hızlıca görmenizi sağlar.",
-      "searchPlaceholder": "Modül, işlem veya izin adı ara...",
-      "selectActionGroup": "Tüm {{action}} izinlerini seç"
+      "introTitle": "ما الأذونات التي يمكن لهذه المجموعة تنفيذها؟",
+      "introBody": "اختر الوحدات التي يمكن لهذه المجموعة عرضها أو إنشائها أو تحديثها أو حذفها. جميع المستخدمين المعيّنين إلى هذه المجموعة يحصلون على نفس مجموعة الأذونات.",
+      "selectionSummaryTitle": "ملخص الإجراءات المحددة",
+      "selectionSummaryBody": "يوضح هذا الملخص بسرعة أنواع الإجراءات التي تمتلكها المجموعة حالياً.",
+      "searchPlaceholder": "ابحث عن وحدة أو إجراء أو إذن...",
+      "selectActionGroup": "تحديد جميع أذونات {{action}}"
     }
   },
   "userGroupAssignments": {
-    "noUserSelected": "Henüz kullanıcı seçilmedi",
-    "statusLabel": "Durum",
-    "statusPending": "Kaydedilmedi",
-    "statusCurrent": "Güncel",
-    "readOnlyInfo": "Bu ekrani goruntuleyebilirsiniz ancak grup atamalarini guncellemek icin update yetkisi gerekir."
+    "noUserSelected": "لم يتم اختيار أي مستخدم بعد",
+    "statusLabel": "الحالة",
+    "statusPending": "غير محفوظ",
+    "statusCurrent": "حالي",
+    "readOnlyInfo": "يمكنك عرض هذه الشاشة، لكن تحديث تعيينات المجموعات يتطلب صلاحية التحديث."
   },
   "barcodeFormat": "تنسيق الباركود النشط: {{format}}",
   "paged": {
