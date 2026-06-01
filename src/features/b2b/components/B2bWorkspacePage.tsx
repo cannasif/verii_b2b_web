@@ -1,12 +1,13 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, Box, CheckCircle2, Clock3, FileText, GitBranchPlus, Image as ImageIcon, Info, Layers, PackageSearch, RefreshCw, ShoppingCart, Tag, TriangleAlert } from 'lucide-react';
+import { ArrowDown, ArrowUp, Box, CheckCircle2, Clock3, Copy, FileText, GitBranchPlus, Image as ImageIcon, Info, Layers, Link2, Mail, PackageSearch, RefreshCw, ShoppingCart, Tag, TriangleAlert } from 'lucide-react';
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { DataTableActionBar, DetailPageShell, FormPageShell, PagedDataGrid, PagedLookupDialog, type PagedDataGridColumn } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -78,6 +79,15 @@ type WorkspaceRow =
   | B2bIntegrationEventDto;
 
 type WorkspaceColumnKey = 'primary' | 'secondary' | 'scope' | 'status' | 'amount' | 'date';
+
+type PaymentLinkDraft = {
+  paymentOrder: PaymentOrderDto;
+  providerKey: string;
+  customerEmail: string;
+  shareChannel: string;
+  expiresAt: string;
+  regenerateToken: boolean;
+};
 type B2bLookupKind = 'company' | 'buyer' | 'customer' | 'user' | 'stock' | 'catalogProduct' | 'warehouse' | 'order' | 'paymentTransaction' | 'marketplaceChannel';
 
 interface WorkspaceTableConfig {
@@ -775,6 +785,17 @@ function formatDate(value?: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '-';
   return date.toLocaleString('tr-TR');
+}
+
+function defaultPaymentLinkExpiry(): string {
+  const date = new Date();
+  date.setDate(date.getDate() + 7);
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+  return date.toISOString().slice(0, 16);
+}
+
+function canGeneratePaymentLink(paymentOrder: PaymentOrderDto): boolean {
+  return !['Completed', 'Cancelled'].includes(paymentOrder.status) && (paymentOrder.remainingAmount || paymentOrder.amount) > 0;
 }
 
 function formatNumber(value?: number): string {
@@ -1481,6 +1502,7 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
   const [portalSummary, setPortalSummary] = useState<CustomerPortalSummaryDto | null>(null);
   const [customerLookupTarget, setCustomerLookupTarget] = useState<'quick' | 'portal' | null>(null);
   const [selectedCatalogIds, setSelectedCatalogIds] = useState<number[]>([]);
+  const [paymentLinkDraft, setPaymentLinkDraft] = useState<PaymentLinkDraft | null>(null);
   const { userId, columnOrder, visibleColumns, orderedVisibleColumns, setColumnOrder, setVisibleColumns } = useColumnPreferences({
     pageKey: tableConfig.pageKey,
     columns: tableConfig.columns.map(({ key, label }) => ({ key, label })),
@@ -1541,6 +1563,23 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
     } finally {
       setIsActionBusy(false);
     }
+  }
+
+  async function createPaymentLinkFromDraft() {
+    if (!paymentLinkDraft) return;
+    const result = await b2bApi.generatePaymentOrderLink(paymentLinkDraft.paymentOrder.id, {
+      portalBaseUrl: window.location.origin,
+      providerKey: paymentLinkDraft.providerKey,
+      customerEmail: paymentLinkDraft.customerEmail || undefined,
+      shareChannel: paymentLinkDraft.shareChannel,
+      expiresAt: new Date(paymentLinkDraft.expiresAt).toISOString(),
+      regenerateToken: paymentLinkDraft.regenerateToken,
+    });
+    if (result.paymentLinkUrl && navigator.clipboard) {
+      await navigator.clipboard.writeText(result.paymentLinkUrl);
+    }
+    setPaymentLinkDraft(null);
+    return `${result.paymentOrderNumber} ödeme linki hazırlandı${result.paymentLinkUrl ? ' ve kopyalandı' : ''}.`;
   }
 
   return (
@@ -2133,24 +2172,21 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
                       type="button"
                       size="sm"
                       variant="ghost"
-                      disabled={isActionBusy}
+                      disabled={isActionBusy || !canGeneratePaymentLink(paymentOrder)}
                       onClick={(event) => {
                         event.stopPropagation();
-                        void runAction(async () => {
-                          const result = await b2bApi.generatePaymentOrderLink(paymentOrder.id, {
-                            portalBaseUrl: window.location.origin,
-                            providerKey: paymentOrder.providerKey || 'PAYTR',
-                            customerEmail: paymentOrder.paymentLinkCustomerEmail,
-                            shareChannel: 'COPY',
-                          });
-                          if (result.paymentLinkUrl && navigator.clipboard) {
-                            await navigator.clipboard.writeText(result.paymentLinkUrl);
-                          }
-                          return `${result.paymentOrderNumber} ödeme linki hazırlandı${result.paymentLinkUrl ? ' ve kopyalandı' : ''}.`;
+                        setPaymentLinkDraft({
+                          paymentOrder,
+                          providerKey: paymentOrder.paymentLinkProvider || paymentOrder.providerKey || 'PORTAL',
+                          customerEmail: paymentOrder.paymentLinkCustomerEmail || '',
+                          shareChannel: paymentOrder.paymentLinkShareChannel || 'COPY',
+                          expiresAt: paymentOrder.paymentLinkExpiresAt ? paymentOrder.paymentLinkExpiresAt.slice(0, 16) : defaultPaymentLinkExpiry(),
+                          regenerateToken: false,
                         });
                       }}
                     >
-                      Link Oluştur
+                      <Link2 className="mr-2 h-4 w-4" />
+                      Link Hazırla
                     </Button>
                   </div>
                 );
@@ -2200,6 +2236,131 @@ export function B2bWorkspacePage({ kind }: { kind: B2bWorkspaceKind }): ReactEle
           ) : null}
         </CardContent>
       </Card>
+
+      <Dialog open={Boolean(paymentLinkDraft)} onOpenChange={(open) => !open && setPaymentLinkDraft(null)}>
+        <DialogContent className="sm:max-w-[560px]">
+          <DialogHeader>
+            <DialogTitle>Ödeme linki hazırla</DialogTitle>
+            <DialogDescription>
+              Link oluşturulmadan önce tahsilat bilgilerini kontrol edin. Oluşturulan link müşterinin ödeme portalını açar ve otomatik panoya kopyalanır.
+            </DialogDescription>
+          </DialogHeader>
+
+          {paymentLinkDraft ? (
+            <form
+              className="space-y-5"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void runAction(async () => (await createPaymentLinkFromDraft()) ?? 'Ödeme linki hazırlandı.');
+              }}
+            >
+              <div className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm dark:border-white/10 dark:bg-white/5">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-semibold text-slate-600 dark:text-slate-300">Ödeme emri</span>
+                  <span className="font-mono font-bold text-slate-950 dark:text-white">{paymentLinkDraft.paymentOrder.paymentOrderNumber}</span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-semibold text-slate-600 dark:text-slate-300">Kalan tutar</span>
+                  <span className="font-bold text-slate-950 dark:text-white">
+                    {formatMoney(paymentLinkDraft.paymentOrder.remainingAmount || paymentLinkDraft.paymentOrder.amount, paymentLinkDraft.paymentOrder.currencyCode)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-semibold text-slate-600 dark:text-slate-300">Durum</span>
+                  {renderStatusBadge(paymentLinkDraft.paymentOrder.status)}
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="space-y-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  Sağlayıcı
+                  <Select
+                    value={paymentLinkDraft.providerKey}
+                    onValueChange={(value) => setPaymentLinkDraft((current) => current ? { ...current, providerKey: value } : current)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PORTAL">Portal</SelectItem>
+                      <SelectItem value="PAYTR">PayTR</SelectItem>
+                      <SelectItem value="IYZICO">iyzico</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </label>
+
+                <label className="space-y-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  Paylaşım kanalı
+                  <Select
+                    value={paymentLinkDraft.shareChannel}
+                    onValueChange={(value) => setPaymentLinkDraft((current) => current ? { ...current, shareChannel: value } : current)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="COPY">Kopyala</SelectItem>
+                      <SelectItem value="EMAIL">E-posta</SelectItem>
+                      <SelectItem value="SMS">SMS</SelectItem>
+                      <SelectItem value="WHATSAPP">WhatsApp</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </label>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="space-y-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  Müşteri e-postası
+                  <Input
+                    type="email"
+                    value={paymentLinkDraft.customerEmail}
+                    onChange={(event) => setPaymentLinkDraft((current) => current ? { ...current, customerEmail: event.target.value } : current)}
+                    placeholder="musteri@firma.com"
+                  />
+                </label>
+
+                <label className="space-y-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  Geçerlilik tarihi
+                  <Input
+                    type="datetime-local"
+                    value={paymentLinkDraft.expiresAt}
+                    min={new Date(Date.now() + 10 * 60 * 1000).toISOString().slice(0, 16)}
+                    onChange={(event) => setPaymentLinkDraft((current) => current ? { ...current, expiresAt: event.target.value } : current)}
+                    required
+                  />
+                </label>
+              </div>
+
+              <label className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 p-3 text-sm font-semibold text-slate-700 dark:border-white/10 dark:text-slate-200">
+                <span>Yeni güvenli token üret</span>
+                <Switch
+                  checked={paymentLinkDraft.regenerateToken}
+                  onCheckedChange={(checked) => setPaymentLinkDraft((current) => current ? { ...current, regenerateToken: checked } : current)}
+                />
+              </label>
+
+              {paymentLinkDraft.paymentOrder.paymentLinkUrl ? (
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold text-emerald-900 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200">
+                  Bu ödeme emrinde aktif link var. Token yenilemezseniz aynı linkin süresi ve paylaşım bilgisi güncellenir.
+                </div>
+              ) : null}
+
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button type="button" variant="outline" onClick={() => setPaymentLinkDraft(null)}>
+                  Vazgeç
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isActionBusy || (paymentLinkDraft.shareChannel === 'EMAIL' && !paymentLinkDraft.customerEmail.trim())}
+                >
+                  {paymentLinkDraft.shareChannel === 'EMAIL' ? <Mail className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+                  Link Oluştur
+                </Button>
+              </DialogFooter>
+            </form>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -533,11 +533,12 @@ export interface PaymentOrderDto {
 }
 
 export interface GeneratePaymentOrderLinkDto {
-  portalBaseUrl?: string;
+  portalBaseUrl: string;
   providerKey?: string;
   customerEmail?: string;
   shareChannel?: string;
   expiresAt?: string;
+  regenerateToken?: boolean;
 }
 
 export interface PaymentInstallmentDto {
