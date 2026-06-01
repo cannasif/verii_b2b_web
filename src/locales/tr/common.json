@@ -498,8 +498,8 @@
   },
   "welcome": {
     "title": "Hoş geldiniz",
-    "subtitle": "Depo yönetim sistemine giriş yaptınız. Devam etmek için panele gidin.",
-    "goToDashboard": "Panele git"
+    "subtitle": "B2B portalına giriş yaptınız. Devam etmek için panele gidin.",
+    "goToDashboard": "Panele Git"
   },
   "dashboard": {
     "title": "Dashboard",

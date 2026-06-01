@@ -498,7 +498,7 @@
   },
   "welcome": {
     "title": "Welcome",
-    "subtitle": "You have signed in to the warehouse management system. Go to the dashboard to continue.",
+    "subtitle": "You have signed in to the B2B portal. Go to the dashboard to continue.",
     "goToDashboard": "Go to dashboard"
   },
   "dashboard": {

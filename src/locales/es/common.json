@@ -437,7 +437,7 @@
   },
   "welcome": {
     "title": "Bienvenido",
-    "subtitle": "Ha iniciado sesión en el sistema de gestión de almacén. Vaya al panel para continuar.",
+    "subtitle": "Has iniciado sesión en el portal B2B. Ve al panel para continuar.",
     "goToDashboard": "Ir al Panel"
   },
   "dashboard": {

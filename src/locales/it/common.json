@@ -437,7 +437,7 @@
   },
   "welcome": {
     "title": "Benvenuto",
-    "subtitle": "Hai effettuato l'accesso al sistema di gestione del magazzino. Vai al pannello per continuare.",
+    "subtitle": "Hai effettuato l'accesso al portale B2B. Vai al pannello per continuare.",
     "goToDashboard": "Vai al Pannello"
   },
   "dashboard": {

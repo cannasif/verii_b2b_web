@@ -437,7 +437,7 @@
   },
   "welcome": {
     "title": "Bienvenue",
-    "subtitle": "Vous êtes connecté au système de gestion d'entrepôt. Accédez au tableau de bord pour continuer.",
+    "subtitle": "Vous êtes connecté au portail B2B. Accédez au tableau de bord pour continuer.",
     "goToDashboard": "Aller au tableau de bord"
   },
   "dashboard": {

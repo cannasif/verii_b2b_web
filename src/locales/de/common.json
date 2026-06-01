@@ -437,7 +437,7 @@
   },
   "welcome": {
     "title": "Willkommen",
-    "subtitle": "Sie sind im Lagerverwaltungssystem angemeldet. Gehen Sie zum Dashboard, um fortzufahren.",
+    "subtitle": "Sie sind im B2B-Portal angemeldet. Gehen Sie zum Dashboard, um fortzufahren.",
     "goToDashboard": "Zum Dashboard"
   },
   "dashboard": {
