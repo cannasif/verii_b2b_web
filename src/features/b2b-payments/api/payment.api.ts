@@ -4,6 +4,7 @@ import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
 import type {
   CreateIyzico3dsPaymentDto,
   CreatePaymentOrderDto,
+  CreatePartialPaymentAllocationDto,
   CreatePaymentProviderOperationDto,
   CreatePaytrIframeTokenDto,
   GeneratePaymentOrderLinkDto,
@@ -13,6 +14,7 @@ import type {
   PaymentInstallmentOptionsDto,
   PaymentInstallmentOptionsRequestDto,
   PaymentMethodOptionDto,
+  PaymentErpPostingDto,
   PaymentOrderDto,
   PaymentProviderReadinessDto,
   PaymentProviderOperationDto,
@@ -172,6 +174,32 @@ export const paymentApi = {
 
   async executePaymentProviderOperation(operationId: number): Promise<PaymentProviderOperationDto> {
     const response = await api.post<ApiResponse<PaymentProviderOperationDto>>(`/api/b2b/payments/operations/${operationId}/execute`, {});
+    return extractData(response);
+  },
+
+  async applyPartialCollection(paymentOrderId: number, payload: CreatePartialPaymentAllocationDto): Promise<PaymentOrderDto> {
+    const response = await api.post<ApiResponse<PaymentOrderDto>>(
+      `/api/b2b/payments/orders/${paymentOrderId}/partial-collections`,
+      payload,
+    );
+    return extractData(response);
+  },
+
+  async getPaymentErpPostings(params: PagedParams = {}): Promise<PagedResponse<PaymentErpPostingDto>> {
+    const response = await api.post<ApiResponse<PagedResponse<PaymentErpPostingDto>>>(
+      '/api/b2b/payments/erp-postings/paged',
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
+    );
+    return normalizePaged(response);
+  },
+
+  async executePaymentErpPosting(postingId: number): Promise<PaymentErpPostingDto> {
+    const response = await api.post<ApiResponse<PaymentErpPostingDto>>(`/api/b2b/payments/erp-postings/${postingId}/execute`, {});
+    return extractData(response);
+  },
+
+  async executePendingPaymentErpPostings(retryFailedOnly = false): Promise<number> {
+    const response = await api.post<ApiResponse<number>>('/api/b2b/payments/erp-postings/execute-pending', { retryFailedOnly });
     return extractData(response);
   },
 };

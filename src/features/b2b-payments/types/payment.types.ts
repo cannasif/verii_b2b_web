@@ -276,6 +276,53 @@ export interface PaymentProviderOperationDto {
   processedDate?: string;
 }
 
+export interface PaymentErpPostingDto {
+  id: number;
+  paymentOrderId: number;
+  paymentTransactionId?: number;
+  paymentInstallmentId?: number;
+  customerId: number;
+  providerKey: string;
+  postingMode: string;
+  status: string;
+  amount: number;
+  currencyCode: string;
+  erpCustomerCode?: string;
+  externalReference?: string;
+  idempotencyKey?: string;
+  errorMessage?: string;
+  attemptCount: number;
+  requestedDate: string;
+  lastAttemptDate?: string;
+  postedDate?: string;
+  nextRetryDate?: string;
+  notes?: string;
+}
+
+export interface QueuePaymentErpPostingDto {
+  paymentOrderId: number;
+  paymentTransactionId?: number;
+  paymentInstallmentId?: number;
+  amount: number;
+  currencyCode: string;
+  postingMode?: string;
+  idempotencyKey?: string;
+  notes?: string;
+}
+
+export interface CreatePartialPaymentAllocationDto {
+  paymentTransactionId?: number;
+  paymentInstallmentId?: number;
+  amount: number;
+  currencyCode: string;
+  providerKey: string;
+  paymentMethod: string;
+  collectionDate?: string;
+  queueErpPosting: boolean;
+  externalReference?: string;
+  notes?: string;
+}
+
 export interface CreatePaymentProviderOperationDto {
   paymentTransactionId: number;
   paymentInstallmentId?: number;
