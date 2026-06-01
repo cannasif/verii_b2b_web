@@ -264,6 +264,21 @@ const paymentInstallmentOptions = [
   { label: '12 taksit', value: '12' },
 ];
 
+const paymentProviderOptions = [
+  { label: 'PayTR', value: 'PAYTR' },
+  { label: 'iyzico', value: 'IYZICO' },
+  { label: 'Açık Hesap', value: 'ACCOUNT' },
+];
+
+function getPaymentInstallmentOptions(providerKey: string | boolean | undefined): Array<{ label: string; value: string }> {
+  const normalizedProvider = typeof providerKey === 'string' ? providerKey.toUpperCase() : 'PAYTR';
+  if (normalizedProvider === 'ACCOUNT') return paymentInstallmentOptions.filter((option) => option.value === '1');
+  if (normalizedProvider === 'IYZICO') {
+    return paymentInstallmentOptions.filter((option) => ['1', '2', '3', '6', '9', '12'].includes(option.value));
+  }
+  return paymentInstallmentOptions;
+}
+
 type B2bFormConfig = {
   fields: B2bFormField[];
   defaults: Record<string, string | boolean>;
@@ -625,11 +640,11 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
       { name: 'amount', label: 'Tahsilat Tutarı', type: 'number', required: true },
       { name: 'currencyCode', label: 'Para Birimi', type: 'currency', required: true },
       { name: 'orderId', label: 'Sipariş Referansı', type: 'lookup', lookupKind: 'order', helpText: 'Zorunlu değildir; tahsilat doğrudan cariye açılır.' },
-      { name: 'providerKey', label: 'Sağlayıcı', type: 'select', options: [{ label: 'PayTR', value: 'PAYTR' }, { label: 'iyzico', value: 'IYZICO' }, { label: 'Açık Hesap', value: 'ACCOUNT' }] },
+      { name: 'providerKey', label: 'Sağlayıcı', type: 'select', options: paymentProviderOptions },
       { name: 'paymentMethod', label: 'Ödeme Yöntemi' },
       { name: 'paymentTermDays', label: 'Vade Günü', type: 'number' },
       { name: 'dueDate', label: 'Son Ödeme Tarihi', type: 'date' },
-      { name: 'installmentCount', label: 'Taksit Sayısı', type: 'select', required: true, options: paymentInstallmentOptions, helpText: 'PayTR en fazla 12 taksit destekler; iyzico taksitleri kart/BIN sonucuna göre netleşir.' },
+      { name: 'installmentCount', label: 'Taksit Sayısı', type: 'select', required: true, options: paymentInstallmentOptions, helpText: 'Seçenekler sağlayıcıya göre filtrelenir; açık hesapta yalnızca tek çekim kullanılabilir.' },
       { name: 'notes', label: 'Not', type: 'textarea', colSpan: 'full' },
     ],
     transform: (values) => ({
@@ -2470,7 +2485,18 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
 
   function updateValue(name: string, value: string | boolean): void {
     setFormError(null);
-    setValues((current) => ({ ...current, [name]: value }));
+    setValues((current) => {
+      if (kind === 'payments' && name === 'providerKey') {
+        const installmentOptions = getPaymentInstallmentOptions(value);
+        const currentInstallment = String(current.installmentCount || '1');
+        return {
+          ...current,
+          [name]: value,
+          installmentCount: installmentOptions.some((option) => option.value === currentInstallment) ? currentInstallment : '1',
+        };
+      }
+      return { ...current, [name]: value };
+    });
   }
 
   function setLookupValue(name: string, value: number | string, label: string, extraValues?: Record<string, string | boolean>): void {
@@ -2744,6 +2770,9 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
       );
     }
     if (field.type === 'select') {
+      const options = kind === 'payments' && field.name === 'installmentCount'
+        ? getPaymentInstallmentOptions(values.providerKey)
+        : field.options ?? [];
       return (
         <label key={field.name} htmlFor={fieldId} className={wrapperClass}>
           <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
@@ -2754,7 +2783,7 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
               <SelectValue placeholder={`${field.label} seç`} />
             </SelectTrigger>
             <SelectContent>
-              {(field.options ?? []).map((option) => (
+              {options.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
