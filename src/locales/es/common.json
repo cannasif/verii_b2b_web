@@ -4112,72 +4112,75 @@
     }
   },
   "marketplaceSettings": {
-    "badge": "Ayarlar",
-    "title": "Pazar yeri entegrasyon ayarları",
-    "subtitle": "Her pazar yerini kendi gerektirdiği alanlarla yönetin. Trendyol/Hepsiburada daha sade, Amazon ise SP-API nedeniyle ayrı OAuth/AWS bilgileri ister.",
-    "loading": "Ayarlar yükleniyor...",
-    "saveButton": "Ayarları Kaydet",
-    "channelNotCreated": "Kanal oluşturulmadı",
-    "providerSettingsTitle": "{{provider}} ayarları",
-    "officialDocument": "Resmi doküman",
-    "requiredInfo": "Gerekli bilgiler",
-    "officialLinks": "Resmi bağlantılar",
-    "currentSecret": "Mevcut secret: {{secret}}. Yeni değer girmezseniz mevcut credential korunur.",
+    "badge": "Configuración",
+    "title": "Configuración de integración de marketplace",
+    "subtitle": "Gestione cada marketplace con los campos que requiere. Trendyol y Hepsiburada son más simples, mientras que Amazon SP-API requiere credenciales OAuth y AWS separadas.",
+    "loading": "Cargando configuración...",
+    "saveButton": "Guardar configuración",
+    "channelNotCreated": "Canal no creado",
+    "providerSettingsTitle": "Ajustes de {{provider}}",
+    "officialDocument": "Documentación oficial",
+    "requiredInfo": "Información requerida",
+    "connectionChecklist": "Lista de verificación de conexión",
+    "connectionModes": "Métodos de conexión soportados",
+    "officialLinks": "Enlaces oficiales",
+    "lastConnection": "Última conexión",
+    "currentSecret": "Secreto actual: {{secret}}. Si no introduces un nuevo valor, la credencial existente se conserva.",
     "tabs": {
-      "connection": "Bağlantı",
-      "credentials": "Kimlik Bilgileri",
-      "operations": "Operasyonlar"
+      "connection": "Conexión",
+      "credentials": "Credenciales",
+      "operations": "Operaciones"
     },
     "flags": {
-      "product": "Ürün",
-      "price": "Fiyat",
-      "stock": "Stok",
-      "order": "Sipariş"
+      "product": "Producto",
+      "price": "Precio",
+      "stock": "Stock",
+      "order": "Pedido"
     },
     "fields": {
-      "channelCode": "Kanal Kodu",
-      "channelName": "Kanal Adı",
-      "sellerNo": "Satıcı / Mağaza No",
-      "apiBaseUrl": "API Adresi",
-      "authType": "Kimlik Doğrulama",
-      "channelStatus": "Kanal Durumu",
-      "notes": "Not"
+      "channelCode": "Código de canal",
+      "channelName": "Nombre de canal",
+      "sellerNo": "Vendedor / Tienda N°",
+      "apiBaseUrl": "URL base de API",
+      "authType": "Autenticación",
+      "channelStatus": "Estado del canal",
+      "notes": "Notas"
     },
     "placeholders": {
-      "defaultApiBaseUrl": "Boşsa varsayılan kullanılır",
-      "notes": "Mağaza, kategori veya operasyon notları"
+      "defaultApiBaseUrl": "Si queda vacío, se usará el valor predeterminado",
+      "notes": "Notas de tienda, categoría o operación"
     },
     "advancedJson": {
-      "title": "Gelişmiş JSON modu",
-      "description": "Provider dokümanındaki credential JSON’unu birebir yapıştırmak için kullanın.",
+      "title": "Modo JSON avanzado",
+      "description": "Úsalo para pegar exactamente el JSON de credenciales tal como aparece en la documentación del proveedor.",
       "placeholder": "{\"apiKey\":\"...\",\"apiSecret\":\"...\"}"
     },
     "operations": {
       "product": {
-        "title": "Ürün ekleme",
-        "description": "Katalog ürününü pazaryerine açar."
+        "title": "Añadir producto",
+        "description": "Publica productos del catálogo en el marketplace."
       },
       "price": {
-        "title": "Fiyat güncelleme",
-        "description": "ERP/B2B fiyat snapshotını gönderir."
+        "title": "Actualizar precio",
+        "description": "Envía la instantánea de precio ERP/B2B."
       },
       "stock": {
-        "title": "Stok güncelleme",
-        "description": "Satılabilir stok bilgisini aktarır."
+        "title": "Actualizar stock",
+        "description": "Transfiere el stock vendible disponible."
       },
       "order": {
-        "title": "Sipariş çekme",
-        "description": "Pazaryeri siparişlerini içeri alır."
+        "title": "Importar pedidos",
+        "description": "Importa los pedidos del marketplace."
       }
     },
     "toasts": {
-      "saved": "Entegrasyon ayarları kaydedildi.",
-      "saveFailed": "Entegrasyon ayarları kaydedilemedi.",
-      "connectionTestSuccess": "Bağlantı testi başarılı.",
-      "connectionTestFailed": "Bağlantı testi başarısız oldu."
+      "saved": "La configuración de integración se guardó.",
+      "saveFailed": "No se pudo guardar la configuración de integración.",
+      "connectionTestSuccess": "La prueba de conexión fue exitosa.",
+      "connectionTestFailed": "La prueba de conexión falló."
     },
     "errors": {
-      "providerNotFound": "Provider ayarı bulunamadı."
+      "providerNotFound": "No se encontró la configuración del proveedor."
     },
     "guides": {
       "Trendyol": {
@@ -4574,20 +4577,20 @@
       "passive": "Pasif"
     },
     "connectionChecklist": "Bağlantı kontrol listesi",
-    "connectionModes": "Desteklenen bağlantı metodları",
-    "lastConnection": "Son bağlantı",
-    "requiredField": "Alan {{index}}",
-    "defaultStep": "Adım {{index}}",
-    "defaultWarning": "Ek ayar gereksinimleri nedeniyle üretim bağlantısı dikkatle doğrulanmalıdır.",
+    "connectionModes": "Métodos de conexión soportados",
+    "lastConnection": "Última conexión",
+    "requiredField": "Campo {{index}}",
+    "defaultStep": "Paso {{index}}",
+    "defaultWarning": "Las conexiones productivas deben validarse cuidadosamente porque algunos requisitos adicionales pueden ser específicos del proveedor.",
     "actions": {
-      "testConnection": "Bağlantıyı Test Et"
+      "testConnection": "Probar conexión"
     },
     "connectionStatus": {
-      "unknown": "Durum bilinmiyor",
-      "not-tested": "Henüz test edilmedi",
-      "testing": "Test yapılıyor",
-      "success": "Bağlantı başarılı",
-      "failed": "Bağlantı başarısız"
+      "unknown": "Estado desconocido",
+      "not-tested": "Aún no probado",
+      "testing": "Probando",
+      "success": "Conexión correcta",
+      "failed": "Conexión fallida"
     },
     "channels": "Canales",
     "searchProviders": "Buscar integración...",

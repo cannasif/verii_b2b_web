@@ -4564,7 +4564,8 @@
         "credentialHelp": {
           "shopId": "Etsy Shop ID des Verkäuferkontos.",
           "clientId": "Etsy App Client ID oder Keystring.",
-          "clientSecret": "Etsy App Shared Secret."
+          "clientSecret": "Etsy App Shared Secret.",
+          "refreshToken": "Durch die Verkäuferautorisierung erzeugter OAuth Refresh Token."
         }
       }
     },
