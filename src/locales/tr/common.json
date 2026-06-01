@@ -196,9 +196,9 @@
   },
   "auth": {
     "login": {
-      "title": "STOK & SEVKİYAT YÖNETİMİ",
-      "subtitle": "VERII WMS",
-      "slogan": "\"ENVANTERİNİ ARAYAN DEĞİL, <brand>v3rii</brand>'YLE YÖNETEN OLUN.\"",
+      "title": "B2B SATICI PORTALI",
+      "subtitle": "VERII B2B",
+      "slogan": "\"STOK, STOK FİYATI VE SİPARİŞLERİNİZİ <brand>v3rii</brand> B2B ile tek panelden yönetin.\"",
       "branch": "Şube",
       "selectBranch": "Şube seçiniz",
       "branchNotFound": "Şube bulunamadı",
