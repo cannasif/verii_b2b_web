@@ -22,8 +22,6 @@ export {
   B2bMarketplaceChannelsPage,
   B2bMarketplaceEventsPage,
   B2bOrdersPage,
-  B2bPaymentOperationsPage,
-  B2bPaymentsPage,
   B2bPricingPage,
   B2bProductMatchesPage,
   B2bQuotesPage,

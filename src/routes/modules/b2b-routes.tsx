@@ -12,8 +12,8 @@ const B2bShoppingListsPage = lazyNamed(() => import('@/features/b2b'), 'B2bShopp
 const B2bApprovalRulesPage = lazyNamed(() => import('@/features/b2b'), 'B2bApprovalRulesPage');
 const B2bQuotesPage = lazyNamed(() => import('@/features/b2b'), 'B2bQuotesPage');
 const B2bOrdersPage = lazyNamed(() => import('@/features/b2b'), 'B2bOrdersPage');
-const B2bPaymentsPage = lazyNamed(() => import('@/features/b2b'), 'B2bPaymentsPage');
-const B2bPaymentOperationsPage = lazyNamed(() => import('@/features/b2b'), 'B2bPaymentOperationsPage');
+const B2bPaymentsPage = lazyNamed(() => import('@/features/b2b-payments'), 'B2bPaymentsPage');
+const B2bPaymentOperationsPage = lazyNamed(() => import('@/features/b2b-payments'), 'B2bPaymentOperationsPage');
 const B2bMarketplaceChannelsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceChannelsPage');
 const B2bMarketplaceListingsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceListingsPage');
 const B2bMarketplaceEventsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceEventsPage');
