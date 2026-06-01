@@ -14,6 +14,7 @@ import type {
   PaymentInstallmentOptionsRequestDto,
   PaymentMethodOptionDto,
   PaymentOrderDto,
+  PaymentProviderReadinessDto,
   PaymentProviderOperationDto,
   PaymentTransactionDto,
   PaytrIframeTokenDto,
@@ -130,6 +131,11 @@ export const paymentApi = {
       payload,
       portalToken ? portalRequestConfig(portalToken) : undefined,
     );
+    return extractData(response);
+  },
+
+  async getProviderReadiness(): Promise<PaymentProviderReadinessDto[]> {
+    const response = await api.get<ApiResponse<PaymentProviderReadinessDto[]>>('/api/b2b/payments/providers/readiness');
     return extractData(response);
   },
 

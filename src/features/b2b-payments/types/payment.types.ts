@@ -102,6 +102,26 @@ export interface PaymentInstallmentOptionDto {
   isAvailable: boolean;
 }
 
+export interface PaymentProviderReadinessDto {
+  providerKey: string;
+  displayName: string;
+  isConfigured: boolean;
+  hasCredentials: boolean;
+  hasCallbackUrl: boolean;
+  hasRequiredEndpoints: boolean;
+  supportsBinLookup: boolean;
+  supportsInstallments: boolean;
+  supportsHostedPayment: boolean;
+  supports3ds: boolean;
+  supportsRefund: boolean;
+  supportsCancel: boolean;
+  maxInstallmentCount: number;
+  environment: string;
+  documentationUrl: string;
+  missingItems: string[];
+  nextActions: string[];
+}
+
 export interface PaymentOrderDto {
   id: number;
   paymentOrderNumber: string;

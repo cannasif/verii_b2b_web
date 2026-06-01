@@ -1,6 +1,6 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Banknote, CheckCircle2, CreditCard, Landmark, RefreshCw, Settings2, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, Banknote, CheckCircle2, CreditCard, ExternalLink, Landmark, RefreshCw, Settings2, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { Badge } from '@/components/ui/badge';
@@ -12,8 +12,10 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useUIStore } from '@/stores/ui-store';
+import { paymentApi } from '../api/payment.api';
 import { paymentSettingsApi } from '../api/payment-settings.api';
 import type { PaymentSettingDto, UpsertPaymentSettingDto } from '../types/payment-settings.types';
+import type { PaymentProviderReadinessDto } from '../types/payment.types';
 
 type PaymentSettingFormState = UpsertPaymentSettingDto;
 
@@ -84,6 +86,11 @@ export function B2bPaymentSettingsPage(): ReactElement {
     queryFn: paymentSettingsApi.get,
   });
 
+  const readinessQuery = useQuery({
+    queryKey: ['b2b-payment-provider-readiness'],
+    queryFn: paymentApi.getProviderReadiness,
+  });
+
   const settings = useMemo(() => {
     const data = settingsQuery.data ?? [];
     return [...data].sort((a, b) => {
@@ -94,6 +101,10 @@ export function B2bPaymentSettingsPage(): ReactElement {
   }, [settingsQuery.data]);
 
   const selectedSetting = settings.find((item) => item.providerKey === selectedProvider) ?? settings[0];
+  const readinessByProvider = useMemo(() => {
+    return new Map((readinessQuery.data ?? []).map((item) => [item.providerKey, item]));
+  }, [readinessQuery.data]);
+  const selectedReadiness = readinessByProvider.get(selectedProvider);
 
   useEffect(() => {
     setPageTitle('Ödeme Ayarları');
@@ -199,6 +210,21 @@ export function B2bPaymentSettingsPage(): ReactElement {
                   </span>
                   {setting.lastConnectionSuccessful ? <CheckCircle2 className="size-4 text-emerald-500" /> : null}
                 </div>
+                {readinessByProvider.has(setting.providerKey) ? (
+                  <div className="mt-3 flex items-center gap-2 text-xs font-bold">
+                    {readinessByProvider.get(setting.providerKey)?.isConfigured ? (
+                      <>
+                        <CheckCircle2 className="size-4 text-emerald-500" />
+                        Entegrasyon hazır
+                      </>
+                    ) : (
+                      <>
+                        <AlertTriangle className="size-4 text-amber-500" />
+                        Kurulum eksik
+                      </>
+                    )}
+                  </div>
+                ) : null}
               </button>
             ))}
           </CardContent>
@@ -296,6 +322,8 @@ export function B2bPaymentSettingsPage(): ReactElement {
         </Card>
       </div>
 
+      {selectedReadiness ? <ProviderReadinessPanel readiness={selectedReadiness} /> : null}
+
       <Card className="border-emerald-200/80 bg-emerald-50/70 shadow-sm dark:border-emerald-400/20 dark:bg-emerald-500/10">
         <CardContent className="flex gap-3 p-4 text-sm text-emerald-950 dark:text-emerald-50">
           <ShieldCheck className="mt-0.5 size-5 shrink-0" />
@@ -304,6 +332,86 @@ export function B2bPaymentSettingsPage(): ReactElement {
           </p>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function ProviderReadinessPanel({ readiness }: { readiness: PaymentProviderReadinessDto }): ReactElement {
+  const capabilities = [
+    readiness.supportsHostedPayment ? 'Hosted ödeme formu' : null,
+    readiness.supports3ds ? '3DS doğrulama' : null,
+    readiness.supportsBinLookup ? 'BIN sorgusu' : null,
+    readiness.supportsInstallments ? 'Taksit sorgusu' : null,
+    readiness.supportsRefund ? 'İade' : null,
+    readiness.supportsCancel ? 'İptal' : null,
+  ].filter(Boolean);
+
+  return (
+    <Card className={`${readiness.isConfigured ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-400/20 dark:bg-emerald-500/10' : 'border-amber-200 bg-amber-50/70 dark:border-amber-400/20 dark:bg-amber-500/10'} shadow-sm`}>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex flex-col gap-3 text-base sm:flex-row sm:items-center sm:justify-between">
+          <span className="flex items-center gap-2">
+            {readiness.isConfigured ? <CheckCircle2 className="size-5 text-emerald-500" /> : <AlertTriangle className="size-5 text-amber-500" />}
+            {readiness.displayName} Entegrasyon Hazırlığı
+          </span>
+          <a
+            href={readiness.documentationUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-sm font-bold text-cyan-700 hover:text-cyan-900 dark:text-cyan-200"
+          >
+            Resmi doküman
+            <ExternalLink className="size-4" />
+          </a>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+        <div className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-3">
+            <ReadinessPill label="Credential" active={readiness.hasCredentials} />
+            <ReadinessPill label="Callback" active={readiness.hasCallbackUrl} />
+            <ReadinessPill label="Endpoint" active={readiness.hasRequiredEndpoints} />
+          </div>
+          <div className="rounded-2xl border border-white/60 bg-white/70 p-4 text-sm dark:border-white/10 dark:bg-slate-950/40">
+            <p className="font-bold text-slate-900 dark:text-white">Desteklenen Akışlar</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {capabilities.map((capability) => (
+                <Badge key={capability} variant="secondary">{capability}</Badge>
+              ))}
+              <Badge variant="outline">Maks. {readiness.maxInstallmentCount} taksit</Badge>
+              <Badge variant="outline">{readiness.environment}</Badge>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <div className="rounded-2xl border border-white/60 bg-white/70 p-4 text-sm dark:border-white/10 dark:bg-slate-950/40">
+            <p className="font-bold text-slate-900 dark:text-white">Eksik Alanlar</p>
+            {readiness.missingItems.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {readiness.missingItems.map((item) => <Badge key={item} variant="destructive">{item}</Badge>)}
+              </div>
+            ) : (
+              <p className="mt-2 font-medium text-emerald-700 dark:text-emerald-200">Zorunlu kurulum alanları tamam.</p>
+            )}
+          </div>
+          <div className="rounded-2xl border border-white/60 bg-white/70 p-4 text-sm dark:border-white/10 dark:bg-slate-950/40">
+            <p className="font-bold text-slate-900 dark:text-white">Sonraki Doğru Test</p>
+            <ul className="mt-2 space-y-2">
+              {readiness.nextActions.map((action) => (
+                <li key={action} className="font-medium text-slate-600 dark:text-slate-300">{action}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ReadinessPill({ label, active }: { label: string; active: boolean }): ReactElement {
+  return (
+    <div className={`rounded-2xl border px-3 py-2 text-sm font-bold ${active ? 'border-emerald-200 bg-emerald-100 text-emerald-900 dark:border-emerald-400/30 dark:bg-emerald-500/15 dark:text-emerald-100' : 'border-amber-200 bg-amber-100 text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/15 dark:text-amber-100'}`}>
+      {active ? 'Hazır' : 'Eksik'} · {label}
     </div>
   );
 }
