@@ -2,6 +2,7 @@ import { api } from '@/lib/axios';
 import { buildPagedRequest } from '@/lib/paged';
 import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
 import type { UserDto } from '@/features/auth/types/auth';
+import { paymentApi } from '@/features/b2b-payments/api/payment.api';
 import type {
   B2bIntegrationEventDto,
   B2bInsightSummaryDto,
@@ -28,23 +29,6 @@ import type {
   MarketplaceProviderSettingDto,
   MarketplaceSyncEventDto,
   OrderDto,
-  PaymentTransactionDto,
-  PaymentBinLookupDto,
-  PaymentBinLookupRequestDto,
-  PaymentInstallmentOptionsDto,
-  PaymentInstallmentOptionsRequestDto,
-  PaymentOrderDto,
-  CreatePaymentOrderDto,
-  GeneratePaymentOrderLinkDto,
-  PaymentMethodOptionDto,
-  CreateIyzico3dsPaymentDto,
-  Iyzico3dsInitializeDto,
-  CreatePaymentProviderOperationDto,
-  PaymentProviderOperationDto,
-  ResolvePaymentMethodsDto,
-  SelectPaymentProviderInstallmentDto,
-  CreatePaytrIframeTokenDto,
-  PaytrIframeTokenDto,
   PurchaseApprovalRuleDto,
   QuickOrderDto,
   QuickOrderResultDto,
@@ -385,123 +369,21 @@ export const b2bApi = {
     return extractData(response);
   },
 
-  async getPayments(params: PagedParams = {}): Promise<PagedResponse<PaymentTransactionDto>> {
-    const response = await api.post<ApiResponse<PagedResponse<PaymentTransactionDto>>>(
-      '/api/b2b/payments/paged',
-      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
-    );
-    return normalizePaged(response);
-  },
-
-  async getPaymentOrders(params: PagedParams = {}): Promise<PagedResponse<PaymentOrderDto>> {
-    const response = await api.post<ApiResponse<PagedResponse<PaymentOrderDto>>>(
-      '/api/b2b/payments/orders/paged',
-      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
-    );
-    return normalizePaged(response);
-  },
-
-  async getPaymentOrderByLinkToken(token: string): Promise<PaymentOrderDto> {
-    const response = await api.get<ApiResponse<PaymentOrderDto>>(
-      `/api/b2b/payments/orders/link/${encodeURIComponent(token)}`,
-      publicRequestConfig,
-    );
-    return extractData(response);
-  },
-
-  async createPaymentOrder(payload: CreatePaymentOrderDto, portalToken?: string): Promise<PaymentOrderDto> {
-    const response = await api.post<ApiResponse<PaymentOrderDto>>(
-      '/api/b2b/payments/orders',
-      payload,
-      portalToken ? portalRequestConfig(portalToken) : undefined,
-    );
-    return extractData(response);
-  },
-
-  async generatePaymentOrderLink(paymentOrderId: number, payload: GeneratePaymentOrderLinkDto): Promise<PaymentOrderDto> {
-    const response = await api.post<ApiResponse<PaymentOrderDto>>(
-      `/api/b2b/payments/orders/${paymentOrderId}/payment-link`,
-      payload,
-    );
-    return extractData(response);
-  },
-
-  async selectPaymentProviderInstallment(paymentOrderId: number, payload: SelectPaymentProviderInstallmentDto, portalToken?: string): Promise<PaymentOrderDto> {
-    const response = await api.put<ApiResponse<PaymentOrderDto>>(
-      `/api/b2b/payments/orders/${paymentOrderId}/provider-installment`,
-      payload,
-      portalToken ? portalRequestConfig(portalToken) : undefined,
-    );
-    return extractData(response);
-  },
-
-  async resolvePaymentMethods(payload: ResolvePaymentMethodsDto, portalToken?: string): Promise<PaymentMethodOptionDto[]> {
-    const response = await api.post<ApiResponse<PaymentMethodOptionDto[]>>(
-      '/api/b2b/payments/methods/resolve',
-      payload,
-      portalToken ? portalRequestConfig(portalToken) : undefined,
-    );
-    return extractData(response);
-  },
-
-  async createPayment(payload: Record<string, unknown>): Promise<PaymentTransactionDto> {
-    const response = await api.post<ApiResponse<PaymentTransactionDto>>('/api/b2b/payments', payload);
-    return extractData(response);
-  },
-
-  async lookupPaymentBin(payload: PaymentBinLookupRequestDto, portalToken?: string): Promise<PaymentBinLookupDto> {
-    const response = await api.post<ApiResponse<PaymentBinLookupDto>>(
-      '/api/b2b/payments/providers/bin-lookup',
-      payload,
-      portalToken ? portalRequestConfig(portalToken) : undefined,
-    );
-    return extractData(response);
-  },
-
-  async getPaymentInstallmentOptions(payload: PaymentInstallmentOptionsRequestDto, portalToken?: string): Promise<PaymentInstallmentOptionsDto> {
-    const response = await api.post<ApiResponse<PaymentInstallmentOptionsDto>>(
-      '/api/b2b/payments/providers/installments',
-      payload,
-      portalToken ? portalRequestConfig(portalToken) : undefined,
-    );
-    return extractData(response);
-  },
-
-  async createPaytrIframeToken(payload: CreatePaytrIframeTokenDto, portalToken?: string): Promise<PaytrIframeTokenDto> {
-    const response = await api.post<ApiResponse<PaytrIframeTokenDto>>(
-      '/api/b2b/payments/paytr/iframe-token',
-      payload,
-      portalToken ? portalRequestConfig(portalToken) : undefined,
-    );
-    return extractData(response);
-  },
-
-  async createIyzico3dsPayment(payload: CreateIyzico3dsPaymentDto, portalToken?: string): Promise<Iyzico3dsInitializeDto> {
-    const response = await api.post<ApiResponse<Iyzico3dsInitializeDto>>(
-      '/api/b2b/payments/iyzico/3ds/initialize',
-      payload,
-      portalToken ? portalRequestConfig(portalToken) : undefined,
-    );
-    return extractData(response);
-  },
-
-  async getPaymentProviderOperations(params: PagedParams = {}): Promise<PagedResponse<PaymentProviderOperationDto>> {
-    const response = await api.post<ApiResponse<PagedResponse<PaymentProviderOperationDto>>>(
-      '/api/b2b/payments/operations/paged',
-      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'Id', sortDirection: 'desc' }),
-    );
-    return normalizePaged(response);
-  },
-
-  async createPaymentProviderOperation(payload: CreatePaymentProviderOperationDto): Promise<PaymentProviderOperationDto> {
-    const response = await api.post<ApiResponse<PaymentProviderOperationDto>>('/api/b2b/payments/operations', payload);
-    return extractData(response);
-  },
-
-  async executePaymentProviderOperation(operationId: number): Promise<PaymentProviderOperationDto> {
-    const response = await api.post<ApiResponse<PaymentProviderOperationDto>>(`/api/b2b/payments/operations/${operationId}/execute`, {});
-    return extractData(response);
-  },
+  getPayments: paymentApi.getPayments,
+  getPaymentOrders: paymentApi.getPaymentOrders,
+  getPaymentOrderByLinkToken: paymentApi.getPaymentOrderByLinkToken,
+  createPaymentOrder: paymentApi.createPaymentOrder,
+  generatePaymentOrderLink: paymentApi.generatePaymentOrderLink,
+  selectPaymentProviderInstallment: paymentApi.selectPaymentProviderInstallment,
+  resolvePaymentMethods: paymentApi.resolvePaymentMethods,
+  createPayment: paymentApi.createPayment,
+  lookupPaymentBin: paymentApi.lookupPaymentBin,
+  getPaymentInstallmentOptions: paymentApi.getPaymentInstallmentOptions,
+  createPaytrIframeToken: paymentApi.createPaytrIframeToken,
+  createIyzico3dsPayment: paymentApi.createIyzico3dsPayment,
+  getPaymentProviderOperations: paymentApi.getPaymentProviderOperations,
+  createPaymentProviderOperation: paymentApi.createPaymentProviderOperation,
+  executePaymentProviderOperation: paymentApi.executePaymentProviderOperation,
 
   async getIntegrationEvents(params: PagedParams = {}): Promise<PagedResponse<B2bIntegrationEventDto>> {
     const response = await api.post<ApiResponse<PagedResponse<B2bIntegrationEventDto>>>(
