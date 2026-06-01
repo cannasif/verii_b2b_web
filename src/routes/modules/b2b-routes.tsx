@@ -14,6 +14,8 @@ const B2bQuotesPage = lazyNamed(() => import('@/features/b2b'), 'B2bQuotesPage')
 const B2bOrdersPage = lazyNamed(() => import('@/features/b2b'), 'B2bOrdersPage');
 const B2bPaymentsPage = lazyNamed(() => import('@/features/b2b-payments'), 'B2bPaymentsPage');
 const B2bPaymentOperationsPage = lazyNamed(() => import('@/features/b2b-payments'), 'B2bPaymentOperationsPage');
+const B2bPaymentCreatePage = lazyNamed(() => import('@/features/b2b-payments'), 'B2bPaymentCreatePage');
+const B2bPaymentOperationCreatePage = lazyNamed(() => import('@/features/b2b-payments'), 'B2bPaymentOperationCreatePage');
 const B2bMarketplaceChannelsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceChannelsPage');
 const B2bMarketplaceListingsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceListingsPage');
 const B2bMarketplaceEventsPage = lazyNamed(() => import('@/features/b2b'), 'B2bMarketplaceEventsPage');
@@ -42,7 +44,9 @@ export const b2bChildRoutes: RouteObject[] = [
       { path: 'quotes', element: withRoute(B2bQuotesPage, { routeName: 'b2b-quotes' }) },
       { path: 'orders', element: withRoute(B2bOrdersPage, { routeName: 'b2b-orders' }) },
       { path: 'payments', element: withRoute(B2bPaymentsPage, { routeName: 'b2b-payments' }) },
+      { path: 'payments/create', element: withRoute(B2bPaymentCreatePage, { routeName: 'b2b-payment-create' }) },
       { path: 'payment-operations', element: withRoute(B2bPaymentOperationsPage, { routeName: 'b2b-payment-operations' }) },
+      { path: 'payment-operations/create', element: withRoute(B2bPaymentOperationCreatePage, { routeName: 'b2b-payment-operation-create' }) },
       { path: 'marketplace-channels', element: withRoute(B2bMarketplaceChannelsPage, { routeName: 'b2b-marketplace-channels' }) },
       { path: 'marketplace-listings', element: withRoute(B2bMarketplaceListingsPage, { routeName: 'b2b-marketplace-listings' }) },
       { path: 'marketplace-events', element: withRoute(B2bMarketplaceEventsPage, { routeName: 'b2b-marketplace-events' }) },
