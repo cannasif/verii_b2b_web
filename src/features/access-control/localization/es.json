@@ -21,11 +21,11 @@
       "systemAdminNote": "Si el usuario tiene un grupo de administrador del sistema, los permisos detallados se omiten."
     },
     "wmsScopePolicy": {
-      "code": "Policy code is the stable key used by backend enforcement and support flows.",
-      "name": "Operational display name that explains why the policy exists.",
-      "entityType": "Determines which document or workflow type this policy applies to.",
-      "scopeType": "Defines whether access is unrestricted, branch-based, warehouse-based, or assigned-only.",
-      "description": "Optional internal note used for support and audit context."
+      "code": "El código de política es la clave estable usada por la validación del backend y los flujos de soporte.",
+      "name": "Nombre visible operativo que explica por qué existe esta política.",
+      "entityType": "Determina a qué tipo de documento o flujo de trabajo se aplica esta política.",
+      "scopeType": "Define si el acceso es sin restricciones, por sucursal, por almacén o solo asignado.",
+      "description": "Nota interna opcional usada para soporte y contexto de auditoría."
     }
   },
   "permissionDefinitions": {
@@ -93,12 +93,12 @@
       "title": "Editar permisos del grupo",
       "description": "Seleccione los permisos de este grupo",
       "currentCodes": "Códigos de permiso actuales",
-      "introTitle": "What can this group do?",
-      "introBody": "Below, you choose which modules this group can view, create, update, or delete. Every user assigned to this group receives the same permission set.",
-      "selectionSummaryTitle": "Selected CRUD summary",
-      "selectionSummaryBody": "This summary helps you quickly see which operation types are currently granted to the group.",
-      "searchPlaceholder": "Search by module, action, or permission name...",
-      "selectActionGroup": "Select all {{action}} permissions"
+      "introTitle": "¿Qué puede hacer este grupo?",
+      "introBody": "A continuación elige los módulos que este grupo puede ver, crear, actualizar o eliminar. Todos los usuarios asignados a este grupo reciben el mismo conjunto de permisos.",
+      "selectionSummaryTitle": "Resumen de CRUD seleccionado",
+      "selectionSummaryBody": "Este resumen ayuda a ver rápidamente qué tipos de operación están permitidos hoy.",
+      "searchPlaceholder": "Buscar por módulo, acción o nombre de permiso...",
+      "selectActionGroup": "Seleccionar todos los permisos de {{action}}"
     },
     "delete": {
       "confirmTitle": "Eliminar grupo de permisos",
@@ -139,98 +139,98 @@
     "permissionDefinitions": "Definiciones de Permisos",
     "permissionGroups": "Grupos de Permisos",
     "userGroupAssignments": "Asignaciones de Grupos de Usuarios",
-    "wmsScopePolicies": "B2B Scope Policies",
-    "wmsScopeAssignments": "B2B Scope Assignments"
+    "wmsScopePolicies": "Políticas de alcance B2B",
+    "wmsScopeAssignments": "Asignaciones de alcance B2B"
   },
   "accessControl": {
     "permissionActions": {
       "view": {
-        "description": "Opens list, detail, and read-only monitoring screens."
+        "description": "Abre lista, detalle y pantallas de monitoreo de solo lectura."
       },
       "create": {
-        "description": "Opens new record creation and first-save steps."
+        "description": "Abre la creación de nuevo registro y los primeros pasos de guardado."
       },
       "update": {
-        "description": "Opens edit, process, and change-saving steps for existing records."
+        "description": "Abre edición, proceso y pasos de guardado de cambios para registros existentes."
       },
       "delete": {
-        "description": "Allows soft delete, deactivation, or delete actions."
+        "description": "Permite baja lógica, desactivación o eliminación."
       }
     }
   },
   "wmsScopePolicies": {
-    "title": "B2B Scope Policies",
-    "description": "Manage branch, customer, catalog, and assignment-based data scope rules",
-    "add": "Add Policy",
+    "title": "Políticas de alcance B2B",
+    "description": "Gestionar reglas de alcance por sucursal, cliente, catálogo y asignación",
+    "add": "Agregar política",
     "stats": {
-      "total": "Total Policies",
-      "active": "Active Policies",
-      "entities": "Covered Flows"
+      "total": "Total de políticas",
+      "active": "Políticas activas",
+      "entities": "Flujos cubiertos"
     },
     "form": {
-      "addTitle": "Add B2B Scope Policy",
-      "editTitle": "Edit B2B Scope Policy",
-      "addDescription": "Define a new data-scope policy.",
-      "editDescription": "Update the policy behavior and scope type.",
-      "code": "Code",
-      "codePlaceholder": "Select a policy code",
-      "codeEmpty": "No suitable policy code found",
-      "name": "Name",
-      "namePlaceholder": "Policy display name",
-      "entityType": "Entity Type",
-      "entityTypePlaceholder": "Select an entity type",
-      "scopeType": "Scope Type",
-      "scopeTypePlaceholder": "Select a scope type",
-      "description": "Description",
-      "descriptionPlaceholder": "Explain the operational context",
-      "includeSelf": "Include Own Records",
-      "includeSelfHint": "Allows the user to also see their own records when the policy is assignment, branch, or warehouse based.",
-      "isActive": "Active",
-      "isActiveHint": "Inactive policies are ignored in resolution and assignment flows."
+      "addTitle": "Agregar política de alcance B2B",
+      "editTitle": "Editar política de alcance B2B",
+      "addDescription": "Definir una nueva política de alcance de datos.",
+      "editDescription": "Actualizar comportamiento y tipo de alcance de la política.",
+      "code": "Código",
+      "codePlaceholder": "Seleccionar un código de política",
+      "codeEmpty": "No se encontró un código de política adecuado",
+      "name": "Nombre",
+      "namePlaceholder": "Nombre visible de la política",
+      "entityType": "Tipo de entidad",
+      "entityTypePlaceholder": "Seleccionar tipo de entidad",
+      "scopeType": "Tipo de alcance",
+      "scopeTypePlaceholder": "Seleccionar tipo de alcance",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Explica el contexto operativo",
+      "includeSelf": "Incluir propios registros",
+      "includeSelfHint": "Permite que el usuario también vea sus propios registros cuando la política es por asignación, sucursal o almacén.",
+      "isActive": "Activo",
+      "isActiveHint": "Las políticas inactivas se ignoran en resolución y flujos de asignación."
     },
     "table": {
-      "code": "Code",
-      "name": "Name",
-      "entityType": "Entity Type",
-      "scopeType": "Scope Type",
-      "includeSelf": "Include Self",
-      "isActive": "Active"
+      "code": "Código",
+      "name": "Nombre",
+      "entityType": "Tipo de entidad",
+      "scopeType": "Tipo de alcance",
+      "includeSelf": "Incluir propios registros",
+      "isActive": "Activo"
     },
     "delete": {
-      "confirmTitle": "Delete B2B Scope Policy",
-      "confirmMessage": "Are you sure you want to delete \"{{name}}\"?"
+      "confirmTitle": "Eliminar política de alcance B2B",
+      "confirmMessage": "¿Confirma que desea eliminar \"{{name}}\"?"
     }
   },
   "wmsScopeAssignments": {
-    "title": "B2B Scope Assignments",
-    "description": "Manage which branch, customer, catalog, and record scope each user can operate on",
-    "selectUser": "Select User",
-    "selectUserPlaceholder": "Search and select user...",
-    "selectUserHint": "Choose a user to edit scope assignments.",
-    "noUserSelected": "No user selected yet",
-    "noUsers": "No users found",
-    "assignedPolicies": "Assigned Policies",
-    "resolutionScope": "Reviewed Flow",
-    "statusLabel": "Status",
-    "statusPending": "Unsaved changes",
-    "statusCurrent": "In sync with server",
-    "editorTitle": "Assignment Editor",
-    "editorDescription": "You can define branch and warehouse based scope for multiple entity types.",
-    "addAssignment": "Add Assignment",
-    "empty": "This user does not have any B2B scope assignments yet.",
-    "policyPlaceholder": "Select policy",
-    "branchCodePlaceholder": "Branch code",
-    "warehousePlaceholder": "Select warehouse",
-    "previewTitle": "Access Preview",
-    "previewDescription": "Shows the effective scope resolution for the selected entity type.",
-    "entityTypePlaceholder": "Select entity type",
-    "previewEmpty": "Choose a user and entity type to see the effective scope here.",
-    "previewUnrestricted": "Unrestricted access",
-    "previewIncludeSelf": "Own records included",
-    "previewAssignedOnly": "Assigned records only",
-    "previewBranches": "Branches",
-    "previewWarehouses": "Warehouses",
-    "previewAssignments": "Matching Assignments",
-    "noExplicitPolicy": "No explicit policy"
+    "title": "Asignaciones de alcance B2B",
+    "description": "Gestionar qué usuarios pueden operar en el alcance de sucursal, cliente, catálogo y registro",
+    "selectUser": "Seleccionar usuario",
+    "selectUserPlaceholder": "Buscar y seleccionar usuario...",
+    "selectUserHint": "Seleccione un usuario para editar sus asignaciones de alcance.",
+    "noUserSelected": "Aún no hay usuario seleccionado",
+    "noUsers": "No se encontraron usuarios",
+    "assignedPolicies": "Políticas asignadas",
+    "resolutionScope": "Flujo revisado",
+    "statusLabel": "Estado",
+    "statusPending": "Cambios pendientes",
+    "statusCurrent": "Sincronizado con servidor",
+    "editorTitle": "Editor de asignación",
+    "editorDescription": "Puede definir alcance por sucursal y almacén para varios tipos de entidad.",
+    "addAssignment": "Agregar asignación",
+    "empty": "Este usuario aún no tiene asignaciones de alcance B2B.",
+    "policyPlaceholder": "Seleccionar política",
+    "branchCodePlaceholder": "Código de sucursal",
+    "warehousePlaceholder": "Seleccionar almacén",
+    "previewTitle": "Vista de acceso",
+    "previewDescription": "Muestra la resolución de alcance efectiva para el tipo de entidad seleccionado.",
+    "entityTypePlaceholder": "Seleccionar tipo de entidad",
+    "previewEmpty": "Seleccione un usuario y tipo de entidad para ver el alcance efectivo.",
+    "previewUnrestricted": "Acceso sin restricciones",
+    "previewIncludeSelf": "Incluir registros propios",
+    "previewAssignedOnly": "Solo registros asignados",
+    "previewBranches": "Sucursales",
+    "previewWarehouses": "Almacenes",
+    "previewAssignments": "Asignaciones coincidentes",
+    "noExplicitPolicy": "No hay política explícita"
   }
 }

@@ -16,16 +16,16 @@
     },
     "userAssignment": {
       "user": "Wählen Sie den Benutzer, dessen Zugriffsbereich Sie verwalten möchten.",
-      "groups": "Benutzer erhält kombinierte Berechtigungen aus allen ausgewählten Gruppen.",
+      "groups": "Der Benutzer erhält kombinierte Berechtigungen aus allen ausgewählten Gruppen.",
       "save": "Zuweisungen gelten sofort für die nächsten Autorisierungsprüfungen. Benutzer müssen möglicherweise ihre Sitzung aktualisieren.",
       "systemAdminNote": "Hat der Benutzer eine System-Admin-Gruppe, werden detaillierte Berechtigungen umgangen."
     },
     "wmsScopePolicy": {
-      "code": "Policy code is the stable key used by backend enforcement and support flows.",
-      "name": "Operational display name that explains why the policy exists.",
-      "entityType": "Determines which document or workflow type this policy applies to.",
-      "scopeType": "Defines whether access is unrestricted, branch-based, warehouse-based, or assigned-only.",
-      "description": "Optional internal note used for support and audit context."
+      "code": "Der Richtliniencode ist der stabile Schlüssel, der von Backend-Prüfungen und Support-Flows verwendet wird.",
+      "name": "Anzeigename, der erklärt, warum diese Richtlinie existiert.",
+      "entityType": "Legt fest, auf welchen Dokument- oder Workflow-Typ diese Richtlinie angewendet wird.",
+      "scopeType": "Definiert, ob der Zugriff uneingeschränkt, filial- oder lagerbasiert oder nur auf zugewiesene Datensätze beschränkt ist.",
+      "description": "Optionale interne Notiz für Support- und Audit-Kontexte."
     }
   },
   "permissionDefinitions": {
@@ -93,12 +93,12 @@
       "title": "Gruppenberechtigungen bearbeiten",
       "description": "Berechtigungen für diese Gruppe auswählen",
       "currentCodes": "Aktuelle Berechtigungscodes",
-      "introTitle": "What can this group do?",
-      "introBody": "Below, you choose which modules this group can view, create, update, or delete. Every user assigned to this group receives the same permission set.",
-      "selectionSummaryTitle": "Selected CRUD summary",
-      "selectionSummaryBody": "This summary helps you quickly see which operation types are currently granted to the group.",
-      "searchPlaceholder": "Search by module, action, or permission name...",
-      "selectActionGroup": "Select all {{action}} permissions"
+      "introTitle": "Was kann diese Gruppe tun?",
+      "introBody": "Unten wählen Sie die Module aus, die diese Gruppe anzeigen, erstellen, aktualisieren oder löschen darf. Alle Benutzer dieser Gruppe erhalten denselben Berechtigungssatz.",
+      "selectionSummaryTitle": "Ausgewählte CRUD-Zusammenfassung",
+      "selectionSummaryBody": "Diese Zusammenfassung zeigt schnell, welche Operationstypen der Gruppe aktuell erlaubt sind.",
+      "searchPlaceholder": "Nach Modul, Aktion oder Berechtigungsname suchen...",
+      "selectActionGroup": "Alle {{action}}-Berechtigungen auswählen"
     },
     "delete": {
       "confirmTitle": "Berechtigungsgruppe löschen",
@@ -106,6 +106,22 @@
     },
     "search": "Suchen...",
     "systemAdminLocked": "Die System-Admin-Gruppe kann nicht geändert werden"
+  },
+  "accessControl": {
+    "permissionActions": {
+      "view": {
+        "description": "Öffnet Listen-, Detail- und nur-lesbare Überwachungsseiten."
+      },
+      "create": {
+        "description": "Öffnet die Erfassung neuer Datensätze und die ersten Speicherschritte."
+      },
+      "update": {
+        "description": "Öffnet Bearbeitungs-, Prozess- und Änderungs-Schritte für bestehende Datensätze."
+      },
+      "delete": {
+        "description": "Ermöglicht Soft-Delete, Deaktivierung oder Löschvorgänge."
+      }
+    }
   },
   "userGroupAssignments": {
     "title": "Benutzer-Gruppenzuweisungen",
@@ -117,6 +133,81 @@
     "noUsers": "Keine Benutzer gefunden",
     "noGroups": "Keine Berechtigungsgruppen verfügbar",
     "selectAll": "Alle auswählen"
+  },
+  "wmsScopePolicies": {
+    "title": "B2B Umfang-Richtlinien",
+    "description": "Verwalten Sie Datenbereichsregeln für Filiale, Kunde, Katalog und Zuordnung.",
+    "add": "Richtlinie hinzufügen",
+    "stats": {
+      "total": "Richtlinien insgesamt",
+      "active": "Aktive Richtlinien",
+      "entities": "Erfasste Prozesse"
+    },
+    "form": {
+      "addTitle": "B2B-Richtlinie hinzufügen",
+      "editTitle": "B2B-Richtlinie bearbeiten",
+      "addDescription": "Definieren Sie eine neue Datenbereichsrichtlinie.",
+      "editDescription": "Aktualisieren Sie Verhalten und Bereichstyp der Richtlinie.",
+      "code": "Code",
+      "codePlaceholder": "Wählen Sie einen Richtliniencode",
+      "codeEmpty": "Kein passender Richtliniencode gefunden",
+      "name": "Name",
+      "namePlaceholder": "Anzeigename der Richtlinie",
+      "entityType": "Entitätstyp",
+      "entityTypePlaceholder": "Entitätstyp auswählen",
+      "scopeType": "Bereichstyp",
+      "scopeTypePlaceholder": "Bereichstyp auswählen",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Erklären Sie den operativen Kontext",
+      "includeSelf": "Eigene Datensätze einschließen",
+      "includeSelfHint": "Erlaubt es dem Benutzer, eigene Datensätze zusätzlich zu sehen, wenn die Richtlinie auf Zuweisung, Filiale oder Lager basiert.",
+      "isActive": "Aktiv",
+      "isActiveHint": "Inaktive Richtlinien werden bei Auflösung und Zuweisungsabläufen ignoriert."
+    },
+    "table": {
+      "code": "Code",
+      "name": "Name",
+      "entityType": "Entitätstyp",
+      "scopeType": "Bereichstyp",
+      "includeSelf": "Eigene Datensätze einschließen",
+      "isActive": "Aktiv"
+    },
+    "delete": {
+      "confirmTitle": "B2B-Richtlinie löschen",
+      "confirmMessage": "Sind Sie sicher, dass Sie „{{name}}“ löschen möchten?"
+    }
+  },
+  "wmsScopeAssignments": {
+    "title": "B2B Umfang-Zuordnungen",
+    "description": "Verwalten Sie, welchen Benutzern der Bereich für Filiale, Kunde, Katalog und Datensatz zugewiesen ist.",
+    "selectUser": "Benutzer auswählen",
+    "selectUserPlaceholder": "Suchen und Benutzer auswählen...",
+    "selectUserHint": "Wählen Sie einen Benutzer, um Bereichszuweisungen zu bearbeiten.",
+    "noUserSelected": "Noch kein Benutzer ausgewählt",
+    "noUsers": "Keine Benutzer gefunden",
+    "assignedPolicies": "Zugewiesene Richtlinien",
+    "resolutionScope": "Überprüfter Ablauf",
+    "statusLabel": "Status",
+    "statusPending": "Nicht gespeicherte Änderungen",
+    "statusCurrent": "Mit Server synchron",
+    "editorTitle": "Zuordnungseditor",
+    "editorDescription": "Sie können filialspezifische und lagerbezogene Bereiche für mehrere Entitätstypen definieren.",
+    "addAssignment": "Zuordnung hinzufügen",
+    "empty": "Dieser Benutzer hat noch keine B2B-Umfangszuordnungen.",
+    "policyPlaceholder": "Richtlinie auswählen",
+    "branchCodePlaceholder": "Filialcode",
+    "warehousePlaceholder": "Lager auswählen",
+    "previewTitle": "Zugriffsübersicht",
+    "previewDescription": "Zeigt den effektiven Umfang für den ausgewählten Entitätstyp.",
+    "entityTypePlaceholder": "Entitätstyp auswählen",
+    "previewEmpty": "Bitte wählen Sie einen Benutzer und einen Entitätstyp, um den effektiven Umfang hier zu sehen.",
+    "previewUnrestricted": "Uneingeschränkter Zugriff",
+    "previewIncludeSelf": "Eigene Datensätze enthalten",
+    "previewAssignedOnly": "Nur zugewiesene Datensätze",
+    "previewBranches": "Filialen",
+    "previewWarehouses": "Lager",
+    "previewAssignments": "Passende Zuordnungen",
+    "noExplicitPolicy": "Keine explizite Richtlinie"
   },
   "common": {
     "cancel": "Abbrechen",
@@ -139,98 +230,7 @@
     "permissionDefinitions": "Berechtigungsdefinitionen",
     "permissionGroups": "Berechtigungsgruppen",
     "userGroupAssignments": "Benutzer-Gruppenzuweisungen",
-    "wmsScopePolicies": "B2B Scope Policies",
-    "wmsScopeAssignments": "B2B Scope Assignments"
-  },
-  "accessControl": {
-    "permissionActions": {
-      "view": {
-        "description": "Opens list, detail, and read-only monitoring screens."
-      },
-      "create": {
-        "description": "Opens new record creation and first-save steps."
-      },
-      "update": {
-        "description": "Opens edit, process, and change-saving steps for existing records."
-      },
-      "delete": {
-        "description": "Allows soft delete, deactivation, or delete actions."
-      }
-    }
-  },
-  "wmsScopePolicies": {
-    "title": "B2B Scope Policies",
-    "description": "Manage branch, customer, catalog, and assignment-based data scope rules",
-    "add": "Add Policy",
-    "stats": {
-      "total": "Total Policies",
-      "active": "Active Policies",
-      "entities": "Covered Flows"
-    },
-    "form": {
-      "addTitle": "Add B2B Scope Policy",
-      "editTitle": "Edit B2B Scope Policy",
-      "addDescription": "Define a new data-scope policy.",
-      "editDescription": "Update the policy behavior and scope type.",
-      "code": "Code",
-      "codePlaceholder": "Select a policy code",
-      "codeEmpty": "No suitable policy code found",
-      "name": "Name",
-      "namePlaceholder": "Policy display name",
-      "entityType": "Entity Type",
-      "entityTypePlaceholder": "Select an entity type",
-      "scopeType": "Scope Type",
-      "scopeTypePlaceholder": "Select a scope type",
-      "description": "Description",
-      "descriptionPlaceholder": "Explain the operational context",
-      "includeSelf": "Include Own Records",
-      "includeSelfHint": "Allows the user to also see their own records when the policy is assignment, branch, or warehouse based.",
-      "isActive": "Active",
-      "isActiveHint": "Inactive policies are ignored in resolution and assignment flows."
-    },
-    "table": {
-      "code": "Code",
-      "name": "Name",
-      "entityType": "Entity Type",
-      "scopeType": "Scope Type",
-      "includeSelf": "Include Self",
-      "isActive": "Active"
-    },
-    "delete": {
-      "confirmTitle": "Delete B2B Scope Policy",
-      "confirmMessage": "Are you sure you want to delete \"{{name}}\"?"
-    }
-  },
-  "wmsScopeAssignments": {
-    "title": "B2B Scope Assignments",
-    "description": "Manage which branch, customer, catalog, and record scope each user can operate on",
-    "selectUser": "Select User",
-    "selectUserPlaceholder": "Search and select user...",
-    "selectUserHint": "Choose a user to edit scope assignments.",
-    "noUserSelected": "No user selected yet",
-    "noUsers": "No users found",
-    "assignedPolicies": "Assigned Policies",
-    "resolutionScope": "Reviewed Flow",
-    "statusLabel": "Status",
-    "statusPending": "Unsaved changes",
-    "statusCurrent": "In sync with server",
-    "editorTitle": "Assignment Editor",
-    "editorDescription": "You can define branch and warehouse based scope for multiple entity types.",
-    "addAssignment": "Add Assignment",
-    "empty": "This user does not have any B2B scope assignments yet.",
-    "policyPlaceholder": "Select policy",
-    "branchCodePlaceholder": "Branch code",
-    "warehousePlaceholder": "Select warehouse",
-    "previewTitle": "Access Preview",
-    "previewDescription": "Shows the effective scope resolution for the selected entity type.",
-    "entityTypePlaceholder": "Select entity type",
-    "previewEmpty": "Choose a user and entity type to see the effective scope here.",
-    "previewUnrestricted": "Unrestricted access",
-    "previewIncludeSelf": "Own records included",
-    "previewAssignedOnly": "Assigned records only",
-    "previewBranches": "Branches",
-    "previewWarehouses": "Warehouses",
-    "previewAssignments": "Matching Assignments",
-    "noExplicitPolicy": "No explicit policy"
+    "wmsScopePolicies": "B2B Umfang-Richtlinien",
+    "wmsScopeAssignments": "B2B Umfang-Zuordnungen"
   }
 }

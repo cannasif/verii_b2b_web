@@ -21,11 +21,11 @@
       "systemAdminNote": "إذا كان للمستخدم مجموعة مسؤول النظام، يتم تجاوز الأذونات التفصيلية."
     },
     "wmsScopePolicy": {
-      "code": "Policy code is the stable key used by backend enforcement and support flows.",
-      "name": "Operational display name that explains why the policy exists.",
-      "entityType": "Determines which document or workflow type this policy applies to.",
-      "scopeType": "Defines whether access is unrestricted, branch-based, warehouse-based, or assigned-only.",
-      "description": "Optional internal note used for support and audit context."
+      "code": "مفتاح السياسة هو المفتاح الثابت المستخدم من قبل التحقق الخلفي وسيناريوهات الدعم.",
+      "name": "الاسم التشغيلي الظاهر الذي يوضح سبب وجود السياسة.",
+      "entityType": "يحدد نوع المستند أو سير العمل الذي تنطبق عليه هذه السياسة.",
+      "scopeType": "يحدد ما إذا كان الوصول غير مقيد أو مبنيًا على الفرع أو المستودع أو المخصص فقط.",
+      "description": "ملاحظة داخلية اختيارية تُستخدم في سياق الدعم والتدقيق."
     }
   },
   "permissionDefinitions": {
@@ -93,12 +93,12 @@
       "title": "تعديل صلاحيات المجموعة",
       "description": "حدد الصلاحيات لهذه المجموعة",
       "currentCodes": "رموز الصلاحيات الحالية",
-      "introTitle": "What can this group do?",
-      "introBody": "Below, you choose which modules this group can view, create, update, or delete. Every user assigned to this group receives the same permission set.",
-      "selectionSummaryTitle": "Selected CRUD summary",
-      "selectionSummaryBody": "This summary helps you quickly see which operation types are currently granted to the group.",
-      "searchPlaceholder": "Search by module, action, or permission name...",
-      "selectActionGroup": "Select all {{action}} permissions"
+      "introTitle": "ماذا يمكن لهذه المجموعة أن تفعل؟",
+      "introBody": "أسفل، اختر الوحدات التي يمكن لهذه المجموعة عرضها أو إنشائها أو تحديثها أو حذفها. يحصل كل مستخدم ينتمي إلى هذه المجموعة على نفس مجموعة الصلاحيات.",
+      "selectionSummaryTitle": "ملخص العمليات المختارة",
+      "selectionSummaryBody": "يساعدك هذا الملخص على رؤية أنواع العمليات المسموح بها للمجموعة بسرعة.",
+      "searchPlaceholder": "ابحث حسب الوحدة أو الإجراء أو اسم الإذن...",
+      "selectActionGroup": "اختر جميع صلاحيات {{action}}"
     },
     "delete": {
       "confirmTitle": "حذف مجموعة الصلاحيات",
@@ -139,98 +139,98 @@
     "permissionDefinitions": "تعريفات الأذونات",
     "permissionGroups": "مجموعات الأذونات",
     "userGroupAssignments": "تعيينات مجموعات المستخدمين",
-    "wmsScopePolicies": "B2B Scope Policies",
-    "wmsScopeAssignments": "B2B Scope Assignments"
+    "wmsScopePolicies": "سياسات نطاق B2B",
+    "wmsScopeAssignments": "تعيينات نطاق B2B"
   },
   "accessControl": {
     "permissionActions": {
       "view": {
-        "description": "Opens list, detail, and read-only monitoring screens."
+        "description": "يفتح قوائم التفاصيل وشاشات المراقبة للقراءة فقط."
       },
       "create": {
-        "description": "Opens new record creation and first-save steps."
+        "description": "يفتح إنشاء سجل جديد وخطوات الحفظ الأولية."
       },
       "update": {
-        "description": "Opens edit, process, and change-saving steps for existing records."
+        "description": "يفتح تعديل وحفظ تغييرات السجل الحالي."
       },
       "delete": {
-        "description": "Allows soft delete, deactivation, or delete actions."
+        "description": "يسمح بالحذف الناعم أو التعطيل أو الحذف."
       }
     }
   },
   "wmsScopePolicies": {
-    "title": "B2B Scope Policies",
-    "description": "Manage branch, customer, catalog, and assignment-based data scope rules",
-    "add": "Add Policy",
+    "title": "سياسات نطاق B2B",
+    "description": "إدارة قواعد نطاق البيانات حسب الفرع والعميل والفهرس والتعيين",
+    "add": "إضافة سياسة",
     "stats": {
-      "total": "Total Policies",
-      "active": "Active Policies",
-      "entities": "Covered Flows"
+      "total": "إجمالي السياسات",
+      "active": "السياسات النشطة",
+      "entities": "العمليات المشمولة"
     },
     "form": {
-      "addTitle": "Add B2B Scope Policy",
-      "editTitle": "Edit B2B Scope Policy",
-      "addDescription": "Define a new data-scope policy.",
-      "editDescription": "Update the policy behavior and scope type.",
-      "code": "Code",
-      "codePlaceholder": "Select a policy code",
-      "codeEmpty": "No suitable policy code found",
-      "name": "Name",
-      "namePlaceholder": "Policy display name",
-      "entityType": "Entity Type",
-      "entityTypePlaceholder": "Select an entity type",
-      "scopeType": "Scope Type",
-      "scopeTypePlaceholder": "Select a scope type",
-      "description": "Description",
-      "descriptionPlaceholder": "Explain the operational context",
-      "includeSelf": "Include Own Records",
-      "includeSelfHint": "Allows the user to also see their own records when the policy is assignment, branch, or warehouse based.",
-      "isActive": "Active",
-      "isActiveHint": "Inactive policies are ignored in resolution and assignment flows."
+      "addTitle": "إضافة سياسة نطاق B2B",
+      "editTitle": "تعديل سياسة نطاق B2B",
+      "addDescription": "تعريف سياسة جديدة لنطاق البيانات.",
+      "editDescription": "تحديث سلوك السياسة ونوع النطاق.",
+      "code": "الرمز",
+      "codePlaceholder": "اختر رمز سياسة",
+      "codeEmpty": "لا يوجد رمز سياسة مناسب",
+      "name": "الاسم",
+      "namePlaceholder": "اسم السياسة الظاهر",
+      "entityType": "نوع الكيان",
+      "entityTypePlaceholder": "اختر نوع الكيان",
+      "scopeType": "نوع النطاق",
+      "scopeTypePlaceholder": "اختر نوع النطاق",
+      "description": "الوصف",
+      "descriptionPlaceholder": "اشرح السياق التشغيلي",
+      "includeSelf": "تضمين السجلات الخاصة",
+      "includeSelfHint": "يتيح للمستخدم رؤية سجلاته الخاصة أيضًا عندما تكون السياسة مبنية على التعيين أو الفرع أو المستودع.",
+      "isActive": "مفعل",
+      "isActiveHint": "السياسات غير النشطة يتم تجاهلها في سير عمل الحلول والتعيين."
     },
     "table": {
-      "code": "Code",
-      "name": "Name",
-      "entityType": "Entity Type",
-      "scopeType": "Scope Type",
-      "includeSelf": "Include Self",
-      "isActive": "Active"
+      "code": "الرمز",
+      "name": "الاسم",
+      "entityType": "نوع الكيان",
+      "scopeType": "نوع النطاق",
+      "includeSelf": "تضمين السجلات الخاصة",
+      "isActive": "مفعل"
     },
     "delete": {
-      "confirmTitle": "Delete B2B Scope Policy",
-      "confirmMessage": "Are you sure you want to delete \"{{name}}\"?"
+      "confirmTitle": "حذف سياسة نطاق B2B",
+      "confirmMessage": "هل تريد حذف سياسة \"{{name}}\"؟"
     }
   },
   "wmsScopeAssignments": {
-    "title": "B2B Scope Assignments",
-    "description": "Manage which branch, customer, catalog, and record scope each user can operate on",
-    "selectUser": "Select User",
-    "selectUserPlaceholder": "Search and select user...",
-    "selectUserHint": "Choose a user to edit scope assignments.",
-    "noUserSelected": "No user selected yet",
-    "noUsers": "No users found",
-    "assignedPolicies": "Assigned Policies",
-    "resolutionScope": "Reviewed Flow",
-    "statusLabel": "Status",
-    "statusPending": "Unsaved changes",
-    "statusCurrent": "In sync with server",
-    "editorTitle": "Assignment Editor",
-    "editorDescription": "You can define branch and warehouse based scope for multiple entity types.",
-    "addAssignment": "Add Assignment",
-    "empty": "This user does not have any B2B scope assignments yet.",
-    "policyPlaceholder": "Select policy",
-    "branchCodePlaceholder": "Branch code",
-    "warehousePlaceholder": "Select warehouse",
-    "previewTitle": "Access Preview",
-    "previewDescription": "Shows the effective scope resolution for the selected entity type.",
-    "entityTypePlaceholder": "Select entity type",
-    "previewEmpty": "Choose a user and entity type to see the effective scope here.",
-    "previewUnrestricted": "Unrestricted access",
-    "previewIncludeSelf": "Own records included",
-    "previewAssignedOnly": "Assigned records only",
-    "previewBranches": "Branches",
-    "previewWarehouses": "Warehouses",
-    "previewAssignments": "Matching Assignments",
-    "noExplicitPolicy": "No explicit policy"
+    "title": "تعيينات نطاق B2B",
+    "description": "إدارة النطاق المعين لكل مستخدم في فرع/عميل/فهرس/سجل",
+    "selectUser": "اختر مستخدماً",
+    "selectUserPlaceholder": "ابحث وحدد مستخدماً...",
+    "selectUserHint": "اختر مستخدماً لتعديل تعيينات النطاق.",
+    "noUserSelected": "لم يتم اختيار مستخدم بعد",
+    "noUsers": "لا يوجد مستخدمون",
+    "assignedPolicies": "السياسات المعينة",
+    "resolutionScope": "المسار المفحوص",
+    "statusLabel": "الحالة",
+    "statusPending": "تغييرات غير محفوظة",
+    "statusCurrent": "متزامن مع الخادم",
+    "editorTitle": "محرر التعيين",
+    "editorDescription": "يمكنك تعريف نطاق فرعي أو مستودعي لعدة أنواع كيانات.",
+    "addAssignment": "إضافة تعيين",
+    "empty": "هذا المستخدم لا يملك أي تعيينات نطاق B2B بعد.",
+    "policyPlaceholder": "اختر سياسة",
+    "branchCodePlaceholder": "رمز الفرع",
+    "warehousePlaceholder": "اختر مستودعًا",
+    "previewTitle": "معاينة الوصول",
+    "previewDescription": "تظهر هنا نتيجة النطاق الفعلي للكيان المختار.",
+    "entityTypePlaceholder": "اختر نوع الكيان",
+    "previewEmpty": "اختر مستخدماً ونوع الكيان لرؤية النطاق الفعلي.",
+    "previewUnrestricted": "وصول غير مقيد",
+    "previewIncludeSelf": "تضمين السجلات الخاصة",
+    "previewAssignedOnly": "السجلات المعينة فقط",
+    "previewBranches": "الفروع",
+    "previewWarehouses": "المستودعات",
+    "previewAssignments": "التعيينات المطابقة",
+    "noExplicitPolicy": "لا توجد سياسة صريحة"
   }
 }
