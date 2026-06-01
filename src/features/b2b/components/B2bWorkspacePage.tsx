@@ -173,7 +173,7 @@ const configs: Record<B2bWorkspaceKind, WorkspaceConfig> = {
   },
   payments: {
     title: 'Ödeme Altyapısı',
-    description: 'V1 ödeme sağlayıcıdan bağımsız ilerler: siparişe bağlı işlem kaydı, dış API referansı ve durum güncellemesi tutulur.',
+    description: 'Cari bazlı ödeme emri, vade, taksit, ödeme linki ve sağlayıcı durumunu tek akışta yönetin.',
     breadcrumb: 'Ödemeler',
     emptyState: 'Henüz ödeme işlem kaydı yok.',
   },
@@ -248,6 +248,21 @@ type B2bFormField = {
   hidden?: boolean;
   colSpan?: 'full';
 };
+
+const paymentInstallmentOptions = [
+  { label: 'Tek çekim', value: '1' },
+  { label: '2 taksit', value: '2' },
+  { label: '3 taksit', value: '3' },
+  { label: '4 taksit', value: '4' },
+  { label: '5 taksit', value: '5' },
+  { label: '6 taksit', value: '6' },
+  { label: '7 taksit', value: '7' },
+  { label: '8 taksit', value: '8' },
+  { label: '9 taksit', value: '9' },
+  { label: '10 taksit', value: '10' },
+  { label: '11 taksit', value: '11' },
+  { label: '12 taksit', value: '12' },
+];
 
 type B2bFormConfig = {
   fields: B2bFormField[];
@@ -604,18 +619,24 @@ const b2bFormConfigs: Partial<Record<B2bWorkspaceKind, B2bFormConfig>> = {
     submit: b2bApi.createQuote,
   },
   payments: {
-    defaults: { orderId: '', providerKey: 'PAYTR', paymentMethod: 'CARD', paymentTermDays: '', dueDate: '', installmentCount: '1', notes: '' },
+    defaults: { customerId: '', amount: '', currencyCode: 'TRY', orderId: '', providerKey: 'PAYTR', paymentMethod: 'CARD', paymentTermDays: '', dueDate: '', installmentCount: '1', notes: '' },
     fields: [
-      { name: 'orderId', label: 'Sipariş', type: 'lookup', lookupKind: 'order', required: true },
+      { name: 'customerId', label: 'Cari', type: 'lookup', lookupKind: 'customer', required: true },
+      { name: 'amount', label: 'Tahsilat Tutarı', type: 'number', required: true },
+      { name: 'currencyCode', label: 'Para Birimi', type: 'currency', required: true },
+      { name: 'orderId', label: 'Sipariş Referansı', type: 'lookup', lookupKind: 'order', helpText: 'Zorunlu değildir; tahsilat doğrudan cariye açılır.' },
       { name: 'providerKey', label: 'Sağlayıcı', type: 'select', options: [{ label: 'PayTR', value: 'PAYTR' }, { label: 'iyzico', value: 'IYZICO' }, { label: 'Açık Hesap', value: 'ACCOUNT' }] },
       { name: 'paymentMethod', label: 'Ödeme Yöntemi' },
       { name: 'paymentTermDays', label: 'Vade Günü', type: 'number' },
       { name: 'dueDate', label: 'Son Ödeme Tarihi', type: 'date' },
-      { name: 'installmentCount', label: 'Taksit Sayısı', type: 'number', required: true },
+      { name: 'installmentCount', label: 'Taksit Sayısı', type: 'select', required: true, options: paymentInstallmentOptions, helpText: 'PayTR en fazla 12 taksit destekler; iyzico taksitleri kart/BIN sonucuna göre netleşir.' },
       { name: 'notes', label: 'Not', type: 'textarea', colSpan: 'full' },
     ],
     transform: (values) => ({
-      orderId: toRequiredNumber(values.orderId),
+      orderId: toOptionalNumber(values.orderId),
+      customerId: toRequiredNumber(values.customerId),
+      amount: toRequiredNumber(values.amount),
+      currencyCode: trimOptional(values.currencyCode) ?? 'TRY',
       providerKey: trimOptional(values.providerKey),
       paymentMethod: trimOptional(values.paymentMethod),
       paymentTermDays: toOptionalNumber(values.paymentTermDays),
@@ -874,7 +895,7 @@ function getWorkspaceTableConfig(kind: B2bWorkspaceKind): WorkspaceTableConfig {
     'approval-rules': { primary: 'RuleName', secondary: 'ApproverRoleCode', scope: 'CompanyId', status: 'IsActive', amount: 'MinOrderAmount' },
     quotes: { primary: 'QuoteNumber', scope: 'CustomerId', status: 'Status', amount: 'EstimatedTotal', date: 'SubmittedDate' },
     orders: { primary: 'OrderNumber', scope: 'CustomerId', status: 'Status', amount: 'GrandTotal', date: 'SubmittedDate' },
-    payments: { primary: 'PaymentOrderNumber', secondary: 'PaymentLinkStatus', scope: 'OrderId', status: 'Status', amount: 'RemainingAmount', date: 'DueDate' },
+    payments: { primary: 'PaymentOrderNumber', secondary: 'PaymentLinkStatus', scope: 'CustomerId', status: 'Status', amount: 'RemainingAmount', date: 'DueDate' },
     'payment-operations': { primary: 'OperationType', secondary: 'ExternalOperationId', scope: 'PaymentTransactionId', status: 'Status', amount: 'Amount', date: 'RequestedDate' },
     'marketplace-channels': { primary: 'Name', secondary: 'Code', scope: 'ProviderKey', status: 'IsActive', date: 'LastSyncDate' },
     'marketplace-listings': { primary: 'Sku', secondary: 'MarketplaceListingId', scope: 'ChannelId', status: 'Status', amount: 'LastPushedPrice', date: 'LastPriceSyncDate' },
@@ -1179,7 +1200,7 @@ function renderWorkspaceCell(kind: B2bWorkspaceKind, row: WorkspaceRow, columnKe
     const values = {
       primary: <span className="font-mono text-sm">{item.paymentOrderNumber}</span>,
       secondary: item.paymentLinkUrl ? 'Link hazır' : item.providerKey || item.paymentMethod || '-',
-      scope: `Sipariş #${item.orderId}`,
+      scope: item.orderId ? `Sipariş #${item.orderId}` : 'Cari tahsilat',
       status: renderStatusBadge(item.status),
       amount: formatMoney(item.remainingAmount || item.amount, item.currencyCode),
       date: item.paymentLinkExpiresAt ? `Link: ${formatDate(item.paymentLinkExpiresAt)}` : formatDate(item.dueDate),
@@ -2626,7 +2647,16 @@ export function B2bRecordFormPage({ mode }: { mode: 'create' | 'edit' }): ReactE
           fetchPage={({ pageNumber, pageSize, search }) => b2bApi.getOrders({ pageNumber, pageSize, search })}
           getKey={(item) => String(item.id)}
           getLabel={(item) => `${item.orderNumber} - ${formatMoney(item.grandTotal, item.currencyCode)}`}
-          onSelect={(item) => setLookupValue(field.name, item.id, `${item.orderNumber} - ${formatMoney(item.grandTotal, item.currencyCode)}`)}
+          onSelect={(item) => {
+            const extraValues = kind === 'payments'
+              ? {
+                  customerId: String(item.customerId),
+                  amount: String(item.grandTotal),
+                  currencyCode: item.currencyCode || 'TRY',
+                }
+              : undefined;
+            setLookupValue(field.name, item.id, `${item.orderNumber} - ${formatMoney(item.grandTotal, item.currencyCode)}`, extraValues);
+          }}
         />
       );
     }

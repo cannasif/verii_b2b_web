@@ -491,7 +491,7 @@ export interface PaymentInstallmentOptionDto {
 export interface PaymentOrderDto {
   id: number;
   paymentOrderNumber: string;
-  orderId: number;
+  orderId?: number;
   customerId: number;
   buyerId?: number;
   userId?: number;
@@ -572,7 +572,10 @@ export interface SelectPaymentProviderInstallmentDto {
 }
 
 export interface CreatePaymentOrderDto {
-  orderId: number;
+  orderId?: number;
+  customerId?: number;
+  amount?: number;
+  currencyCode?: string;
   paymentTermDays?: number;
   dueDate?: string;
   installmentCount: number;
