@@ -2030,8 +2030,8 @@
   "profile": {
     "title": "Informazioni sul profilo"
   },
-  "language_choice": "Opzione lingua",
-  "appearance": "Modalità di visualizzazione",
+  "language_choice": "Lingua",
+  "appearance": "Aspetto",
   "warehouse": {
     "validation": {
       "operationTypeRequired": "Operation type is required",
@@ -2303,7 +2303,7 @@
     "operator<": "Less than",
     "operator<=": "Less than or equal"
   },
-  "export": "Export",
+  "export": "Esporta",
   "exportExcel": "Excel",
   "exportPdf": "PDF",
   "voiceSearch": {
@@ -2316,16 +2316,16 @@
     "errorWithReason": "Errore ricerca vocale: {{reason}}",
     "startFailed": "Impossibile avviare la ricerca vocale"
   },
-  "noPermission": "You do not have permission for this action.",
-  "active": "Active",
-  "passive": "Passive",
-  "default": "Default",
-  "activate": "Activate",
-  "deactivate": "Deactivate",
-  "clearForm": "Clear Form",
-  "description": "Description",
-  "date": "Date",
-  "error": "Error",
+  "noPermission": "Non hai l'autorizzazione per questa azione.",
+  "active": "Attivo",
+  "passive": "Passivo",
+  "default": "Predefinito",
+  "activate": "Attivare",
+  "deactivate": "Disattivare",
+  "clearForm": "Azzera modulo",
+  "description": "Descrizione",
+  "date": "Data",
+  "error": "Errore",
   "barcodeDesigner": {
     "list": {
       "badge": "List",
@@ -3545,7 +3545,7 @@
     "statusCurrent": "Güncel",
     "readOnlyInfo": "Bu ekrani goruntuleyebilirsiniz ancak grup atamalarini guncellemek icin update yetkisi gerekir."
   },
-  "barcodeFormat": "Active barcode format: {{format}}",
+  "barcodeFormat": "Formato codice a barre attivo: {{format}}",
   "paged": {
     "search": "Cerca",
     "searchPlaceholder": "Cerca nei record",

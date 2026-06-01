@@ -2030,8 +2030,8 @@
   "profile": {
     "title": "معلومات الملف الشخصي"
   },
-  "language_choice": "خيار اللغة",
-  "appearance": "وضع العرض",
+  "language_choice": "اللغة",
+  "appearance": "المظهر",
   "warehouse": {
     "validation": {
       "operationTypeRequired": "Operation type is required",
@@ -2303,7 +2303,7 @@
     "operator<": "Less than",
     "operator<=": "Less than or equal"
   },
-  "export": "Export",
+  "export": "تصدير",
   "exportExcel": "Excel",
   "exportPdf": "PDF",
   "voiceSearch": {
@@ -2316,16 +2316,16 @@
     "errorWithReason": "خطأ في البحث الصوتي: {{reason}}",
     "startFailed": "تعذر بدء البحث الصوتي"
   },
-  "noPermission": "You do not have permission for this action.",
-  "active": "Active",
-  "passive": "Passive",
-  "default": "Default",
-  "activate": "Activate",
-  "deactivate": "Deactivate",
-  "clearForm": "Clear Form",
-  "description": "Description",
-  "date": "Date",
-  "error": "Error",
+  "noPermission": "ليس لديك صلاحية لهذه العملية.",
+  "active": "مفعل",
+  "passive": "غير مفعل",
+  "default": "الإعدادات الافتراضية",
+  "activate": "تفعيل",
+  "deactivate": "إلغاء التفعيل",
+  "clearForm": "مسح النموذج",
+  "description": "الوصف",
+  "date": "التاريخ",
+  "error": "خطأ",
   "barcodeDesigner": {
     "list": {
       "badge": "List",
@@ -3545,7 +3545,7 @@
     "statusCurrent": "Güncel",
     "readOnlyInfo": "Bu ekrani goruntuleyebilirsiniz ancak grup atamalarini guncellemek icin update yetkisi gerekir."
   },
-  "barcodeFormat": "Active barcode format: {{format}}",
+  "barcodeFormat": "تنسيق الباركود النشط: {{format}}",
   "paged": {
     "search": "بحث",
     "searchPlaceholder": "ابحث في السجلات",

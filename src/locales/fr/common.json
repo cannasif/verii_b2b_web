@@ -2030,8 +2030,8 @@
   "profile": {
     "title": "Informations sur le profil"
   },
-  "language_choice": "Option de langue",
-  "appearance": "Mode d'affichage",
+  "language_choice": "Langue",
+  "appearance": "Apparence",
   "warehouse": {
     "validation": {
       "operationTypeRequired": "Le type d'opération est requis",
@@ -2316,16 +2316,16 @@
     "errorWithReason": "Erreur de recherche vocale : {{reason}}",
     "startFailed": "La recherche vocale n'a pas pu demarrer"
   },
-  "noPermission": "You do not have permission for this action.",
-  "active": "Active",
-  "passive": "Passive",
-  "default": "Default",
-  "activate": "Activate",
-  "deactivate": "Deactivate",
-  "clearForm": "Clear Form",
+  "noPermission": "Vous n'avez pas l'autorisation pour cette action.",
+  "active": "Actif",
+  "passive": "Inactif",
+  "default": "Par défaut",
+  "activate": "Activer",
+  "deactivate": "Désactiver",
+  "clearForm": "Effacer le formulaire",
   "description": "Description",
   "date": "Date",
-  "error": "Error",
+  "error": "Erreur",
   "barcodeDesigner": {
     "list": {
       "badge": "List",
@@ -3545,7 +3545,7 @@
     "statusCurrent": "Güncel",
     "readOnlyInfo": "Bu ekrani goruntuleyebilirsiniz ancak grup atamalarini guncellemek icin update yetkisi gerekir."
   },
-  "barcodeFormat": "Active barcode format: {{format}}",
+  "barcodeFormat": "Format de code-barres actif : {{format}}",
   "paged": {
     "search": "Rechercher",
     "searchPlaceholder": "Rechercher des enregistrements",

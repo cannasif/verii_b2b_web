@@ -2030,8 +2030,8 @@
   "profile": {
     "title": "Profilinformationen"
   },
-  "language_choice": "Sprachoption",
-  "appearance": "Ansichtsmodus",
+  "language_choice": "Sprache",
+  "appearance": "Darstellung",
   "warehouse": {
     "validation": {
       "operationTypeRequired": "Vorgangstyp ist erforderlich",
@@ -2316,16 +2316,16 @@
     "errorWithReason": "Sprachsuchfehler: {{reason}}",
     "startFailed": "Sprachsuche konnte nicht gestartet werden"
   },
-  "noPermission": "You do not have permission for this action.",
-  "active": "Active",
-  "passive": "Passive",
-  "default": "Default",
-  "activate": "Activate",
-  "deactivate": "Deactivate",
-  "clearForm": "Clear Form",
-  "description": "Description",
-  "date": "Date",
-  "error": "Error",
+  "noPermission": "Für diese Aktion haben Sie keine Berechtigung.",
+  "active": "Aktiv",
+  "passive": "Passiv",
+  "default": "Standard",
+  "activate": "Aktivieren",
+  "deactivate": "Deaktivieren",
+  "clearForm": "Formular zurücksetzen",
+  "description": "Beschreibung",
+  "date": "Datum",
+  "error": "Fehler",
   "barcodeDesigner": {
     "list": {
       "badge": "List",
@@ -3545,7 +3545,7 @@
     "statusCurrent": "Güncel",
     "readOnlyInfo": "Bu ekrani goruntuleyebilirsiniz ancak grup atamalarini guncellemek icin update yetkisi gerekir."
   },
-  "barcodeFormat": "Active barcode format: {{format}}",
+  "barcodeFormat": "Aktives Barcode-Format: {{format}}",
   "paged": {
     "search": "Suchen",
     "searchPlaceholder": "Datensätze suchen",
@@ -4531,7 +4531,7 @@
           "region": "SP-API-Endpunktregion. Türkei/Europa verwendet typischerweise die EU-Endpunktfamilie.",
           "roleArn": "Role ARN, falls IAM-Rollen-basierter Zugriff verwendet wird."
         },
-          "connectionModeHelp": "Amazon SP-API erfordert die Kombination aus LWA OAuth und AWS Signature Version 4. Verkäufer-ID und Region müssen zum Zielmarktplatz passen, bevor Anfragen gesendet werden.",
+        "connectionModeHelp": "Amazon SP-API erfordert die Kombination aus LWA OAuth und AWS Signature Version 4. Verkäufer-ID und Region müssen zum Zielmarktplatz passen, bevor Anfragen gesendet werden.",
         "connectionChecklist": [
           "SP-API-Anwendung in Seller Central erstellen und LWA-Client-Anmeldeinformationen abrufen.",
           "Verkäuferautorisierung abschließen und Refresh Token erhalten.",
