@@ -1,6 +1,6 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { ArrowLeft, CreditCard, ReceiptText, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, CreditCard, Plus, ReceiptText, ShieldCheck, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { FormPageShell, PagedLookupDialog } from '@/components/shared';
@@ -28,6 +28,22 @@ interface PaymentOrderFormState {
   paymentTermDays: string;
   dueDate: string;
   installmentCount: string;
+  notes: string;
+  allocations: PaymentAllocationFormState[];
+}
+
+interface PaymentAllocationFormState {
+  localId: string;
+  allocationType: string;
+  erpDocumentType: string;
+  erpDocumentNumber: string;
+  erpDocumentReference: string;
+  documentDate: string;
+  dueDate: string;
+  documentAmount: string;
+  openAmount: string;
+  allocatedAmount: string;
+  externalReference: string;
   notes: string;
 }
 
@@ -81,6 +97,33 @@ function trimOptional(value: string): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
+function createAllocationDraft(): PaymentAllocationFormState {
+  return {
+    localId: crypto.randomUUID(),
+    allocationType: 'Invoice',
+    erpDocumentType: '',
+    erpDocumentNumber: '',
+    erpDocumentReference: '',
+    documentDate: '',
+    dueDate: '',
+    documentAmount: '',
+    openAmount: '',
+    allocatedAmount: '',
+    externalReference: '',
+    notes: '',
+  };
+}
+
+function hasAllocationValue(item: PaymentAllocationFormState): boolean {
+  return Boolean(
+    item.erpDocumentNumber.trim()
+    || item.erpDocumentReference.trim()
+    || item.documentAmount.trim()
+    || item.openAmount.trim()
+    || item.allocatedAmount.trim()
+  );
+}
+
 function formatMoney(amount?: number, currencyCode = 'TRY'): string {
   return new Intl.NumberFormat('tr-TR', {
     style: 'currency',
@@ -121,6 +164,7 @@ function defaultPaymentOrderState(): PaymentOrderFormState {
     dueDate: '',
     installmentCount: '1',
     notes: '',
+    allocations: [],
   };
 }
 
@@ -153,6 +197,30 @@ export function B2bPaymentCreatePage(): ReactElement {
       const customerId = toRequiredNumber(values.customerId, 'Cari');
       const amount = toRequiredNumber(values.amount, 'Tahsilat tutarı');
       const installmentCount = toRequiredNumber(values.installmentCount, 'Taksit sayısı');
+      const allocations = values.allocations
+        .filter(hasAllocationValue)
+        .map((allocation) => {
+          const documentAmount = toRequiredNumber(allocation.documentAmount || allocation.allocatedAmount, 'Fatura tutarı');
+          const openAmount = toRequiredNumber(allocation.openAmount || allocation.allocatedAmount, 'Açık tutar');
+          const allocatedAmount = toRequiredNumber(allocation.allocatedAmount, 'Tahsis tutarı');
+          if (allocatedAmount > amount) {
+            throw new Error('Tahsis tutarı ödeme emri tutarından büyük olamaz.');
+          }
+          return {
+            allocationType: allocation.allocationType || 'Invoice',
+            erpDocumentType: trimOptional(allocation.erpDocumentType),
+            erpDocumentNumber: trimOptional(allocation.erpDocumentNumber),
+            erpDocumentReference: trimOptional(allocation.erpDocumentReference),
+            documentDate: trimOptional(allocation.documentDate),
+            dueDate: trimOptional(allocation.dueDate),
+            documentAmount,
+            openAmount,
+            allocatedAmount,
+            currencyCode: values.currencyCode || 'TRY',
+            externalReference: trimOptional(allocation.externalReference),
+            notes: trimOptional(allocation.notes),
+          };
+        });
       return paymentApi.createPaymentOrder({
         customerId,
         orderId: toOptionalNumber(values.orderId),
@@ -164,6 +232,7 @@ export function B2bPaymentCreatePage(): ReactElement {
         paymentMethod: trimOptional(values.paymentMethod),
         providerKey: trimOptional(values.providerKey),
         notes: trimOptional(values.notes),
+        allocations,
       });
     },
     onSuccess: () => {
@@ -187,6 +256,28 @@ export function B2bPaymentCreatePage(): ReactElement {
       }
       return { ...current, [name]: value };
     });
+  }
+
+  function addAllocation(): void {
+    setValues((current) => ({ ...current, allocations: [...current.allocations, createAllocationDraft()] }));
+  }
+
+  function updateAllocation(localId: string, patch: Partial<PaymentAllocationFormState>): void {
+    setValues((current) => ({
+      ...current,
+      allocations: current.allocations.map((item) => {
+        if (item.localId !== localId) return item;
+        const next = { ...item, ...patch };
+        if ('allocatedAmount' in patch && !item.documentAmount && !item.openAmount) {
+          return { ...next, documentAmount: patch.allocatedAmount ?? next.documentAmount, openAmount: patch.allocatedAmount ?? next.openAmount };
+        }
+        return next;
+      }),
+    }));
+  }
+
+  function removeAllocation(localId: string): void {
+    setValues((current) => ({ ...current, allocations: current.allocations.filter((item) => item.localId !== localId) }));
   }
 
   return (
@@ -341,6 +432,86 @@ export function B2bPaymentCreatePage(): ReactElement {
           <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Not</span>
           <Textarea value={values.notes} onChange={(event) => updateValue('notes', event.target.value)} />
         </label>
+
+        <section className="space-y-4 rounded-3xl border border-slate-200 bg-white/70 p-5 shadow-sm dark:border-white/10 dark:bg-white/5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-base font-black text-slate-950 dark:text-white">Fatura / Açık Kalem Tahsisi</h2>
+              <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+                İsterseniz tahsilatı ERP fatura numarası veya açık kalem referansına bağlayın; ödeme geldiğinde tahsilat bu satırlara dağıtılır.
+              </p>
+            </div>
+            <Button type="button" variant="outline" onClick={addAllocation}>
+              <Plus className="mr-2 h-4 w-4" />
+              Satır Ekle
+            </Button>
+          </div>
+
+          {values.allocations.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-300 p-5 text-sm font-semibold text-slate-500 dark:border-white/15 dark:text-slate-400">
+              Henüz tahsis satırı yok. Cari bazlı avans/tahsilat için boş bırakabilirsiniz.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {values.allocations.map((allocation, index) => (
+                <div key={allocation.localId} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 dark:border-white/10 dark:bg-black/10">
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <span className="text-sm font-black text-slate-900 dark:text-white">Tahsis Satırı {index + 1}</span>
+                    <Button type="button" size="sm" variant="ghost" onClick={() => removeAllocation(allocation.localId)}>
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Kaldır
+                    </Button>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <label className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Tip</span>
+                      <Select value={allocation.allocationType} onValueChange={(value) => updateAllocation(allocation.localId, { allocationType: value })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Invoice">Fatura</SelectItem>
+                          <SelectItem value="OpenItem">Açık Kalem</SelectItem>
+                          <SelectItem value="Advance">Avans</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">ERP Belge No</span>
+                      <Input value={allocation.erpDocumentNumber} onChange={(event) => updateAllocation(allocation.localId, { erpDocumentNumber: event.target.value })} />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Belge Referansı</span>
+                      <Input value={allocation.erpDocumentReference} onChange={(event) => updateAllocation(allocation.localId, { erpDocumentReference: event.target.value })} />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Belge Tarihi</span>
+                      <Input type="date" value={allocation.documentDate} onChange={(event) => updateAllocation(allocation.localId, { documentDate: event.target.value })} />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Vade Tarihi</span>
+                      <Input type="date" value={allocation.dueDate} onChange={(event) => updateAllocation(allocation.localId, { dueDate: event.target.value })} />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Tahsis Tutarı</span>
+                      <Input type="number" min="0.01" step="0.01" value={allocation.allocatedAmount} onChange={(event) => updateAllocation(allocation.localId, { allocatedAmount: event.target.value })} />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Fatura Tutarı</span>
+                      <Input type="number" min="0.01" step="0.01" value={allocation.documentAmount} onChange={(event) => updateAllocation(allocation.localId, { documentAmount: event.target.value })} />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Açık Tutar</span>
+                      <Input type="number" min="0.01" step="0.01" value={allocation.openAmount} onChange={(event) => updateAllocation(allocation.localId, { openAmount: event.target.value })} />
+                    </label>
+                    <label className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Dış Referans</span>
+                      <Input value={allocation.externalReference} onChange={(event) => updateAllocation(allocation.localId, { externalReference: event.target.value })} />
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
 
         <div className="flex justify-end gap-3">
           <Button type="button" variant="outline" asChild>

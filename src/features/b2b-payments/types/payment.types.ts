@@ -167,6 +167,33 @@ export interface PaymentOrderDto {
   paymentLinkShareChannel?: string;
   notes?: string;
   installments: PaymentInstallmentDto[];
+  allocations: PaymentOrderAllocationDto[];
+}
+
+export interface PaymentOrderAllocationDto {
+  id: number;
+  paymentOrderId: number;
+  paymentTransactionId?: number;
+  customerId: number;
+  allocationType: string;
+  status: string;
+  erpDocumentType?: string;
+  erpDocumentNumber?: string;
+  erpDocumentReference?: string;
+  documentDate?: string;
+  dueDate?: string;
+  documentAmount: number;
+  openAmount: number;
+  allocatedAmount: number;
+  paidAmount: number;
+  currencyCode: string;
+  erpCurrencyCode?: number;
+  currencyName?: string;
+  exchangeRate?: number;
+  exchangeRateSource?: string;
+  exchangeRateDate?: string;
+  externalReference?: string;
+  notes?: string;
 }
 
 export interface GeneratePaymentOrderLinkDto {
@@ -218,6 +245,22 @@ export interface CreatePaymentOrderDto {
   installmentCount: number;
   paymentMethod?: string;
   providerKey?: string;
+  notes?: string;
+  allocations?: CreatePaymentOrderAllocationDto[];
+}
+
+export interface CreatePaymentOrderAllocationDto {
+  allocationType: string;
+  erpDocumentType?: string;
+  erpDocumentNumber?: string;
+  erpDocumentReference?: string;
+  documentDate?: string;
+  dueDate?: string;
+  documentAmount: number;
+  openAmount: number;
+  allocatedAmount: number;
+  currencyCode?: string;
+  externalReference?: string;
   notes?: string;
 }
 
@@ -352,6 +395,7 @@ export interface QueuePaymentErpPostingDto {
 export interface CreatePartialPaymentAllocationDto {
   paymentTransactionId?: number;
   paymentInstallmentId?: number;
+  paymentOrderAllocationId?: number;
   amount: number;
   currencyCode: string;
   providerKey: string;

@@ -37,6 +37,7 @@ type PartialCollectionDraft = {
   providerKey: string;
   paymentMethod: string;
   paymentInstallmentId: string;
+  paymentOrderAllocationId: string;
   collectionDate: string;
   externalReference: string;
   queueErpPosting: boolean;
@@ -110,6 +111,7 @@ function defaultPartialCollectionDraft(paymentOrder: PaymentOrderDto): PartialCo
     providerKey: paymentOrder.providerKey || 'MANUAL',
     paymentMethod: 'PARTIAL_COLLECTION',
     paymentInstallmentId: '',
+    paymentOrderAllocationId: '',
     collectionDate: new Date().toISOString().slice(0, 16),
     externalReference: '',
     queueErpPosting: true,
@@ -182,6 +184,7 @@ export function B2bPaymentsPage(): ReactElement {
         providerKey: draft.providerKey,
         paymentMethod: draft.paymentMethod,
         paymentInstallmentId: draft.paymentInstallmentId ? Number(draft.paymentInstallmentId) : undefined,
+        paymentOrderAllocationId: draft.paymentOrderAllocationId ? Number(draft.paymentOrderAllocationId) : undefined,
         collectionDate: draft.collectionDate ? new Date(draft.collectionDate).toISOString() : undefined,
         externalReference: draft.externalReference || undefined,
         queueErpPosting: draft.queueErpPosting,
@@ -218,7 +221,7 @@ export function B2bPaymentsPage(): ReactElement {
     const values = {
       primary: <span className="font-mono text-sm font-semibold text-slate-950 dark:text-white">{row.paymentOrderNumber}</span>,
       secondary: row.paymentLinkUrl ? 'Link hazır' : row.providerKey || row.paymentMethod || '-',
-      scope: row.orderId ? `Sipariş #${row.orderId}` : 'Cari tahsilat',
+      scope: row.orderId ? `Sipariş #${row.orderId}` : (row.allocations?.length ? `${row.allocations.length} açık kalem` : 'Cari tahsilat'),
       status: statusBadge(row.status),
       amount: formatMoney(row.remainingAmount || row.amount, row.currencyCode),
       date: row.paymentLinkExpiresAt ? `Link: ${formatDate(row.paymentLinkExpiresAt)}` : formatDate(row.dueDate),
@@ -418,6 +421,38 @@ export function B2bPaymentsPage(): ReactElement {
                   Kalan tutar: {formatMoney(partialDraft.paymentOrder.remainingAmount, partialDraft.paymentOrder.currencyCode)}
                 </div>
               </div>
+              {(partialDraft.paymentOrder.allocations?.length ?? 0) > 0 ? (
+                <div className="grid gap-3">
+                  {partialDraft.paymentOrder.allocations.map((allocation) => {
+                    const remainingAllocation = Math.max((allocation.allocatedAmount || allocation.openAmount || 0) - (allocation.paidAmount || 0), 0);
+                    const active = partialDraft.paymentOrderAllocationId === String(allocation.id);
+                    return (
+                      <button
+                        key={allocation.id}
+                        type="button"
+                        className={`rounded-2xl border p-4 text-left transition ${active ? 'border-emerald-500 bg-emerald-50 text-emerald-950 dark:border-emerald-400 dark:bg-emerald-500/10 dark:text-emerald-100' : 'border-slate-200 bg-white hover:border-slate-300 dark:border-white/10 dark:bg-white/5'}`}
+                        onClick={() => setPartialDraft((current) => current ? {
+                          ...current,
+                          paymentOrderAllocationId: active ? '' : String(allocation.id),
+                          amount: active ? current.amount : String(remainingAllocation || allocation.allocatedAmount || current.amount),
+                        } : current)}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <div className="text-sm font-black">
+                              {allocation.erpDocumentNumber || allocation.erpDocumentReference || allocation.allocationType}
+                            </div>
+                            <div className="mt-1 text-xs font-semibold opacity-75">
+                              {allocation.allocationType} · {allocation.status || 'Bekliyor'} · Vade {formatDate(allocation.dueDate)}
+                            </div>
+                          </div>
+                          <Badge variant={active ? 'default' : 'secondary'}>{formatMoney(remainingAllocation, allocation.currencyCode)}</Badge>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-2">
                   <span className="text-sm font-semibold">Tahsilat Tutarı</span>
@@ -449,6 +484,25 @@ export function B2bPaymentsPage(): ReactElement {
                     </SelectContent>
                   </Select>
                 </label>
+                {(partialDraft.paymentOrder.allocations?.length ?? 0) > 0 ? (
+                  <label className="space-y-2">
+                    <span className="text-sm font-semibold">Fatura / Açık Kalem</span>
+                    <Select value={partialDraft.paymentOrderAllocationId || 'AUTO'} onValueChange={(value) => setPartialDraft((current) => current ? { ...current, paymentOrderAllocationId: value === 'AUTO' ? '' : value } : current)}>
+                      <SelectTrigger><SelectValue placeholder="Otomatik dağıt" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="AUTO">Otomatik dağıt</SelectItem>
+                        {partialDraft.paymentOrder.allocations.map((allocation) => {
+                          const remainingAllocation = Math.max((allocation.allocatedAmount || allocation.openAmount || 0) - (allocation.paidAmount || 0), 0);
+                          return (
+                            <SelectItem key={allocation.id} value={String(allocation.id)}>
+                              {allocation.erpDocumentNumber || allocation.erpDocumentReference || allocation.allocationType} · {formatMoney(remainingAllocation, allocation.currencyCode)}
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </label>
+                ) : null}
                 <label className="space-y-2">
                   <span className="text-sm font-semibold">Tahsilat Tarihi</span>
                   <Input type="datetime-local" value={partialDraft.collectionDate} onChange={(event) => setPartialDraft((current) => current ? { ...current, collectionDate: event.target.value } : current)} />
