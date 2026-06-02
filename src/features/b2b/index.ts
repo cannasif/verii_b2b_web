@@ -3,14 +3,6 @@ export {
 } from './components/B2bPortalPage';
 
 export {
-  B2bMarketplaceSettingsPage,
-} from './components/B2bMarketplaceSettingsPage';
-
-export {
-  B2bMarketplaceListingsPage,
-} from './components/B2bMarketplaceListingsWorkbenchPage';
-
-export {
   B2bApprovalRulesPage,
   B2bBuyersPage,
   B2bCatalogPage,

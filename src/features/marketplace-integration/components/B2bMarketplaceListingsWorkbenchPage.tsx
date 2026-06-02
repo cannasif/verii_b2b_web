@@ -26,8 +26,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { b2bApi } from '../api/b2b.api';
-import type { MarketplaceListingDto } from '../types/b2b.types';
+import { b2bApi } from '@/features/b2b/api/b2b.api';
+import type { MarketplaceListingDto } from '@/features/b2b/types/b2b.types';
 
 type MarketplaceAction = 'product-create' | 'price-update' | 'stock-update' | 'bulk-price-update' | 'clone-to-channel';
 type QuickOperation = 'price-update' | 'stock-update';

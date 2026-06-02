@@ -11,11 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
-import { b2bApi } from '../api/b2b.api';
+import { b2bApi } from '@/features/b2b/api/b2b.api';
 import type {
   MarketplaceConnectionTestResultDto,
   MarketplaceProviderSettingDto,
-} from '../types/b2b.types';
+} from '@/features/b2b/types/b2b.types';
 
 type ProviderFormState = {
   channelId?: number;
