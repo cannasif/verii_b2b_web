@@ -630,9 +630,24 @@ export function B2bPaymentOperationsPage(): ReactElement {
 
   function renderErpCell(row: PaymentErpPostingDto, columnKey: ErpPostingColumnKey): ReactElement | string {
     const values = {
-      primary: <span className="font-mono text-xs font-semibold">{row.idempotencyKey || `ERP-${row.id}`}</span>,
-      scope: `Ödeme emri #${row.paymentOrderId}${row.erpCustomerCode ? ` · ${row.erpCustomerCode}` : ''}`,
-      status: statusBadge(row.status),
+      primary: (
+        <div className="space-y-1">
+          <span className="block font-mono text-xs font-semibold">{row.erpDocumentNumber || row.externalReference || row.idempotencyKey || `ERP-${row.id}`}</span>
+          <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{row.erpReceiptType || row.postingMode}</span>
+        </div>
+      ),
+      scope: (
+        <div className="space-y-1">
+          <span className="block">Ödeme emri #{row.paymentOrderId}{row.erpCustomerCode ? ` · ${row.erpCustomerCode}` : ''}</span>
+          <span className="block text-xs font-medium text-slate-500 dark:text-slate-400">{row.clearingStatus || 'Kapama bekleniyor'}</span>
+        </div>
+      ),
+      status: (
+        <div className="flex flex-col items-start gap-1">
+          {statusBadge(row.status)}
+          {row.errorMessage ? <span className="max-w-64 text-xs font-semibold text-red-500">{row.errorMessage}</span> : null}
+        </div>
+      ),
       amount: formatMoney(row.amount, row.currencyCode),
       attempt: `${row.attemptCount || 0} deneme`,
       date: formatDate(row.postedDate || row.lastAttemptDate || row.requestedDate),

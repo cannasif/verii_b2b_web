@@ -369,7 +369,16 @@ export interface PaymentErpPostingDto {
   status: string;
   amount: number;
   currencyCode: string;
+  erpCurrencyCode?: number;
+  currencyName?: string;
+  exchangeRate?: number;
+  exchangeRateSource?: string;
+  exchangeRateDate?: string;
   erpCustomerCode?: string;
+  erpReceiptType?: string;
+  erpDocumentNumber?: string;
+  clearingStatus?: string;
+  openItemAllocationJson?: string;
   externalReference?: string;
   idempotencyKey?: string;
   errorMessage?: string;
