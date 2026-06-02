@@ -1,6 +1,6 @@
-import { type ReactElement, useEffect, useMemo, useState } from 'react';
+import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock3, Copy, Link2, ReceiptText, RefreshCw, TriangleAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -120,6 +120,8 @@ function defaultPartialCollectionDraft(paymentOrder: PaymentOrderDto): PartialCo
 export function B2bPaymentsPage(): ReactElement {
   const { setPageTitle } = useUIStore();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const appliedDrilldownRef = useRef('');
   const [paymentLinkDraft, setPaymentLinkDraft] = useState<PaymentLinkDraft | null>(null);
   const [partialDraft, setPartialDraft] = useState<PartialCollectionDraft | null>(null);
   const grid = usePagedDataGrid<PaymentColumnKey>({
@@ -203,6 +205,15 @@ export function B2bPaymentsPage(): ReactElement {
     return () => setPageTitle(null);
   }, [setPageTitle]);
 
+  useEffect(() => {
+    const drilldown = searchParams.get('drilldown');
+    if (!drilldown || appliedDrilldownRef.current === drilldown) return;
+    appliedDrilldownRef.current = drilldown;
+    const search = drilldown === 'overdue' ? 'Pending' : drilldown;
+    grid.searchConfig.onValueChange(search);
+    grid.searchConfig.onSearchChange(search);
+  }, [grid, searchParams]);
+
   function renderCell(row: PaymentOrderDto, columnKey: PaymentColumnKey): ReactElement | string {
     const values = {
       primary: <span className="font-mono text-sm font-semibold text-slate-950 dark:text-white">{row.paymentOrderNumber}</span>,
@@ -243,23 +254,43 @@ export function B2bPaymentsPage(): ReactElement {
           icon={<Clock3 className="size-5" />}
           label="Bekleyen ödeme"
           value={`${dashboard?.pendingPaymentOrderCount ?? 0} · ${formatMoney(dashboard?.pendingPaymentAmount, dashboard?.currencyCode)}`}
+          to="/b2b/payments?drilldown=pending"
         />
         <MetricCard
           icon={<TriangleAlert className="size-5" />}
           label="Vadesi geçen"
           value={`${dashboard?.overduePaymentOrderCount ?? 0} · ${formatMoney(dashboard?.overduePaymentAmount, dashboard?.currencyCode)}`}
+          to="/b2b/payments?drilldown=overdue"
         />
         <MetricCard
           icon={<RefreshCw className="size-5" />}
           label="ERP aktarım hatası"
           value={dashboard?.failedErpPostingCount ?? 0}
+          to="/b2b/payment-operations?target=erp&search=Failed"
         />
         <MetricCard
           icon={<ReceiptText className="size-5" />}
           label="Callback / iade takibi"
           value={`${dashboard?.failedCallbackCount ?? 0} / ${dashboard?.pendingRefundCount ?? 0}`}
+          to="/b2b/payment-operations?target=operations&search=REFUND"
         />
       </div>
+
+      {(dashboard?.currencyBreakdowns?.length ?? 0) > 0 ? (
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {dashboard!.currencyBreakdowns.slice(0, 4).map((item) => (
+            <Card key={item.key} className="border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3">
+              <CardContent className="p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">{item.displayName}</p>
+                <p className="mt-2 text-xl font-black text-slate-950 dark:text-white">{formatMoney(item.pendingPaymentAmount, item.currencyCode)}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">
+                  {item.pendingPaymentOrderCount} bekleyen · {item.overduePaymentOrderCount} vadesi geçen
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : null}
 
       <PagedDataGrid<PaymentOrderDto, PaymentColumnKey>
         pageKey="b2b-payments"
@@ -452,6 +483,8 @@ export function B2bPaymentsPage(): ReactElement {
 export function B2bPaymentOperationsPage(): ReactElement {
   const { setPageTitle } = useUIStore();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const appliedOperationDrilldownRef = useRef('');
   const grid = usePagedDataGrid<OperationColumnKey>({
     pageKey: 'b2b-payment-operations',
     defaultSortBy: 'date',
@@ -511,6 +544,23 @@ export function B2bPaymentOperationsPage(): ReactElement {
     setPageTitle('Ödeme Operasyonları');
     return () => setPageTitle(null);
   }, [setPageTitle]);
+
+  useEffect(() => {
+    const search = searchParams.get('search');
+    if (!search) return;
+    const target = searchParams.get('target');
+    const key = `${target ?? 'operations'}:${search}`;
+    if (appliedOperationDrilldownRef.current === key) return;
+    appliedOperationDrilldownRef.current = key;
+    if (target === 'erp') {
+      erpGrid.searchConfig.onValueChange(search);
+      erpGrid.searchConfig.onSearchChange(search);
+      return;
+    }
+
+    grid.searchConfig.onValueChange(search);
+    grid.searchConfig.onSearchChange(search);
+  }, [erpGrid, grid, searchParams]);
 
   function renderCell(row: PaymentProviderOperationDto, columnKey: OperationColumnKey): ReactElement | string {
     const values = {
@@ -668,8 +718,8 @@ export function B2bPaymentOperationsPage(): ReactElement {
   );
 }
 
-function MetricCard({ icon, label, value }: { icon: ReactElement; label: string; value: number | string }): ReactElement {
-  return (
+function MetricCard({ icon, label, value, to }: { icon: ReactElement; label: string; value: number | string; to?: string }): ReactElement {
+  const content = (
     <Card className="border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3">
       <CardContent className="flex items-center gap-4 p-5">
         <span className="flex size-12 items-center justify-center rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-950">{icon}</span>
@@ -680,4 +730,6 @@ function MetricCard({ icon, label, value }: { icon: ReactElement; label: string;
       </CardContent>
     </Card>
   );
+
+  return to ? <Link to={to} className="block transition hover:-translate-y-0.5">{content}</Link> : content;
 }

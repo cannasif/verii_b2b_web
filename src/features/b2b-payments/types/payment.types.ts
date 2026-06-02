@@ -249,6 +249,18 @@ export interface PaymentFinanceDashboardDto {
   pendingRefundCount: number;
   currencyCode: string;
   generatedAt: string;
+  currencyBreakdowns: PaymentFinanceDashboardBreakdownDto[];
+  providerBreakdowns: PaymentFinanceDashboardBreakdownDto[];
+}
+
+export interface PaymentFinanceDashboardBreakdownDto {
+  key: string;
+  displayName: string;
+  currencyCode: string;
+  pendingPaymentOrderCount: number;
+  pendingPaymentAmount: number;
+  overduePaymentOrderCount: number;
+  overduePaymentAmount: number;
 }
 
 export interface Iyzico3dsInitializeDto {
