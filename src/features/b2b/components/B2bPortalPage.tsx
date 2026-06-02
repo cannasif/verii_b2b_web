@@ -1,6 +1,6 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, BarChart3, Building2, CheckCircle2, ClipboardList, CreditCard, FileText, Heart, PackageSearch, Repeat2, ShoppingCart, Sparkles, Upload } from 'lucide-react';
+import { ArrowRight, BarChart3, Building2, CalendarDays, CheckCircle2, ClipboardList, FileText, Heart, PackageSearch, Repeat2, ShieldCheck, ShoppingCart, Sparkles, Upload } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -432,6 +432,11 @@ export function B2bPortalPage(): ReactElement {
     onError: (error) => setMessage((error as Error).message),
   });
 
+  const activePaymentAmount = paymentOrder ? paymentOrder.remainingAmount || paymentOrder.amount : 0;
+  const paymentDueDate = paymentOrder ? new Date(paymentOrder.dueDate) : null;
+  const paymentDueDays = paymentDueDate ? Math.ceil((paymentDueDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000)) : null;
+  const selectedPaymentWarnings = selectedPaymentMethod?.warnings ?? [];
+
   const orderMutation = useMutation({
     mutationFn: async () => {
       if (!cart) throw new Error('Sipariş için sepet bulunamadı.');
@@ -618,110 +623,163 @@ export function B2bPortalPage(): ReactElement {
                   </Button>
                 </div>
                 {paymentOrder && (
-                  <div className="space-y-3 rounded-3xl border border-emerald-900/10 bg-white p-4 shadow-sm">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="flex items-center gap-2 text-sm font-black text-emerald-950"><CreditCard className="h-4 w-4" /> Ödeme planı</p>
-                        <p className="mt-1 text-xs font-semibold text-slate-500">
-                          {paymentOrder.orderId ? `Sipariş #${paymentOrder.orderId}` : 'Cari tahsilat'} için {formatMoney(paymentOrder.remainingAmount || paymentOrder.amount, paymentOrder.currencyCode)}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-wide">
-                          <span className="rounded-full bg-stone-100 px-2 py-1 text-slate-600">Vade: {paymentOrder.paymentTermDays ?? '-'} gün</span>
-                          <span className="rounded-full bg-stone-100 px-2 py-1 text-slate-600">Son tarih: {new Date(paymentOrder.dueDate).toLocaleDateString('tr-TR')}</span>
-                          <span className="rounded-full bg-stone-100 px-2 py-1 text-slate-600">Taksit: {paymentOrder.installmentCount || 1}</span>
+                  <div className="overflow-hidden rounded-[2rem] border border-emerald-950/10 bg-white shadow-2xl shadow-emerald-950/10">
+                    <div className="relative overflow-hidden bg-[radial-gradient(circle_at_15%_0%,rgba(255,255,255,0.35),transparent_34%),linear-gradient(135deg,#064e3b,#0f766e_62%,#134e4a)] p-5 text-white">
+                      <div className="absolute right-[-3rem] top-[-4rem] h-36 w-36 rounded-full bg-white/15 blur-2xl" />
+                      <div className="relative flex items-start justify-between gap-4">
+                        <div>
+                          <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-emerald-100">
+                            <ShieldCheck className="h-4 w-4" />
+                            Güvenli ödeme linki
+                          </p>
+                          <h3 className="mt-3 text-3xl font-black tracking-tight">{formatMoney(activePaymentAmount, paymentOrder.currencyCode)}</h3>
+                          <p className="mt-1 text-sm font-semibold text-white/70">
+                            {paymentOrder.orderId ? `Sipariş #${paymentOrder.orderId}` : 'Cari tahsilat'} · {paymentOrder.paymentOrderNumber}
+                          </p>
+                        </div>
+                        <Badge className="bg-white/15 text-white hover:bg-white/15">{paymentOrder.status}</Badge>
+                      </div>
+                      <div className="relative mt-5 grid gap-2 sm:grid-cols-3">
+                        <div className="rounded-2xl bg-white/12 p-3 backdrop-blur">
+                          <p className="text-[10px] font-black uppercase tracking-wide text-white/55">Son ödeme</p>
+                          <p className="mt-1 text-sm font-black">{paymentDueDate?.toLocaleDateString('tr-TR') ?? '-'}</p>
+                        </div>
+                        <div className="rounded-2xl bg-white/12 p-3 backdrop-blur">
+                          <p className="text-[10px] font-black uppercase tracking-wide text-white/55">Vade</p>
+                          <p className="mt-1 text-sm font-black">{paymentOrder.paymentTermDays ?? 0} gün</p>
+                        </div>
+                        <div className="rounded-2xl bg-white/12 p-3 backdrop-blur">
+                          <p className="text-[10px] font-black uppercase tracking-wide text-white/55">Kalan süre</p>
+                          <p className="mt-1 text-sm font-black">{paymentDueDays !== null ? paymentDueDays < 0 ? 'Vadesi geçti' : `${paymentDueDays} gün` : '-'}</p>
                         </div>
                       </div>
-                      <Badge className="bg-emerald-100 text-emerald-900 hover:bg-emerald-100">{paymentOrder.status}</Badge>
                     </div>
-                    <div className="grid gap-2">
-                      {paymentMethods.map((method) => {
-                        const active = selectedPaymentMethod?.providerKey === method.providerKey && selectedPaymentMethod.paymentMethod === method.paymentMethod;
-                        return (
-                          <button
-                            key={`${method.providerKey}-${method.paymentMethod}`}
-                            type="button"
-                            disabled={!method.isAvailable}
-                            className={`rounded-2xl border px-3 py-2 text-left text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'border-emerald-700 bg-emerald-50 text-emerald-950' : 'border-stone-200 bg-white text-slate-600 hover:border-emerald-300'}`}
-                            onClick={() => {
-                              if (!method.isAvailable) return;
-                              setSelectedPaymentMethod(method);
-                              setInstallmentOptions([]);
-                              setSelectedInstallment(null);
-                            }}
-                          >
-                            <span>{method.displayName}</span>
-                            {method.requiresApproval && <span className="ml-2 text-xs font-bold text-amber-700">Onaylı</span>}
-                            <span className="ml-2 text-xs font-bold text-slate-400">Risk: {method.riskLevel}</span>
-                            {method.unavailableReason ? <p className="mt-1 text-xs font-bold text-rose-700">{method.unavailableReason}</p> : null}
-                            {method.warnings?.length ? <p className="mt-1 text-xs font-bold text-amber-700">{method.warnings[0]}</p> : null}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {selectedPaymentMethod?.isProviderHosted && (
-                      <div className="space-y-3 rounded-2xl bg-stone-50 p-3">
-                        <div className="flex gap-2">
-                          <Input
-                            value={cardBin}
-                            onChange={(event) => setCardBin(event.target.value.replace(/\D/g, '').slice(0, 8))}
-                            placeholder="Kart ilk 6/8 hane"
-                            inputMode="numeric"
-                            className="bg-white"
-                          />
-                          <Button type="button" variant="outline" onClick={() => installmentMutation.mutate()} disabled={installmentMutation.isPending || !paymentOrder}>
-                            Taksit Bul
-                          </Button>
+
+                    <div className="space-y-4 p-4">
+                      <div className="grid gap-2">
+                        <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">Ödeme yöntemi</p>
+                        {paymentMethods.map((method) => {
+                          const active = selectedPaymentMethod?.providerKey === method.providerKey && selectedPaymentMethod.paymentMethod === method.paymentMethod;
+                          return (
+                            <button
+                              key={`${method.providerKey}-${method.paymentMethod}`}
+                              type="button"
+                              disabled={!method.isAvailable}
+                              className={`group rounded-2xl border p-3 text-left transition disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'border-emerald-700 bg-emerald-50 shadow-sm shadow-emerald-900/10' : 'border-stone-200 bg-stone-50 hover:border-emerald-300 hover:bg-white'}`}
+                              onClick={() => {
+                                if (!method.isAvailable) return;
+                                setSelectedPaymentMethod(method);
+                                setInstallmentOptions([]);
+                                setSelectedInstallment(null);
+                              }}
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div>
+                                  <p className="text-sm font-black text-slate-950">{method.displayName}</p>
+                                  <p className="mt-1 text-xs font-semibold text-slate-500">
+                                    {method.isProviderHosted ? 'Kart ve taksit seçenekleri sağlayıcı üzerinden tamamlanır.' : 'Finans onayı veya açık hesap akışı için uygundur.'}
+                                  </p>
+                                </div>
+                                <div className="flex flex-col items-end gap-1">
+                                  {active ? <CheckCircle2 className="h-5 w-5 text-emerald-700" /> : null}
+                                  <span className="rounded-full bg-white px-2 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">Risk: {method.riskLevel}</span>
+                                </div>
+                              </div>
+                              {method.requiresApproval ? <p className="mt-2 text-xs font-bold text-amber-700">Finans onayı gerektirir.</p> : null}
+                              {method.unavailableReason ? <p className="mt-2 text-xs font-bold text-rose-700">{method.unavailableReason}</p> : null}
+                              {method.warnings?.length ? <p className="mt-2 text-xs font-bold text-amber-700">{method.warnings[0]}</p> : null}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {paymentOrder.installments.length > 0 ? (
+                        <div className="rounded-2xl border border-stone-200 bg-stone-50 p-3">
+                          <div className="mb-2 flex items-center justify-between gap-3">
+                            <p className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                              <CalendarDays className="h-4 w-4" />
+                              Vade planı
+                            </p>
+                            <Badge variant="secondary">{paymentOrder.installmentCount || 1} taksit</Badge>
+                          </div>
+                          <div className="space-y-2">
+                            {paymentOrder.installments.slice(0, 3).map((installment) => (
+                              <div key={installment.id} className="flex items-center justify-between rounded-xl bg-white px-3 py-2 text-xs font-bold text-slate-600">
+                                <span>{installment.installmentNumber}. vade · {new Date(installment.dueDate).toLocaleDateString('tr-TR')}</span>
+                                <span>{formatMoney(installment.amount - installment.paidAmount, paymentOrder.currencyCode)}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        {installmentOptions.length > 0 && (
-                          <div className="grid gap-2">
-                            {installmentOptions.map((option) => {
-                              const active = selectedInstallment?.installmentNumber === option.installmentNumber;
-                              return (
-                                <button
-                                  key={option.installmentNumber}
-                                  type="button"
-                                  className={`flex items-center justify-between rounded-2xl border px-3 py-2 text-sm font-black ${active ? 'border-emerald-700 bg-white text-emerald-950' : 'border-stone-200 bg-white/70 text-slate-600'}`}
-                                  onClick={() => setSelectedInstallment(option)}
-                                >
-                                  <span>{option.installmentNumber === 1 ? 'Tek çekim' : `${option.installmentNumber} taksit`}</span>
-                                  <span>{formatMoney(option.totalPrice, paymentOrder?.currencyCode)}</span>
-                                </button>
-                              );
-                            })}
-                            <Button type="button" className="bg-emerald-800 hover:bg-emerald-700" disabled={!selectedInstallment || selectInstallmentMutation.isPending} onClick={() => selectInstallmentMutation.mutate()}>
-                              Taksit Planını Kaydet
+                      ) : null}
+
+                      {selectedPaymentMethod?.isProviderHosted && (
+                        <div className="space-y-3 rounded-2xl border border-emerald-900/10 bg-emerald-50/70 p-3">
+                          <div className="flex gap-2">
+                            <Input
+                              value={cardBin}
+                              onChange={(event) => setCardBin(event.target.value.replace(/\D/g, '').slice(0, 8))}
+                              placeholder="Kart ilk 6/8 hane"
+                              inputMode="numeric"
+                              className="bg-white"
+                            />
+                            <Button type="button" variant="outline" onClick={() => installmentMutation.mutate()} disabled={installmentMutation.isPending || !paymentOrder}>
+                              Taksit Bul
                             </Button>
                           </div>
-                        )}
-                        <div className="grid gap-2 rounded-2xl border border-stone-200 bg-white p-3">
-                          <p className="text-xs font-black uppercase tracking-wide text-slate-400">Ödeme bilgileri</p>
-                          <div className="grid gap-2 md:grid-cols-2">
-                            <Input placeholder="E-posta" value={checkoutForm.email} onChange={(event) => setCheckoutForm((current) => ({ ...current, email: event.target.value }))} />
-                            <Input placeholder="Ad Soyad" value={checkoutForm.fullName} onChange={(event) => setCheckoutForm((current) => ({ ...current, fullName: event.target.value }))} />
-                            <Input placeholder="Telefon" value={checkoutForm.phone} onChange={(event) => setCheckoutForm((current) => ({ ...current, phone: event.target.value }))} />
-                            <Input placeholder="Şehir" value={checkoutForm.city} onChange={(event) => setCheckoutForm((current) => ({ ...current, city: event.target.value }))} />
-                          </div>
-                          <Input placeholder="Adres" value={checkoutForm.address} onChange={(event) => setCheckoutForm((current) => ({ ...current, address: event.target.value }))} />
-                          {selectedPaymentMethod.providerKey === 'IYZICO' ? (
-                            <div className="grid gap-2 md:grid-cols-2">
-                              <Input placeholder="Kart üzerindeki ad" value={checkoutForm.cardHolderName} onChange={(event) => setCheckoutForm((current) => ({ ...current, cardHolderName: event.target.value }))} />
-                              <Input placeholder="Kart numarası" inputMode="numeric" value={checkoutForm.cardNumber} onChange={(event) => setCheckoutForm((current) => ({ ...current, cardNumber: event.target.value.replace(/\D/g, '').slice(0, 19) }))} />
-                              <Input placeholder="Ay" inputMode="numeric" value={checkoutForm.expireMonth} onChange={(event) => setCheckoutForm((current) => ({ ...current, expireMonth: event.target.value.replace(/\D/g, '').slice(0, 2) }))} />
-                              <Input placeholder="Yıl" inputMode="numeric" value={checkoutForm.expireYear} onChange={(event) => setCheckoutForm((current) => ({ ...current, expireYear: event.target.value.replace(/\D/g, '').slice(0, 4) }))} />
-                              <Input placeholder="CVC" inputMode="numeric" value={checkoutForm.cvc} onChange={(event) => setCheckoutForm((current) => ({ ...current, cvc: event.target.value.replace(/\D/g, '').slice(0, 4) }))} />
+                          {installmentOptions.length > 0 && (
+                            <div className="grid gap-2">
+                              {installmentOptions.map((option) => {
+                                const active = selectedInstallment?.installmentNumber === option.installmentNumber;
+                                return (
+                                  <button
+                                    key={option.installmentNumber}
+                                    type="button"
+                                    className={`flex items-center justify-between rounded-2xl border px-3 py-2 text-sm font-black ${active ? 'border-emerald-700 bg-white text-emerald-950' : 'border-white bg-white/60 text-slate-600'}`}
+                                    onClick={() => setSelectedInstallment(option)}
+                                  >
+                                    <span>{option.installmentNumber === 1 ? 'Tek çekim' : `${option.installmentNumber} taksit`}</span>
+                                    <span>{formatMoney(option.totalPrice, paymentOrder.currencyCode)}</span>
+                                  </button>
+                                );
+                              })}
+                              <Button type="button" className="bg-emerald-800 hover:bg-emerald-700" disabled={!selectedInstallment || selectInstallmentMutation.isPending} onClick={() => selectInstallmentMutation.mutate()}>
+                                Taksit Planını Kaydet
+                              </Button>
                             </div>
-                          ) : null}
-                          <Button
-                            type="button"
-                            className="bg-emerald-800 hover:bg-emerald-700"
-                            disabled={paytrCheckoutMutation.isPending || iyzicoCheckoutMutation.isPending || !paymentOrder}
-                            onClick={() => selectedPaymentMethod.providerKey === 'IYZICO' ? iyzicoCheckoutMutation.mutate() : paytrCheckoutMutation.mutate()}
-                          >
-                            {selectedPaymentMethod.providerKey === 'IYZICO' ? 'iyzico 3DS ile Öde' : 'PayTR ile Öde'}
-                          </Button>
+                          )}
+
+                          <div className="grid gap-2 rounded-2xl bg-white p-3">
+                            <p className="text-xs font-black uppercase tracking-wide text-slate-400">Ödeme bilgileri</p>
+                            <div className="grid gap-2 md:grid-cols-2">
+                              <Input placeholder="E-posta" value={checkoutForm.email} onChange={(event) => setCheckoutForm((current) => ({ ...current, email: event.target.value }))} />
+                              <Input placeholder="Ad Soyad" value={checkoutForm.fullName} onChange={(event) => setCheckoutForm((current) => ({ ...current, fullName: event.target.value }))} />
+                              <Input placeholder="Telefon" value={checkoutForm.phone} onChange={(event) => setCheckoutForm((current) => ({ ...current, phone: event.target.value }))} />
+                              <Input placeholder="Şehir" value={checkoutForm.city} onChange={(event) => setCheckoutForm((current) => ({ ...current, city: event.target.value }))} />
+                            </div>
+                            <Input placeholder="Adres" value={checkoutForm.address} onChange={(event) => setCheckoutForm((current) => ({ ...current, address: event.target.value }))} />
+                            {selectedPaymentMethod.providerKey === 'IYZICO' ? (
+                              <div className="grid gap-2 md:grid-cols-2">
+                                <Input placeholder="Kart üzerindeki ad" value={checkoutForm.cardHolderName} onChange={(event) => setCheckoutForm((current) => ({ ...current, cardHolderName: event.target.value }))} />
+                                <Input placeholder="Kart numarası" inputMode="numeric" value={checkoutForm.cardNumber} onChange={(event) => setCheckoutForm((current) => ({ ...current, cardNumber: event.target.value.replace(/\D/g, '').slice(0, 19) }))} />
+                                <Input placeholder="Ay" inputMode="numeric" value={checkoutForm.expireMonth} onChange={(event) => setCheckoutForm((current) => ({ ...current, expireMonth: event.target.value.replace(/\D/g, '').slice(0, 2) }))} />
+                                <Input placeholder="Yıl" inputMode="numeric" value={checkoutForm.expireYear} onChange={(event) => setCheckoutForm((current) => ({ ...current, expireYear: event.target.value.replace(/\D/g, '').slice(0, 4) }))} />
+                                <Input placeholder="CVC" inputMode="numeric" value={checkoutForm.cvc} onChange={(event) => setCheckoutForm((current) => ({ ...current, cvc: event.target.value.replace(/\D/g, '').slice(0, 4) }))} />
+                              </div>
+                            ) : null}
+                            {selectedPaymentWarnings.length > 0 ? <p className="text-xs font-bold text-amber-700">{selectedPaymentWarnings[0]}</p> : null}
+                            <Button
+                              type="button"
+                              className="h-12 bg-emerald-900 text-base font-black hover:bg-emerald-800"
+                              disabled={paytrCheckoutMutation.isPending || iyzicoCheckoutMutation.isPending || !paymentOrder}
+                              onClick={() => selectedPaymentMethod.providerKey === 'IYZICO' ? iyzicoCheckoutMutation.mutate() : paytrCheckoutMutation.mutate()}
+                            >
+                              {selectedPaymentMethod.providerKey === 'IYZICO' ? 'iyzico 3DS ile Öde' : 'PayTR ile Güvenli Öde'}
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 )}
               </CardContent>
