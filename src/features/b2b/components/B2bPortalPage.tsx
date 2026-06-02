@@ -62,6 +62,19 @@ export function B2bPortalPage(): ReactElement {
   const [cardBin, setCardBin] = useState('');
   const [installmentOptions, setInstallmentOptions] = useState<PaymentInstallmentOptionDto[]>([]);
   const [selectedInstallment, setSelectedInstallment] = useState<PaymentInstallmentOptionDto | null>(null);
+  const [checkoutForm, setCheckoutForm] = useState({
+    email: '',
+    fullName: '',
+    phone: '',
+    address: '',
+    city: 'İstanbul',
+    country: 'Türkiye',
+    cardHolderName: '',
+    cardNumber: '',
+    expireMonth: '',
+    expireYear: '',
+    cvc: '',
+  });
 
   const selectedCompany = portalSession?.company ?? null;
   const selectedBuyer = portalSession?.buyer ?? null;
@@ -347,6 +360,78 @@ export function B2bPortalPage(): ReactElement {
     onError: (error) => setMessage((error as Error).message),
   });
 
+  const paytrCheckoutMutation = useMutation({
+    mutationFn: async () => {
+      if (!paymentOrder) throw new Error('Ödeme emri bulunamadı.');
+      if (!checkoutForm.email || !checkoutForm.fullName || !checkoutForm.phone || !checkoutForm.address) {
+        throw new Error('PayTR için e-posta, ad soyad, telefon ve adres zorunlu.');
+      }
+
+      return b2bApi.createPaytrIframeToken({
+        orderId: paymentOrder.orderId ?? 0,
+        paymentOrderId: paymentOrder.id,
+        paymentLinkToken: paymentLinkToken || undefined,
+        email: checkoutForm.email,
+        userName: checkoutForm.fullName,
+        userAddress: checkoutForm.address,
+        userPhone: checkoutForm.phone,
+        okUrl: `${window.location.origin}/b2b-portal?paymentLinkToken=${encodeURIComponent(paymentLinkToken)}`,
+        failUrl: `${window.location.origin}/b2b-portal?paymentLinkToken=${encodeURIComponent(paymentLinkToken)}`,
+      }, portalToken);
+    },
+    onSuccess: (token) => {
+      setMessage('PayTR ödeme ekranına yönlendiriliyorsunuz.');
+      window.location.href = token.iframeUrl;
+    },
+    onError: (error) => setMessage((error as Error).message),
+  });
+
+  const iyzicoCheckoutMutation = useMutation({
+    mutationFn: async () => {
+      if (!paymentOrder) throw new Error('Ödeme emri bulunamadı.');
+      if (!checkoutForm.email || !checkoutForm.fullName || !checkoutForm.phone || !checkoutForm.address || !checkoutForm.cardHolderName || !checkoutForm.cardNumber || !checkoutForm.expireMonth || !checkoutForm.expireYear || !checkoutForm.cvc) {
+        throw new Error('iyzico 3DS için müşteri ve kart alanları zorunlu.');
+      }
+
+      const [buyerName, ...surnameParts] = checkoutForm.fullName.trim().split(/\s+/);
+      return b2bApi.createIyzico3dsPayment({
+        orderId: paymentOrder.orderId ?? 0,
+        paymentOrderId: paymentOrder.id,
+        paymentLinkToken: paymentLinkToken || undefined,
+        email: checkoutForm.email,
+        buyerName: buyerName || checkoutForm.fullName,
+        buyerSurname: surnameParts.join(' ') || buyerName || 'B2B',
+        buyerPhone: checkoutForm.phone,
+        buyerAddress: checkoutForm.address,
+        city: checkoutForm.city,
+        country: checkoutForm.country,
+        cardHolderName: checkoutForm.cardHolderName,
+        cardNumber: checkoutForm.cardNumber,
+        expireMonth: checkoutForm.expireMonth,
+        expireYear: checkoutForm.expireYear,
+        cvc: checkoutForm.cvc,
+        installmentCount: selectedInstallment?.installmentNumber ?? paymentOrder.providerInstallmentNumber ?? paymentOrder.installmentCount ?? 1,
+      }, portalToken);
+    },
+    onSuccess: (result) => {
+      if (result.paymentPageUrl) {
+        window.location.href = result.paymentPageUrl;
+        return;
+      }
+
+      if (result.threeDSHtmlContent) {
+        const popup = window.open('', '_blank');
+        popup?.document.write(result.threeDSHtmlContent);
+        popup?.document.close();
+        setMessage('iyzico 3DS doğrulama ekranı açıldı.');
+        return;
+      }
+
+      setMessage('iyzico 3DS başlatıldı.');
+    },
+    onError: (error) => setMessage((error as Error).message),
+  });
+
   const orderMutation = useMutation({
     mutationFn: async () => {
       if (!cart) throw new Error('Sipariş için sepet bulunamadı.');
@@ -608,6 +693,33 @@ export function B2bPortalPage(): ReactElement {
                             </Button>
                           </div>
                         )}
+                        <div className="grid gap-2 rounded-2xl border border-stone-200 bg-white p-3">
+                          <p className="text-xs font-black uppercase tracking-wide text-slate-400">Ödeme bilgileri</p>
+                          <div className="grid gap-2 md:grid-cols-2">
+                            <Input placeholder="E-posta" value={checkoutForm.email} onChange={(event) => setCheckoutForm((current) => ({ ...current, email: event.target.value }))} />
+                            <Input placeholder="Ad Soyad" value={checkoutForm.fullName} onChange={(event) => setCheckoutForm((current) => ({ ...current, fullName: event.target.value }))} />
+                            <Input placeholder="Telefon" value={checkoutForm.phone} onChange={(event) => setCheckoutForm((current) => ({ ...current, phone: event.target.value }))} />
+                            <Input placeholder="Şehir" value={checkoutForm.city} onChange={(event) => setCheckoutForm((current) => ({ ...current, city: event.target.value }))} />
+                          </div>
+                          <Input placeholder="Adres" value={checkoutForm.address} onChange={(event) => setCheckoutForm((current) => ({ ...current, address: event.target.value }))} />
+                          {selectedPaymentMethod.providerKey === 'IYZICO' ? (
+                            <div className="grid gap-2 md:grid-cols-2">
+                              <Input placeholder="Kart üzerindeki ad" value={checkoutForm.cardHolderName} onChange={(event) => setCheckoutForm((current) => ({ ...current, cardHolderName: event.target.value }))} />
+                              <Input placeholder="Kart numarası" inputMode="numeric" value={checkoutForm.cardNumber} onChange={(event) => setCheckoutForm((current) => ({ ...current, cardNumber: event.target.value.replace(/\D/g, '').slice(0, 19) }))} />
+                              <Input placeholder="Ay" inputMode="numeric" value={checkoutForm.expireMonth} onChange={(event) => setCheckoutForm((current) => ({ ...current, expireMonth: event.target.value.replace(/\D/g, '').slice(0, 2) }))} />
+                              <Input placeholder="Yıl" inputMode="numeric" value={checkoutForm.expireYear} onChange={(event) => setCheckoutForm((current) => ({ ...current, expireYear: event.target.value.replace(/\D/g, '').slice(0, 4) }))} />
+                              <Input placeholder="CVC" inputMode="numeric" value={checkoutForm.cvc} onChange={(event) => setCheckoutForm((current) => ({ ...current, cvc: event.target.value.replace(/\D/g, '').slice(0, 4) }))} />
+                            </div>
+                          ) : null}
+                          <Button
+                            type="button"
+                            className="bg-emerald-800 hover:bg-emerald-700"
+                            disabled={paytrCheckoutMutation.isPending || iyzicoCheckoutMutation.isPending || !paymentOrder}
+                            onClick={() => selectedPaymentMethod.providerKey === 'IYZICO' ? iyzicoCheckoutMutation.mutate() : paytrCheckoutMutation.mutate()}
+                          >
+                            {selectedPaymentMethod.providerKey === 'IYZICO' ? 'iyzico 3DS ile Öde' : 'PayTR ile Öde'}
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>

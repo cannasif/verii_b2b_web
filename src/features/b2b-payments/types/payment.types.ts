@@ -31,6 +31,8 @@ export interface PaymentTransactionDto {
 
 export interface CreatePaytrIframeTokenDto {
   orderId: number;
+  paymentOrderId?: number;
+  paymentLinkToken?: string;
   email: string;
   userName: string;
   userAddress: string;
@@ -43,6 +45,7 @@ export interface CreatePaytrIframeTokenDto {
 export interface PaytrIframeTokenDto {
   paymentTransactionId: number;
   orderId: number;
+  paymentOrderId: number;
   merchantOid: string;
   iframeToken: string;
   iframeUrl: string;
@@ -251,6 +254,7 @@ export interface PaymentFinanceDashboardDto {
 export interface Iyzico3dsInitializeDto {
   paymentTransactionId: number;
   orderId: number;
+  paymentOrderId: number;
   conversationId: string;
   paymentId?: string;
   status: string;
@@ -262,6 +266,8 @@ export interface Iyzico3dsInitializeDto {
 
 export interface CreateIyzico3dsPaymentDto {
   orderId: number;
+  paymentOrderId?: number;
+  paymentLinkToken?: string;
   email: string;
   buyerName: string;
   buyerSurname: string;
