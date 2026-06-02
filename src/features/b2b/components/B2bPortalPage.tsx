@@ -56,7 +56,6 @@ export function B2bPortalPage(): ReactElement {
   const [quickOrderText, setQuickOrderText] = useState('');
   const [customerNote, setCustomerNote] = useState('');
   const [message, setMessage] = useState<string | null>(null);
-  const [lastOrder, setLastOrder] = useState<OrderDto | null>(null);
   const [paymentOrder, setPaymentOrder] = useState<PaymentOrderDto | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethodOptionDto[]>([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodOptionDto | null>(null);
@@ -87,8 +86,18 @@ export function B2bPortalPage(): ReactElement {
     if (paymentLinkQuery.data) {
       setPaymentOrder(paymentLinkQuery.data);
       setMessage(`${paymentLinkQuery.data.paymentOrderNumber} ödeme emri linkten açıldı.`);
+      void b2bApi.resolvePaymentMethodsByLinkToken(paymentLinkToken)
+        .then((methods) => {
+          const preferredMethod = methods.find((item) => item.isAvailable && item.providerKey === (paymentLinkQuery.data?.providerKey || 'PAYTR'))
+            ?? methods.find((item) => item.isAvailable)
+            ?? methods[0]
+            ?? null;
+          setPaymentMethods(methods);
+          setSelectedPaymentMethod(preferredMethod);
+        })
+        .catch((error: Error) => setMessage(error.message));
     }
-  }, [paymentLinkQuery.data]);
+  }, [paymentLinkQuery.data, paymentLinkToken]);
 
   const sessionMutation = useMutation({
     mutationFn: (input: { selectedCompanyCode: string; selectedBuyerEmail: string }) => b2bApi.createPortalSession(input.selectedCompanyCode, input.selectedBuyerEmail),
@@ -264,7 +273,7 @@ export function B2bPortalPage(): ReactElement {
         amount: order.grandTotal,
         currencyCode: order.currencyCode || 'TRY',
       }, portalToken);
-      const preferredMethod = methods.find((item) => item.providerKey === 'PAYTR' && item.paymentMethod === 'CARD') ?? methods[0] ?? null;
+      const preferredMethod = methods.find((item) => item.isAvailable && item.providerKey === 'PAYTR' && item.paymentMethod === 'CARD') ?? methods.find((item) => item.isAvailable) ?? methods[0] ?? null;
       const createdPaymentOrder = await b2bApi.createPaymentOrder({
         orderId: order.id,
         installmentCount: 1,
@@ -292,12 +301,15 @@ export function B2bPortalPage(): ReactElement {
       if (!selectedPaymentMethod?.isProviderHosted) throw new Error('Bu ödeme yöntemi kart taksiti gerektirmiyor.');
       const binNumber = cardBin.replace(/\D/g, '').slice(0, 8);
       if (binNumber.length < 6) throw new Error('Kartın ilk 6 veya 8 hanesini girin.');
-      return b2bApi.getPaymentInstallmentOptions({
+      const payload = {
         providerKey: selectedPaymentMethod.providerKey,
         binNumber,
         amount: paymentOrder.remainingAmount || paymentOrder.amount,
         currencyCode: paymentOrder.currencyCode || 'TRY',
-      }, portalToken);
+      };
+      return paymentLinkToken
+        ? b2bApi.getPaymentInstallmentOptionsByLinkToken(paymentLinkToken, payload)
+        : b2bApi.getPaymentInstallmentOptions(payload, portalToken);
     },
     onSuccess: (data) => {
       const options = data.options.filter((item) => item.isAvailable);
@@ -314,7 +326,7 @@ export function B2bPortalPage(): ReactElement {
       if (!selectedPaymentMethod) throw new Error('Ödeme yöntemi seçin.');
       if (!selectedInstallment) throw new Error('Taksit seçin.');
       const binNumber = cardBin.replace(/\D/g, '').slice(0, 8);
-      return b2bApi.selectPaymentProviderInstallment(paymentOrder.id, {
+      const payload = {
         providerKey: selectedPaymentMethod.providerKey,
         binNumber,
         installmentNumber: selectedInstallment.installmentNumber,
@@ -323,7 +335,10 @@ export function B2bPortalPage(): ReactElement {
         providerRate: selectedInstallment.providerRate,
         providerCommissionAmount: selectedInstallment.commissionAmount,
         providerInstallmentSnapshotJson: JSON.stringify(selectedInstallment),
-      }, portalToken);
+      };
+      return paymentLinkToken
+        ? b2bApi.selectPaymentProviderInstallmentByLinkToken(paymentLinkToken, payload)
+        : b2bApi.selectPaymentProviderInstallment(paymentOrder.id, payload, portalToken);
     },
     onSuccess: (updatedPaymentOrder) => {
       setPaymentOrder(updatedPaymentOrder);
@@ -344,7 +359,6 @@ export function B2bPortalPage(): ReactElement {
       }, portalToken);
     },
     onSuccess: (order) => {
-      setLastOrder(order);
       setMessage(`${order.offerNo || order.orderNumber} numaralı sipariş oluşturuldu. Ödeme seçenekleri hazırlanıyor.`);
       createPaymentOrderMutation.mutate(order);
     },
@@ -518,14 +532,21 @@ export function B2bPortalPage(): ReactElement {
                     Siparişi Onaya Gönder <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
-                {lastOrder && (
+                {paymentOrder && (
                   <div className="space-y-3 rounded-3xl border border-emerald-900/10 bg-white p-4 shadow-sm">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="flex items-center gap-2 text-sm font-black text-emerald-950"><CreditCard className="h-4 w-4" /> Ödeme planı</p>
-                        <p className="mt-1 text-xs font-semibold text-slate-500">{lastOrder.orderNumber} için {formatMoney(paymentOrder?.remainingAmount ?? lastOrder.grandTotal, lastOrder.currencyCode)}</p>
+                        <p className="mt-1 text-xs font-semibold text-slate-500">
+                          {paymentOrder.orderId ? `Sipariş #${paymentOrder.orderId}` : 'Cari tahsilat'} için {formatMoney(paymentOrder.remainingAmount || paymentOrder.amount, paymentOrder.currencyCode)}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2 text-[11px] font-black uppercase tracking-wide">
+                          <span className="rounded-full bg-stone-100 px-2 py-1 text-slate-600">Vade: {paymentOrder.paymentTermDays ?? '-'} gün</span>
+                          <span className="rounded-full bg-stone-100 px-2 py-1 text-slate-600">Son tarih: {new Date(paymentOrder.dueDate).toLocaleDateString('tr-TR')}</span>
+                          <span className="rounded-full bg-stone-100 px-2 py-1 text-slate-600">Taksit: {paymentOrder.installmentCount || 1}</span>
+                        </div>
                       </div>
-                      {paymentOrder && <Badge className="bg-emerald-100 text-emerald-900 hover:bg-emerald-100">{paymentOrder.status}</Badge>}
+                      <Badge className="bg-emerald-100 text-emerald-900 hover:bg-emerald-100">{paymentOrder.status}</Badge>
                     </div>
                     <div className="grid gap-2">
                       {paymentMethods.map((method) => {
@@ -534,15 +555,20 @@ export function B2bPortalPage(): ReactElement {
                           <button
                             key={`${method.providerKey}-${method.paymentMethod}`}
                             type="button"
-                            className={`rounded-2xl border px-3 py-2 text-left text-sm font-black transition ${active ? 'border-emerald-700 bg-emerald-50 text-emerald-950' : 'border-stone-200 bg-white text-slate-600 hover:border-emerald-300'}`}
+                            disabled={!method.isAvailable}
+                            className={`rounded-2xl border px-3 py-2 text-left text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-60 ${active ? 'border-emerald-700 bg-emerald-50 text-emerald-950' : 'border-stone-200 bg-white text-slate-600 hover:border-emerald-300'}`}
                             onClick={() => {
+                              if (!method.isAvailable) return;
                               setSelectedPaymentMethod(method);
                               setInstallmentOptions([]);
                               setSelectedInstallment(null);
                             }}
                           >
-                            {method.displayName}
+                            <span>{method.displayName}</span>
                             {method.requiresApproval && <span className="ml-2 text-xs font-bold text-amber-700">Onaylı</span>}
+                            <span className="ml-2 text-xs font-bold text-slate-400">Risk: {method.riskLevel}</span>
+                            {method.unavailableReason ? <p className="mt-1 text-xs font-bold text-rose-700">{method.unavailableReason}</p> : null}
+                            {method.warnings?.length ? <p className="mt-1 text-xs font-bold text-amber-700">{method.warnings[0]}</p> : null}
                           </button>
                         );
                       })}

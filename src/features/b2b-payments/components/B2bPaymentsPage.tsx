@@ -134,8 +134,13 @@ export function B2bPaymentsPage(): ReactElement {
     queryKey: ['b2b-payment-orders', grid.queryParams],
     queryFn: () => paymentApi.getPaymentOrders(grid.queryParams),
   });
+  const dashboardQuery = useQuery({
+    queryKey: ['b2b-payment-finance-dashboard'],
+    queryFn: () => paymentApi.getFinanceDashboard(),
+  });
 
   const rows = useMemo(() => query.data?.data ?? [], [query.data?.data]);
+  const dashboard = dashboardQuery.data;
   const range = getPagedRange(query.data);
 
   const linkMutation = useMutation({
@@ -157,6 +162,7 @@ export function B2bPaymentsPage(): ReactElement {
       setPaymentLinkDraft(null);
       toast.success(`${result.paymentOrderNumber} ödeme linki hazırlandı${result.paymentLinkUrl ? ' ve kopyalandı' : ''}.`);
       await queryClient.invalidateQueries({ queryKey: ['b2b-payment-orders'] });
+      await queryClient.invalidateQueries({ queryKey: ['b2b-payment-finance-dashboard'] });
     },
     onError: (error: Error) => toast.error(error.message || 'Ödeme linki oluşturulamadı.'),
   });
@@ -186,6 +192,7 @@ export function B2bPaymentsPage(): ReactElement {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['b2b-payment-orders'] }),
         queryClient.invalidateQueries({ queryKey: ['b2b-payment-erp-postings'] }),
+        queryClient.invalidateQueries({ queryKey: ['b2b-payment-finance-dashboard'] }),
       ]);
     },
     onError: (error: Error) => toast.error(error.message || 'Kısmi tahsilat işlenemedi.'),
@@ -229,6 +236,29 @@ export function B2bPaymentsPage(): ReactElement {
             Yenile
           </Button>
         </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          icon={<Clock3 className="size-5" />}
+          label="Bekleyen ödeme"
+          value={`${dashboard?.pendingPaymentOrderCount ?? 0} · ${formatMoney(dashboard?.pendingPaymentAmount, dashboard?.currencyCode)}`}
+        />
+        <MetricCard
+          icon={<TriangleAlert className="size-5" />}
+          label="Vadesi geçen"
+          value={`${dashboard?.overduePaymentOrderCount ?? 0} · ${formatMoney(dashboard?.overduePaymentAmount, dashboard?.currencyCode)}`}
+        />
+        <MetricCard
+          icon={<RefreshCw className="size-5" />}
+          label="ERP aktarım hatası"
+          value={dashboard?.failedErpPostingCount ?? 0}
+        />
+        <MetricCard
+          icon={<ReceiptText className="size-5" />}
+          label="Callback / iade takibi"
+          value={`${dashboard?.failedCallbackCount ?? 0} / ${dashboard?.pendingRefundCount ?? 0}`}
+        />
       </div>
 
       <PagedDataGrid<PaymentOrderDto, PaymentColumnKey>
@@ -638,7 +668,7 @@ export function B2bPaymentOperationsPage(): ReactElement {
   );
 }
 
-function MetricCard({ icon, label, value }: { icon: ReactElement; label: string; value: number }): ReactElement {
+function MetricCard({ icon, label, value }: { icon: ReactElement; label: string; value: number | string }): ReactElement {
   return (
     <Card className="border-slate-200/80 shadow-sm dark:border-white/10 dark:bg-white/3">
       <CardContent className="flex items-center gap-4 p-5">

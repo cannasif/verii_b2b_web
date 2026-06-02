@@ -13,6 +13,7 @@ import type {
   PaymentBinLookupRequestDto,
   PaymentInstallmentOptionsDto,
   PaymentInstallmentOptionsRequestDto,
+  PaymentFinanceDashboardDto,
   PaymentMethodOptionDto,
   PaymentErpPostingDto,
   PaymentOrderDto,
@@ -62,6 +63,11 @@ export const paymentApi = {
     return normalizePaged(response);
   },
 
+  async getFinanceDashboard(): Promise<PaymentFinanceDashboardDto> {
+    const response = await api.get<ApiResponse<PaymentFinanceDashboardDto>>('/api/b2b/payments/finance-dashboard');
+    return extractData(response);
+  },
+
   async getPaymentOrders(params: PagedParams = {}): Promise<PagedResponse<PaymentOrderDto>> {
     const response = await api.post<ApiResponse<PagedResponse<PaymentOrderDto>>>(
       '/api/b2b/payments/orders/paged',
@@ -104,11 +110,29 @@ export const paymentApi = {
     return extractData(response);
   },
 
+  async selectPaymentProviderInstallmentByLinkToken(paymentLinkToken: string, payload: SelectPaymentProviderInstallmentDto): Promise<PaymentOrderDto> {
+    const response = await api.put<ApiResponse<PaymentOrderDto>>(
+      `/api/b2b/payments/orders/link/${encodeURIComponent(paymentLinkToken)}/provider-installment`,
+      payload,
+      publicRequestConfig,
+    );
+    return extractData(response);
+  },
+
   async resolvePaymentMethods(payload: ResolvePaymentMethodsDto, portalToken?: string): Promise<PaymentMethodOptionDto[]> {
     const response = await api.post<ApiResponse<PaymentMethodOptionDto[]>>(
       '/api/b2b/payments/methods/resolve',
       payload,
       portalToken ? portalRequestConfig(portalToken) : undefined,
+    );
+    return extractData(response);
+  },
+
+  async resolvePaymentMethodsByLinkToken(paymentLinkToken: string): Promise<PaymentMethodOptionDto[]> {
+    const response = await api.post<ApiResponse<PaymentMethodOptionDto[]>>(
+      `/api/b2b/payments/orders/link/${encodeURIComponent(paymentLinkToken)}/methods/resolve`,
+      {},
+      publicRequestConfig,
     );
     return extractData(response);
   },
@@ -127,11 +151,29 @@ export const paymentApi = {
     return extractData(response);
   },
 
+  async lookupPaymentBinByLinkToken(paymentLinkToken: string, payload: PaymentBinLookupRequestDto): Promise<PaymentBinLookupDto> {
+    const response = await api.post<ApiResponse<PaymentBinLookupDto>>(
+      `/api/b2b/payments/providers/link/${encodeURIComponent(paymentLinkToken)}/bin-lookup`,
+      payload,
+      publicRequestConfig,
+    );
+    return extractData(response);
+  },
+
   async getPaymentInstallmentOptions(payload: PaymentInstallmentOptionsRequestDto, portalToken?: string): Promise<PaymentInstallmentOptionsDto> {
     const response = await api.post<ApiResponse<PaymentInstallmentOptionsDto>>(
       '/api/b2b/payments/providers/installments',
       payload,
       portalToken ? portalRequestConfig(portalToken) : undefined,
+    );
+    return extractData(response);
+  },
+
+  async getPaymentInstallmentOptionsByLinkToken(paymentLinkToken: string, payload: PaymentInstallmentOptionsRequestDto): Promise<PaymentInstallmentOptionsDto> {
+    const response = await api.post<ApiResponse<PaymentInstallmentOptionsDto>>(
+      `/api/b2b/payments/providers/link/${encodeURIComponent(paymentLinkToken)}/installments`,
+      payload,
+      publicRequestConfig,
     );
     return extractData(response);
   },

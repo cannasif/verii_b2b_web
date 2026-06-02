@@ -225,6 +225,27 @@ export interface PaymentMethodOptionDto {
   requiresApproval: boolean;
   isProviderHosted: boolean;
   isDeferredPayment: boolean;
+  isAvailable: boolean;
+  unavailableReason?: string;
+  riskLevel: string;
+  creditLimit?: number;
+  currentExposure: number;
+  availableCredit?: number;
+  paymentTermDays?: number;
+  warnings: string[];
+}
+
+export interface PaymentFinanceDashboardDto {
+  pendingPaymentOrderCount: number;
+  pendingPaymentAmount: number;
+  overduePaymentOrderCount: number;
+  overduePaymentAmount: number;
+  failedCallbackCount: number;
+  pendingErpPostingCount: number;
+  failedErpPostingCount: number;
+  pendingRefundCount: number;
+  currencyCode: string;
+  generatedAt: string;
 }
 
 export interface Iyzico3dsInitializeDto {
