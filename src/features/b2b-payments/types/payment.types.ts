@@ -67,6 +67,7 @@ export interface PaymentInstallmentOptionsRequestDto {
   binNumber?: string;
   amount: number;
   currencyCode?: string;
+  maxInstallmentCount?: number;
   conversationId?: string;
 }
 
@@ -146,6 +147,7 @@ export interface PaymentOrderDto {
   dueDate: string;
   isDueDateOverridden: boolean;
   installmentCount: number;
+  maxInstallmentCount: number;
   paymentMethod?: string;
   providerKey?: string;
   providerConversationId?: string;
@@ -248,6 +250,7 @@ export interface CreatePaymentOrderDto {
   paymentTermDays?: number;
   dueDate?: string;
   installmentCount: number;
+  maxInstallmentCount?: number;
   paymentMethod?: string;
   providerKey?: string;
   notes?: string;

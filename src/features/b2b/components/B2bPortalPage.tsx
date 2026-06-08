@@ -319,6 +319,7 @@ export function B2bPortalPage(): ReactElement {
         binNumber,
         amount: paymentOrder.remainingAmount || paymentOrder.amount,
         currencyCode: paymentOrder.currencyCode || 'TRY',
+        maxInstallmentCount: paymentOrder.maxInstallmentCount || paymentOrder.installmentCount || 1,
       };
       return paymentLinkToken
         ? b2bApi.getPaymentInstallmentOptionsByLinkToken(paymentLinkToken, payload)

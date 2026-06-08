@@ -27,7 +27,7 @@ interface PaymentOrderFormState {
   paymentMethod: string;
   paymentTermDays: string;
   dueDate: string;
-  installmentCount: string;
+  maxInstallmentCount: string;
   notes: string;
   allocations: PaymentAllocationFormState[];
 }
@@ -135,8 +135,7 @@ function formatMoney(amount?: number, currencyCode = 'TRY'): string {
 function getInstallmentOptions(providerKey: string): Array<{ label: string; value: string }> {
   const provider = paymentProviderOptions.find((item) => item.value === providerKey);
   const maxInstallment = provider?.maxInstallment ?? 1;
-  return Array.from({ length: maxInstallment }, (_, index) => {
-    const installment = index + 1;
+  return [1, 2, 3, 6, 9, 12].filter((installment) => installment <= maxInstallment).map((installment) => {
     return {
       label: installment === 1 ? 'Tek çekim' : `${installment} taksit`,
       value: String(installment),
@@ -162,7 +161,7 @@ function defaultPaymentOrderState(): PaymentOrderFormState {
     paymentMethod: 'CARD',
     paymentTermDays: '',
     dueDate: '',
-    installmentCount: '1',
+    maxInstallmentCount: '1',
     notes: '',
     allocations: [],
   };
@@ -188,15 +187,15 @@ export function B2bPaymentCreatePage(): ReactElement {
   const installmentOptions = useMemo(() => getInstallmentOptions(values.providerKey), [values.providerKey]);
 
   useEffect(() => {
-    if (installmentOptions.some((option) => option.value === values.installmentCount)) return;
-    setValues((current) => ({ ...current, installmentCount: '1' }));
-  }, [installmentOptions, values.installmentCount]);
+    if (installmentOptions.some((option) => option.value === values.maxInstallmentCount)) return;
+    setValues((current) => ({ ...current, maxInstallmentCount: '1' }));
+  }, [installmentOptions, values.maxInstallmentCount]);
 
   const createMutation = useMutation({
     mutationFn: () => {
       const customerId = toRequiredNumber(values.customerId, 'Cari');
       const amount = toRequiredNumber(values.amount, 'Tahsilat tutarı');
-      const installmentCount = toRequiredNumber(values.installmentCount, 'Taksit sayısı');
+      const maxInstallmentCount = toRequiredNumber(values.maxInstallmentCount, 'En fazla taksit');
       const allocations = values.allocations
         .filter(hasAllocationValue)
         .map((allocation) => {
@@ -228,7 +227,8 @@ export function B2bPaymentCreatePage(): ReactElement {
         currencyCode: values.currencyCode || 'TRY',
         paymentTermDays: toOptionalNumber(values.paymentTermDays),
         dueDate: trimOptional(values.dueDate),
-        installmentCount,
+        installmentCount: 1,
+        maxInstallmentCount,
         paymentMethod: trimOptional(values.paymentMethod),
         providerKey: trimOptional(values.providerKey),
         notes: trimOptional(values.notes),
@@ -248,7 +248,7 @@ export function B2bPaymentCreatePage(): ReactElement {
     setValues((current) => {
       if (name === 'providerKey') {
         const nextMethod = value === 'OPEN_ACCOUNT' ? 'OPEN_ACCOUNT' : current.paymentMethod === 'OPEN_ACCOUNT' ? 'CARD' : current.paymentMethod;
-        return { ...current, providerKey: value, paymentMethod: nextMethod, installmentCount: '1' };
+        return { ...current, providerKey: value, paymentMethod: nextMethod, maxInstallmentCount: '1' };
       }
       if (name === 'paymentTermDays') {
         const termDays = Number(value);
@@ -417,14 +417,14 @@ export function B2bPaymentCreatePage(): ReactElement {
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Taksit Sayısı *</span>
-            <Select value={values.installmentCount} onValueChange={(value) => updateValue('installmentCount', value)}>
-              <SelectTrigger><SelectValue placeholder="Taksit seç" /></SelectTrigger>
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">En Fazla Taksit *</span>
+            <Select value={values.maxInstallmentCount} onValueChange={(value) => updateValue('maxInstallmentCount', value)}>
+              <SelectTrigger><SelectValue placeholder="Max taksit seç" /></SelectTrigger>
               <SelectContent>
                 {installmentOptions.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}
               </SelectContent>
             </Select>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Sağlayıcı limitleri dışında serbest taksit girilemez.</span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Gerçek taksit, ödeme linkinde kart BIN sorgusuna göre bu sınırı aşmadan seçilir.</span>
           </label>
         </div>
 
