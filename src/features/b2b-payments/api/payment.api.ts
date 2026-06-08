@@ -76,6 +76,11 @@ export const paymentApi = {
     return normalizePaged(response);
   },
 
+  async getPaymentOrder(id: number): Promise<PaymentOrderDto> {
+    const response = await api.get<ApiResponse<PaymentOrderDto>>(`/api/b2b/payments/orders/${id}`);
+    return extractData(response);
+  },
+
   async getPaymentOrderByLinkToken(token: string): Promise<PaymentOrderDto> {
     const response = await api.get<ApiResponse<PaymentOrderDto>>(
       `/api/b2b/payments/orders/link/${encodeURIComponent(token)}`,

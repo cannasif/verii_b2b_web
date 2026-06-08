@@ -1,7 +1,7 @@
 import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, useSearchParams } from 'react-router-dom';
-import { CheckCircle2, Clock3, Copy, Link2, ReceiptText, RefreshCw, TriangleAlert } from 'lucide-react';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, CheckCircle2, Clock3, Copy, Link2, ReceiptText, RefreshCw, TriangleAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
@@ -331,6 +331,9 @@ export function B2bPaymentsPage(): ReactElement {
         actionsHeaderLabel="İşlemler"
         renderActionsCell={(row) => (
           <div className="flex justify-end gap-2">
+            <Button type="button" size="sm" variant="outline" asChild>
+              <Link to={`/b2b/payments/${row.id}`}>Detay</Link>
+            </Button>
             {canGeneratePaymentLink(row) ? (
               <Button type="button" size="sm" variant="outline" onClick={() => setPaymentLinkDraft(defaultPaymentLinkDraft(row))}>
                 <Link2 className="mr-2 size-4" />
@@ -530,6 +533,100 @@ export function B2bPaymentsPage(): ReactElement {
           ) : null}
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+export function B2bPaymentDetailPage(): ReactElement {
+  const { id } = useParams();
+  const paymentOrderId = Number(id);
+  const query = useQuery({
+    queryKey: ['b2b-payment-order', paymentOrderId],
+    queryFn: () => paymentApi.getPaymentOrder(paymentOrderId),
+    enabled: Number.isFinite(paymentOrderId) && paymentOrderId > 0,
+  });
+  const erpQuery = useQuery({
+    queryKey: ['b2b-payment-erp-postings', 'payment-order', paymentOrderId],
+    queryFn: () => paymentApi.getPaymentErpPostings({ pageNumber: 1, pageSize: 100, search: String(paymentOrderId) }),
+    enabled: Number.isFinite(paymentOrderId) && paymentOrderId > 0,
+  });
+  const order = query.data;
+  const erpPostings = erpQuery.data?.data ?? [];
+
+  return (
+    <div className="w-full space-y-6 crm-page">
+      <Breadcrumb items={[{ label: 'B2B' }, { label: 'Ödemeler' }, { label: order?.paymentOrderNumber ?? 'Detay', isActive: true }]} />
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <Badge variant="secondary" className="mb-3">Finans mutabakatı</Badge>
+          <h1 className="text-3xl font-bold text-slate-950 dark:text-white">{order?.paymentOrderNumber ?? 'Ödeme Detayı'}</h1>
+          <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+            Ödeme emri, vade/taksit, açık kalem ve ERP aktarım durumunu tek ekranda izleyin.
+          </p>
+        </div>
+        <Button asChild variant="outline">
+          <Link to="/b2b/payments"><ArrowLeft className="mr-2 size-4" />Listeye Dön</Link>
+        </Button>
+      </div>
+
+      {query.isLoading ? (
+        <Card><CardContent className="p-6 text-sm font-semibold">Ödeme detayı yükleniyor...</CardContent></Card>
+      ) : query.error || !order ? (
+        <Card><CardContent className="p-6 text-sm font-semibold text-red-500">{(query.error as Error | undefined)?.message ?? 'Ödeme emri bulunamadı.'}</CardContent></Card>
+      ) : (
+        <>
+          <div className="grid gap-4 md:grid-cols-4">
+            <MetricCard icon={<ReceiptText className="size-5" />} label="Tutar" value={formatMoney(order.amount, order.currencyCode)} />
+            <MetricCard icon={<CheckCircle2 className="size-5" />} label="Tahsil Edilen" value={formatMoney(order.paidAmount, order.currencyCode)} />
+            <MetricCard icon={<Clock3 className="size-5" />} label="Kalan" value={formatMoney(order.remainingAmount, order.currencyCode)} />
+            <MetricCard icon={<TriangleAlert className="size-5" />} label="Durum" value={order.status} />
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card className="border-slate-200/80 dark:border-white/10 dark:bg-white/3">
+              <CardContent className="space-y-3 p-5">
+                <h2 className="text-lg font-black text-slate-950 dark:text-white">Başlık</h2>
+                <InfoLine label="Cari" value={`#${order.customerId}`} />
+                <InfoLine label="Sipariş" value={order.orderId ? `#${order.orderId}` : 'Cari tahsilat'} />
+                <InfoLine label="Sağlayıcı" value={order.providerKey || order.paymentMethod || '-'} />
+                <InfoLine label="Vade" value={`${formatDate(order.dueDate)} · ${order.paymentTermDays ?? 0} gün`} />
+                <InfoLine label="Kur" value={`${order.currencyCode}${order.exchangeRate ? ` · ${order.exchangeRate}` : ''}`} />
+                <InfoLine label="Link" value={order.paymentLinkUrl ? 'Hazır' : '-'} />
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-200/80 dark:border-white/10 dark:bg-white/3">
+              <CardContent className="space-y-3 p-5">
+                <h2 className="text-lg font-black text-slate-950 dark:text-white">ERP Mutabakat</h2>
+                {erpPostings.length === 0 ? <p className="text-sm font-semibold text-slate-500">ERP aktarım kaydı yok.</p> : erpPostings.map((posting) => (
+                  <div key={posting.id} className="rounded-2xl border border-slate-200 p-4 dark:border-white/10">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-mono text-xs font-bold">{posting.erpDocumentNumber || posting.externalReference || posting.idempotencyKey}</p>
+                        <p className="mt-1 text-xs font-semibold text-slate-500">{posting.erpReceiptType || posting.postingMode} · {posting.clearingStatus || 'Kapama bekleniyor'}</p>
+                      </div>
+                      {statusBadge(posting.status)}
+                    </div>
+                    {posting.errorMessage ? <p className="mt-2 text-xs font-semibold text-red-500">{posting.errorMessage}</p> : null}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          <DetailSection title="Taksit / Vade Planı">
+            {order.installments.length === 0 ? <EmptyLine text="Taksit satırı yok." /> : order.installments.map((installment) => (
+              <DetailRow key={installment.id} title={`${installment.installmentNumber}. vade`} subtitle={formatDate(installment.dueDate)} status={installment.status} amount={formatMoney(installment.amount - installment.paidAmount, order.currencyCode)} />
+            ))}
+          </DetailSection>
+
+          <DetailSection title="Fatura / Açık Kalem Tahsisleri">
+            {order.allocations.length === 0 ? <EmptyLine text="Açık kalem tahsisi yok." /> : order.allocations.map((allocation) => (
+              <DetailRow key={allocation.id} title={allocation.erpDocumentNumber || allocation.erpDocumentReference || allocation.allocationType} subtitle={`${allocation.allocationType} · Vade ${formatDate(allocation.dueDate)}`} status={allocation.status} amount={formatMoney(allocation.allocatedAmount - allocation.paidAmount, allocation.currencyCode)} />
+            ))}
+          </DetailSection>
+        </>
+      )}
     </div>
   );
 }
@@ -801,4 +898,43 @@ function MetricCard({ icon, label, value, to }: { icon: ReactElement; label: str
   );
 
   return to ? <Link to={to} className="block transition hover:-translate-y-0.5">{content}</Link> : content;
+}
+
+function InfoLine({ label, value }: { label: string; value: string }): ReactElement {
+  return (
+    <div className="flex items-center justify-between gap-4 border-b border-slate-100 py-2 text-sm last:border-b-0 dark:border-white/10">
+      <span className="font-semibold text-slate-500 dark:text-slate-400">{label}</span>
+      <span className="text-right font-bold text-slate-950 dark:text-white">{value}</span>
+    </div>
+  );
+}
+
+function DetailSection({ title, children }: { title: string; children: ReactElement | ReactElement[] }): ReactElement {
+  return (
+    <Card className="border-slate-200/80 dark:border-white/10 dark:bg-white/3">
+      <CardContent className="space-y-3 p-5">
+        <h2 className="text-lg font-black text-slate-950 dark:text-white">{title}</h2>
+        <div className="grid gap-3 md:grid-cols-2">{children}</div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DetailRow({ title, subtitle, status, amount }: { title: string; subtitle: string; status: string; amount: string }): ReactElement {
+  return (
+    <div className="rounded-2xl border border-slate-200 p-4 dark:border-white/10">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-black text-slate-950 dark:text-white">{title}</p>
+          <p className="mt-1 text-xs font-semibold text-slate-500 dark:text-slate-400">{subtitle}</p>
+        </div>
+        {statusBadge(status)}
+      </div>
+      <p className="mt-3 text-lg font-black text-slate-950 dark:text-white">{amount}</p>
+    </div>
+  );
+}
+
+function EmptyLine({ text }: { text: string }): ReactElement {
+  return <div className="rounded-2xl border border-dashed border-slate-300 p-4 text-sm font-semibold text-slate-500 dark:border-white/15 dark:text-slate-400">{text}</div>;
 }

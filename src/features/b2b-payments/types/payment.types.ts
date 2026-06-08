@@ -137,6 +137,11 @@ export interface PaymentOrderDto {
   paidAmount: number;
   remainingAmount: number;
   currencyCode: string;
+  erpCurrencyCode?: number;
+  currencyName?: string;
+  exchangeRate?: number;
+  exchangeRateSource?: string;
+  exchangeRateDate?: string;
   paymentTermDays?: number;
   dueDate: string;
   isDueDateOverridden: boolean;
