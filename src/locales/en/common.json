@@ -5356,6 +5356,8 @@
     },
     "events": {
       "title": "Latest sync tracking",
+      "lastPoll": "Last poll",
+      "nextPoll": "Next poll",
       "empty": "No sync activity yet."
     },
     "empty": {

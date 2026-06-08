@@ -51,6 +51,11 @@ function formatMoney(value?: number, currency = 'TRY'): string {
   return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(value);
 }
 
+function formatDateTime(value?: string): string {
+  if (!value) return '-';
+  return new Intl.DateTimeFormat('tr-TR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value));
+}
+
 function normalize(value?: string | null): string {
   return (value ?? '').toLocaleLowerCase('tr-TR');
 }
@@ -422,14 +427,24 @@ export function B2bMarketplaceListingsPage(): ReactElement {
           <CardContent className="p-4">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{t('marketplaceWorkbench.events.title')}</p>
             <div className="mt-3 space-y-2">
-              {latestEvents.slice(0, 3).map((event) => (
+              {latestEvents.slice(0, 4).map((event) => (
                 <div key={event.id} className="rounded-2xl border border-slate-200 bg-white p-3 dark:border-white/10 dark:bg-white/5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-black text-slate-950 dark:text-white">{event.sku || event.operationType}</p>
                       <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{event.channelName || event.providerKey} · {event.operationType}</p>
                     </div>
-                    <span className={`rounded-full px-2 py-1 text-[11px] font-black ${statusTone(event.status)}`}>{event.status}</span>
+                    <span className={`rounded-full px-2 py-1 text-[11px] font-black ${statusTone(event.providerResultStatus || event.status)}`}>
+                      {event.providerResultStatus || event.status}
+                    </span>
+                  </div>
+                  <div className="mt-3 grid gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    <p className="line-clamp-2">{event.providerResultMessage || event.errorMessage || event.externalBatchId || '-'}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {event.externalBatchId ? <span className="rounded-full bg-slate-100 px-2 py-1 font-mono dark:bg-white/10">{event.externalBatchId}</span> : null}
+                      {event.lastPolledDate ? <span>{t('marketplaceWorkbench.events.lastPoll')}: {formatDateTime(event.lastPolledDate)}</span> : null}
+                      {event.nextPollDate ? <span>{t('marketplaceWorkbench.events.nextPoll')}: {formatDateTime(event.nextPollDate)}</span> : null}
+                    </div>
                   </div>
                 </div>
               ))}

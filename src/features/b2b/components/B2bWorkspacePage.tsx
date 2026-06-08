@@ -1111,11 +1111,11 @@ function renderWorkspaceCell(kind: B2bWorkspacePageKind, row: WorkspaceRow, colu
     const item = row as MarketplaceSyncEventDto;
     const values = {
       primary: item.operationType,
-      secondary: item.sku || item.externalBatchId || '-',
+      secondary: item.providerResultMessage || item.sku || item.externalBatchId || '-',
       scope: `${item.providerKey || '-'} / ${item.channelName || 'Kanal'}`,
-      status: renderStatusBadge(item.status),
-      amount: item.retryCount > 0 ? `${item.retryCount} retry` : '-',
-      date: formatDate(item.processedDate || item.requestedDate),
+      status: renderStatusBadge(item.providerResultStatus || item.status),
+      amount: item.retryCount > 0 ? `${item.retryCount} retry` : item.externalBatchId || '-',
+      date: formatDate(item.processedDate || item.lastPolledDate || item.nextPollDate || item.requestedDate),
     };
     return values[columnKey];
   }
@@ -1189,7 +1189,7 @@ function workspaceExportRow(kind: B2bWorkspacePageKind, row: WorkspaceRow): Reco
   }
   if (kind === 'marketplace-events') {
     const item = row as MarketplaceSyncEventDto;
-    return { primary: item.operationType, secondary: item.sku || item.externalBatchId, scope: item.channelName || item.providerKey, status: item.status, amount: item.retryCount, date: formatDate(item.processedDate || item.requestedDate) };
+    return { primary: item.operationType, secondary: item.providerResultMessage || item.sku || item.externalBatchId, scope: item.channelName || item.providerKey, status: item.providerResultStatus || item.status, amount: item.retryCount, date: formatDate(item.processedDate || item.lastPolledDate || item.nextPollDate || item.requestedDate) };
   }
   if (kind === 'integrations') {
     const item = row as B2bIntegrationEventDto;

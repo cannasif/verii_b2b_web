@@ -5356,6 +5356,8 @@
     },
     "events": {
       "title": "Son aktarım takibi",
+      "lastPoll": "Son sorgu",
+      "nextPoll": "Sonraki sorgu",
       "empty": "Henüz aktarım hareketi yok."
     },
     "empty": {

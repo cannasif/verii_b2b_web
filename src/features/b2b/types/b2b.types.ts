@@ -137,8 +137,13 @@ export interface MarketplaceSyncEventDto {
   requestJson?: string;
   responseJson?: string;
   errorMessage?: string;
+  providerResultStatus?: string;
+  providerResultMessage?: string;
+  providerItemResultJson?: string;
   retryCount: number;
   requestedDate: string;
+  lastPolledDate?: string;
+  nextPollDate?: string;
   processedDate?: string;
 }
 

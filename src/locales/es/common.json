@@ -4659,6 +4659,8 @@
     },
     "events": {
       "title": "Último seguimiento de sincronización",
+      "lastPoll": "Última consulta",
+      "nextPoll": "Próxima consulta",
       "empty": "Aún no hay actividad de sincronización."
     },
     "empty": {
