@@ -35,8 +35,8 @@ export function DataTableGridPagination({
   totalPages,
 }: DataTableGridPaginationProps): ReactElement {
   return (
-    <div className="flex items-center justify-between gap-2">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-wrap items-center gap-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="h-8 px-3">
@@ -55,7 +55,7 @@ export function DataTableGridPagination({
         <div className="text-xs text-muted-foreground">{paginationInfoText}</div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
         <Button variant="outline" size="sm" onClick={onPreviousPage} disabled={!hasPreviousPage || disablePaginationButtons}>
           {previousLabel}
         </Button>

@@ -218,7 +218,7 @@ export function DataTableGrid<TRow, TKey extends string>({
         onPointerCancel={handleDragEnd}
         onClickCapture={handleClickCapture}
       >
-        <Table className={minTableWidthClassName}>
+        <Table className={minTableWidthClassName} containerClassName="overflow-visible">
           <TableHeader>
             <TableRow>
               {visibleColumnKeys.map((key) => {

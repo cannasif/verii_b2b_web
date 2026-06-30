@@ -116,7 +116,7 @@ export function PagedLookupDialog<T>({
           </DialogHeader>
 
           <div className="flex flex-col gap-4">
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Input
                 value={searchInput}
                 onChange={(event) => setSearchInput(event.target.value)}
@@ -132,7 +132,7 @@ export function PagedLookupDialog<T>({
               <Button
                 type="button"
                 variant="secondary"
-                className="h-10 shrink-0 gap-1.5 px-4"
+                className="h-10 w-full shrink-0 gap-1.5 px-4 sm:w-auto"
                 onClick={() => setSearch(searchInput.trim())}
               >
                 <Search className="size-4 opacity-80" aria-hidden />
@@ -143,7 +143,7 @@ export function PagedLookupDialog<T>({
             <div
               ref={listRef}
               onScroll={handleScroll}
-              className="max-h-[min(360px,50vh)] space-y-2 overflow-y-auto rounded-2xl border border-slate-200/70 bg-slate-50/80 p-3 dark:border-white/10 dark:bg-white/3"
+              className="max-h-[min(360px,50dvh)] space-y-2 overflow-y-auto rounded-2xl border border-slate-200/70 bg-slate-50/80 p-3 dark:border-white/10 dark:bg-white/3"
             >
               {query.isLoading ? (
                 <div className="flex items-center justify-center py-8 text-sm text-slate-500">
