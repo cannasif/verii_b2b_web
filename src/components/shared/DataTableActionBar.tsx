@@ -10,6 +10,7 @@ import { ColumnPreferencesPopover, type ColumnDef } from './ColumnPreferencesPop
 import { GridExportMenu } from './GridExportMenu';
 import type { FilterColumnConfig, FilterRow } from '@/lib/advanced-filter-types';
 import type { GridExportColumn } from '@/lib/grid-export';
+import { cn } from '@/lib/utils';
 
 export interface DataTableSearchConfig {
   value?: string;
@@ -88,7 +89,7 @@ export function DataTableActionBar({
   searchValue,
   searchPlaceholder,
   onSearchChange,
-  searchClassName = 'h-9 w-[200px]',
+  searchClassName = 'h-9 w-full sm:w-[220px]',
   search,
   refresh,
   searchDebounceMs = 700,
@@ -194,25 +195,25 @@ export function DataTableActionBar({
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2">
-      <div className="flex items-center gap-2">
+    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+      <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center">
         {shouldRenderSearch && (
           <Input
             placeholder={resolvedSearchPlaceholder}
             value={currentSearchValue}
             onChange={(event) => handleSearchInputChange(event.target.value)}
-            className={resolvedSearchClassName}
+            className={cn('min-w-0', resolvedSearchClassName)}
           />
         )}
         {refresh && (
-          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshDisabled}>
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshDisabled} className="w-full sm:w-auto">
             <RefreshCw className={`mr-2 h-4 w-4 ${refresh?.isLoading ? 'animate-spin' : ''}`} />
             {refreshRemainingSeconds > 0 ? `${refreshLabel} (${refreshRemainingSeconds}s)` : refreshLabel}
           </Button>
         )}
         {leftSlot}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
         <Popover open={showFilters} onOpenChange={setShowFilters}>
           <PopoverTrigger asChild>
             <Button

@@ -129,7 +129,7 @@ export function WmsScopePolicyForm({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-[80vh] overflow-y-auto px-6 py-6">
+        <div className="max-h-[calc(100dvh-13rem)] overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
           <Form {...form}>
             <form id="wms-scope-policy-form" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">

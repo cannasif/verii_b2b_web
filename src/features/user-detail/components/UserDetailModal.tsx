@@ -273,7 +273,7 @@ export function UserDetailModal({ isOpen, onClose }: UserDetailModalProps): Reac
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[calc(100dvh-1rem)] overflow-y-auto sm:max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>{t('userDetail.title')}</DialogTitle>
           <DialogDescription>

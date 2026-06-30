@@ -109,10 +109,10 @@ export function PermissionGroupForm({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="gap-0 p-0 max-h-[80vh] bg-white dark:bg-[#130822] border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white max-w-2xl w-[95%] sm:w-full shadow-2xl sm:rounded-2xl overflow-hidden"
+        className="gap-0 p-0 max-h-[calc(100dvh-1rem)] bg-white dark:bg-[#130822] border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white max-w-2xl w-[95%] sm:w-full shadow-2xl sm:rounded-2xl overflow-hidden sm:max-h-[90vh]"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="flex flex-col h-[78vh] max-h-[78vh] min-h-0 overflow-hidden">
+        <div className="flex h-[calc(100dvh-1rem)] max-h-[calc(100dvh-1rem)] min-h-0 flex-col overflow-hidden sm:h-[78vh] sm:max-h-[78vh]">
           <DialogHeader className="shrink-0 px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-linear-to-r from-slate-50 via-white to-cyan-50/50 dark:from-[#1a1025] dark:via-[#130822] dark:to-cyan-950/30">
             <div className="inline-flex w-fit items-center gap-2 rounded-2xl border border-cyan-200 bg-white/80 px-3 py-1.5 text-xs font-black text-cyan-700 shadow-sm dark:border-cyan-800/40 dark:bg-blue-950/60 dark:text-cyan-300">
               <Sparkles className="size-4" />

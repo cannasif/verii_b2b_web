@@ -434,7 +434,7 @@ export function UserManagementPage(): ReactElement {
       />
 
       <Dialog open={formOpen} onOpenChange={(open) => (open ? setFormOpen(true) : closeForm())}>
-        <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto">
+        <DialogContent className="max-h-[calc(100dvh-1rem)] max-w-5xl overflow-y-auto sm:max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>{editingUser ? 'Kullanıcı Güncelle' : 'Kullanıcı Oluştur'}</DialogTitle>
             <DialogDescription>

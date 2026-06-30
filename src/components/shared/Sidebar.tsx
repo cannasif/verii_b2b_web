@@ -74,7 +74,7 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
                     fetchPriority="high"
                     width={200}
                     height={120}
-                    className="h-30 w-200 object-contain justify-center"
+                    className="h-24 max-w-[220px] object-contain"
                   />
                 </div>
                 <button
@@ -91,7 +91,7 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
                 decoding="async"
                 width={40}
                 height={40}
-                className="h-10 w-auto object-contain scale-200"
+                className="h-10 w-auto object-contain"
               />
             )}
           </div>
