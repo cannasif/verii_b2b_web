@@ -121,7 +121,7 @@ function normalizePaged<T>(
     ...(data ?? {
       data: [],
       totalCount: 0,
-      pageNumber: 0,
+      pageNumber: 1,
       pageSize: 20,
       totalPages: 1,
       hasPreviousPage: false,
@@ -135,7 +135,7 @@ export const erpReferenceApi = {
   async getCustomers(params: PagedParams = {}): Promise<PagedResponse<CustomerReferenceDto>> {
     const response = await api.post<ApiResponse<PagedResponse<Record<string, unknown>>>>(
       getEndpoint('customer'),
-      buildPagedRequest(params, { pageNumber: 0, pageSize: 20, sortBy: 'CustomerCode', sortDirection: 'asc' }),
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'CustomerCode', sortDirection: 'asc' }),
     );
     return normalizePaged(response, normalizeCustomer);
   },
@@ -143,7 +143,7 @@ export const erpReferenceApi = {
   async getStocks(params: PagedParams = {}): Promise<PagedResponse<StockReferenceDto>> {
     const response = await api.post<ApiResponse<PagedResponse<Record<string, unknown>>>>(
       getEndpoint('stock'),
-      buildPagedRequest(params, { pageNumber: 0, pageSize: 20, sortBy: 'ErpStockCode', sortDirection: 'asc' }),
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'ErpStockCode', sortDirection: 'asc' }),
     );
     return normalizePaged(response, normalizeStock);
   },
@@ -203,7 +203,7 @@ export const erpReferenceApi = {
   async getWarehouses(params: PagedParams = {}): Promise<PagedResponse<WarehouseReferenceDto>> {
     const response = await api.post<ApiResponse<PagedResponse<Record<string, unknown>>>>(
       getEndpoint('warehouse'),
-      buildPagedRequest(params, { pageNumber: 0, pageSize: 20, sortBy: 'WarehouseCode', sortDirection: 'asc' }),
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'WarehouseCode', sortDirection: 'asc' }),
     );
     return normalizePaged(response, normalizeWarehouse);
   },
@@ -211,7 +211,7 @@ export const erpReferenceApi = {
   async getYapKodlar(params: PagedParams = {}): Promise<PagedResponse<YapKodReferenceDto>> {
     const response = await api.post<ApiResponse<PagedResponse<Record<string, unknown>>>>(
       getEndpoint('yapkod'),
-      buildPagedRequest(params, { pageNumber: 0, pageSize: 20, sortBy: 'YapKod', sortDirection: 'asc' }),
+      buildPagedRequest(params, { pageNumber: 1, pageSize: 20, sortBy: 'YapKod', sortDirection: 'asc' }),
     );
     return normalizePaged(response, normalizeYapKod);
   },

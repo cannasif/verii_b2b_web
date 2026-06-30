@@ -30,10 +30,10 @@ export function usePagedDataGrid<TSortKey extends string>({
   defaultSortBy,
   defaultSortDirection = 'desc',
   defaultPageSize = 10,
-  defaultPageNumber = 0,
+  defaultPageNumber = 1,
   pageSizeOptions,
   defaultFilterLogic = 'and',
-  pageNumberBase = 0,
+  pageNumberBase = 1,
   mapSortBy,
 }: UsePagedDataGridOptions<TSortKey>) {
   const [pageNumber, setPageNumber] = useState(defaultPageNumber);

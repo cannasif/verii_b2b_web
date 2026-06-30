@@ -15,7 +15,7 @@ export function buildPagedRequest(
   defaults: BuildPagedRequestDefaults = {},
 ): Required<PagedParams> {
   return {
-    pageNumber: params.pageNumber ?? defaults.pageNumber ?? 0,
+    pageNumber: params.pageNumber ?? defaults.pageNumber ?? 1,
     pageSize: params.pageSize ?? defaults.pageSize ?? 10,
     sortBy: params.sortBy ?? defaults.sortBy ?? 'Id',
     sortDirection: params.sortDirection ?? defaults.sortDirection ?? 'desc',
@@ -27,7 +27,7 @@ export function buildPagedRequest(
 
 export function getPagedRange(
   response: Pick<PagedResponse<unknown>, 'totalCount' | 'pageNumber' | 'pageSize'> | null | undefined,
-  pageNumberBase: 0 | 1 = 0,
+  pageNumberBase: 0 | 1 = 1,
 ): { from: number; to: number; total: number } {
   if (!response || response.totalCount <= 0) {
     return { from: 0, to: 0, total: 0 };

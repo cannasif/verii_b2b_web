@@ -6,7 +6,7 @@ export function useAllWmsScopePoliciesQuery() {
     queryKey: ['access-control', 'wms-scope-policies', 'all'],
     queryFn: async () => {
       const response = await wmsScopePolicyApi.getList({
-        pageNumber: 0,
+        pageNumber: 1,
         pageSize: 500,
         sortBy: 'Name',
         sortDirection: 'asc',

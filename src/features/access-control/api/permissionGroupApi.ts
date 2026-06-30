@@ -17,7 +17,7 @@ export const permissionGroupApi = {
     const response = await api.post<ApiResponse<PagedResponse<PermissionGroupDto>>>(
       '/api/permission-groups/paged',
       buildPagedRequest(params, {
-        pageNumber: 0,
+        pageNumber: 1,
         pageSize: 20,
         sortBy: 'UpdatedDate',
         sortDirection: 'desc',

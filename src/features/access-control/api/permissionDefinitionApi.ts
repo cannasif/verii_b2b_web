@@ -18,7 +18,7 @@ export const permissionDefinitionApi = {
     const response = await api.post<ApiResponse<PagedResponse<PermissionDefinitionDto>>>(
       '/api/permission-definitions/paged',
       buildPagedRequest(params, {
-        pageNumber: 0,
+        pageNumber: 1,
         pageSize: 20,
         sortBy: 'UpdatedDate',
         sortDirection: 'desc',

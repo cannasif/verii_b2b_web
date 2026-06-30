@@ -26,7 +26,7 @@ export const userManagementApi = {
     const response = await api.post<ApiResponse<PagedResponse<UserManagementDto>>>(
       '/api/User/paged',
       buildPagedRequest(params, {
-        pageNumber: 0,
+        pageNumber: 1,
         pageSize: 20,
         sortBy: 'UpdatedDate',
         sortDirection: 'desc',
@@ -43,7 +43,7 @@ export const userManagementApi = {
   getRoles: async (): Promise<UserAuthorityDto[]> => {
     const response = await api.post<ApiResponse<PagedResponse<UserAuthorityDto>>>(
       '/api/UserAuthority/paged',
-      buildPagedRequest({ pageNumber: 0, pageSize: 100, sortBy: 'Title', sortDirection: 'asc' }),
+      buildPagedRequest({ pageNumber: 1, pageSize: 100, sortBy: 'Title', sortDirection: 'asc' }),
     );
     return normalizePaged(response as ApiResponse<PagedResponse<UserAuthorityDto>>).data;
   },

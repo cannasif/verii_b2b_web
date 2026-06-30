@@ -19,7 +19,7 @@ export const wmsScopePolicyApi = {
     const response = await api.post<ApiResponse<PagedResponse<WmsScopePolicyDto>>>(
       '/api/wms-scope-policies/paged',
       buildPagedRequest(params, {
-        pageNumber: 0,
+        pageNumber: 1,
         pageSize: 20,
         sortBy: 'UpdatedDate',
         sortDirection: 'desc',
